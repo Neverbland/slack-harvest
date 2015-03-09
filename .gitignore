@@ -1,0 +1,19 @@
+.vagrant
+Berksfile.lock
+nbproject
+config.json
+.idea
+docs/
+
+# sessions
+.sessions
+
+.cookbooks
+build/chef/nodes
+
+# common ignores
+node_modules
+log
+
+# generated test coverage
+coverage.html

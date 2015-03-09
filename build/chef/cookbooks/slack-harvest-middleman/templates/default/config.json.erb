@@ -1,0 +1,29 @@
+{
+    "NOTE": "###### THIS FILE WAS GENERATED WITH CHEF - DO NOT CHANGE IT MANUALLY #######",
+
+    "app": {
+        "hostname": "<%= @node[:application][:app][:hostname] %>",
+        "ip": "<%= @node[:application][:app][:ip] %>",
+        "port": "<%= @node[:application][:app][:port] %>"
+    },
+    "session": {
+        "secret": "<%= @node[:application][:session][:secret] %>",
+        "maxAge": <%= @node[:application][:session][:maxAge] %>,
+        "path": "<%= @node[:application][:root_dir] %>/.sessions"
+    },
+    "mysql": {
+        "host": "<%= @node[:application][:mysql][:host] %>",
+        "user": "<%= @node[:application][:mysql][:user] %>",
+        "password": "<%= @node[:mysql][:server_root_password] %>",
+        "database": "<%= @node[:application][:mysql][:database] %>",
+        "tables": {
+            "users": "users",
+        }
+    },
+    "logger": {
+        "file" : "<%= @node[:application][:root_dir] %>/log/debug.log",
+        "date_format": "<%= @node[:application][:logger][:date_format] %>",
+        "console": <%= @node[:application][:logger][:console] %>,
+        "syslog": <%= @node[:application][:logger][:syslog] %>
+    }
+}

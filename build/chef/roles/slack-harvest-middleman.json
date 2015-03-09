@@ -1,0 +1,24 @@
+{
+    "name": "slack-harvest-middleman",
+    "description": "Slack - Harvest communication API",
+    "json_class": "Chef::Role",
+    "default_attributes": {
+    },
+    "override_attributes": {
+    },
+    "chef_type": "role",
+    "run_list": [
+        "recipe[apt]",
+        "recipe[build-essential]",
+        "recipe[git]",
+        "recipe[nodejs]",
+        "recipe[nodejs::npm]",
+        "recipe[nginx]",
+        "recipe[mysql::server]",
+        "recipe[slack-harvest-middleman]",
+        "recipe[slack-harvest-middleman::database]",
+        "recipe[slack-harvest-middleman::node]"
+    ],
+    "env_run_lists": {
+    }
+}

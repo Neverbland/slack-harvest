@@ -1,0 +1,42 @@
+{
+  "name": "Slack - Harvest Middleman",
+  "private": true,
+  "scripts": {
+    "test": "mocha --recursive",
+    "test-coverage": "mocha --recursive --require blanket -R html-cov > coverage.html"
+  },
+  "dependencies": {
+    "express": "4.7.2",
+    "knex": "0.7.3",
+    "q": "1.0.1",
+    "mysql": "2.5.2",
+    "cron": "1.0.5",
+    "lodash": "2.4.1",
+    "request": "2.45.0",
+    "express-validator": "2.7.0",
+    "express-session": "1.9.3",
+    "express-session-json": "0.0.7",
+    "syslogh": "1.1.2"
+  },
+  "devDependencies": {
+    "blanket": "1.1.6",
+    "chai": "1.9.2",
+    "chai-as-promised": "4.1.1",
+    "gulp": "^3.8.5",
+    "gulp-concat": "^2.4.3",
+    "gulp-nodemon": "1.0.4",
+    "gulp-sass": "1.0.0",
+    "gulp-sourcemaps": "^1.3.0",
+    "gulp-uglify": "^1.0.2",
+    "mocha": "2.0.1",
+    "nodemon": "1.2.1",
+    "rewire": "2.1.3",
+    "sinon": "1.11.1"
+  },
+  "config": {
+    "blanket": {
+      "pattern": "app",
+      "data-cover-never": "node_modules"
+    }
+  }
+}
