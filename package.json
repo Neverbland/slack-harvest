@@ -1,5 +1,5 @@
 {
-  "name": "Slack - Harvest Middleman",
+  "name": "sh-middleman",
   "private": true,
   "scripts": {
     "test": "mocha --recursive",
@@ -9,6 +9,7 @@
     "express": "4.7.2",
     "knex": "0.7.3",
     "q": "1.0.1",
+    "body-parser": "1.9.2",
     "mysql": "2.5.2",
     "cron": "1.0.5",
     "lodash": "2.4.1",
