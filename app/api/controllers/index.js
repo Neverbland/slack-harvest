@@ -12,7 +12,8 @@ var httpCodes = require('./../codes.js');
  */
 module.exports = function (app, config) 
 {
-    app.post('/api/notify', function (req, res, next) {
+    app.post('/api/notify-all', function (req, res, next) {
+        
         next();
     });
 };

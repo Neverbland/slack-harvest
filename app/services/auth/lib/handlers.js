@@ -76,6 +76,9 @@ module.exports = function (auth, config)
     for (var handlerName in config) {
         if (config.hasOwnProperty(handlerName)) {
             var param = config[handlerName];
+            if (!handlers[handlerName]) {
+                continue;
+            }
             var handler = new handlers[handlerName](param);
             auth.addHandler(handler);
         }

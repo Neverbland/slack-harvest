@@ -35,6 +35,7 @@ module.exports = function (app, config)
             code: httpCodes.UNAUTHORIZED,
             errors : errorMsgs
         }));
+        res.send();
     });
     
     // Apply controllers

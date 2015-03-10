@@ -33,7 +33,7 @@ module.exports = function (app, config, errorCallback)
             next();
         } else {
             errorCallback(
-                authErrorFactory.create("Access denied!", auth.getErrors()),
+                authErrorFactory.create("Access denied!", auth.getErrors(req)),
                 res
             );
         }

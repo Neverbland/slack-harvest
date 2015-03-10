@@ -6,7 +6,6 @@
 
 var Auth = function () {
     this.handlers = [];
-    this.errors = [];
 };
 
 
@@ -70,6 +69,7 @@ Auth.prototype = {
      */
     hasAccess : function (req)
     {
+        var requestErrors = [];
         var hasAccess = true;
         for (var i = 0; i < this.handlers.length; i++) {
             var handler = this.handlers[i];
@@ -79,25 +79,30 @@ Auth.prototype = {
                 hasAccess = false;
                 if (err.name === 'AuthError') {
                     var errors = err.getErrors();
-                    this.errors = mergeErrors(this.errors, errors);
+                    requestErrors = mergeErrors(requestErrors, errors);
                 } else {
                     throw err;
                 }
             }
         }
         
-        return hasAccess;
+        return hasAccess ? hasAccess : (function (requestErrors) {
+            req.errors = requestErrors;
+            return false;
+        })(requestErrors);
     },
     
     
     /**
-     * Returns an array of reasons why the request was denied
+     * Returns an array of reasons why the request was denied taken from the 
+     * request
      * 
+     * @param       {Object}        The request object
      * @returns     {Array}
      */
-    getErrors : function ()
+    getErrors : function (req)
     {
-        return this.errors;
+        return req.errors || [];
     }
 };
 

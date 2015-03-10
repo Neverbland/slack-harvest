@@ -17,7 +17,6 @@ function AuthError (message, errors)
 }
 
 AuthError.prototype = new Error();
-AuthError.prototype.constructor = AuthError;
 
 
 /**
