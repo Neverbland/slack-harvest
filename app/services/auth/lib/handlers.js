@@ -1,6 +1,31 @@
 /*jshint node: true*/
 'use strict';
 
+var crypto = require('crypto'),
+    authErrorFactory = require('./error.js');
+
+/**
+ * Generates/recreates hash for given secret, seed and action
+ * 
+ * @param       {String}    secret
+ * @param       {String}    seed
+ * @param       {String}    action
+ * @returns     {String}
+ */
+function generateHash (secret, seed, action)
+{
+    var hashBase = [
+        secret,
+        seed,
+        action
+    ].join('|');
+    
+    var shasum = crypto.createHash('sha1');
+    shasum.update(hashBase);
+    
+    return shasum.digest('hex');
+}
+
 /**
  * Returns handlers for auth checking
  * 
@@ -30,17 +55,28 @@ handlers.secret.prototype = {
      */
     validate : function (req)
     {
-//        var requestSecret = 
+        var requestToken = req.body.token;
+        var action = req.params.action;
+        var seed = req.body.seed;
+        var hash = generateHash(this.secret, seed, action);
+        
+        if (hash !== requestToken) {
+            throw new authErrorFactory.create("Invalid token", [
+                "Provided token is invalid"
+            ]);
+        }
     }
 };
 handlers.secret.prototype.constructor = handlers.secret;
 
 
 
-module.export = function (auth, config) {
+module.exports = function (auth, config) 
+{
     for (var handlerName in config) {
         if (config.hasOwnProperty(handlerName)) {
-            var handler = new handlers(config[handlerName]);
+            var param = config[handlerName];
+            var handler = new handlers[handlerName](param);
             auth.addHandler(handler);
         }
     }

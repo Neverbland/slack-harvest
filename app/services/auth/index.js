@@ -1,18 +1,41 @@
 /*jshint node: true*/
 'use strict';
 
-module.exports = function (app, config) {
-    
-    var auth = require('./lib/auth.js')(app, config);
-    
+var authErrorFactory = require('./lib/error.js'),
+    auth = require('./lib/auth.js'),
+    applyHandlers = require('./lib/handlers.js');
+
+/**
+ * Auth module handles authentication. Takes the app and the auth config as params
+ * and a mandatory error handler when the request is not granted with access to the
+ * app.
+ * 
+ * @param   {express}       app
+ * @param   {Object}        config
+ * @param   {Function}      errorCallback
+ * @returns {undefined}
+ */
+module.exports = function (app, config, errorCallback)
+{
+   
     // Register handlers in the auth object
-    require('./lib/handlers.js')(auth, config);
+    applyHandlers(auth, config);
     
-    app.use(function (req, res, next) {
+    // Assign action name to the request
+    app.use('/api/:action([a-zA-Z-_]+)', function (req, res, next) 
+    {
+        next();
+    });
+    
+    app.use(function (req, res, next) 
+    {
         if (auth.hasAccess(req)) {
             next();
         } else {
-            throw new require('./lib/error.js')("Access denied!", auth.getErrors());
+            errorCallback(
+                authErrorFactory.create("Access denied!", auth.getErrors()),
+                res
+            );
         }
     });
 }
