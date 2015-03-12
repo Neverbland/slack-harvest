@@ -22,6 +22,6 @@ notifier.addNotifier(slackNotifier);
 
 require('./app/event_listeners')(app);
 require('./app/api')(app, config.api);
-require('./app/services/cronjobs')(app);
+require('./app/services/cronjobs')(app, config.cron);
 
 var server = app.listen(config.app.port);

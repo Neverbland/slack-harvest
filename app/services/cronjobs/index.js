@@ -31,16 +31,16 @@ var cron = require('cron'),
     }
     
 
-module.exports = function (app) {
-    
+module.exports = function (app, config) {
     // Every work day at 16.30 send slack notification
     // Setting up cron
     var CronJob = cron.CronJob;
-    var job1 = new CronJob('00 30 16 * * 1-5', autoNotify);
+    var job1 = new CronJob('00 ' + config.notify.munutes + ' ' + config.notify.hour + ' * * 1-5', autoNotify);
+    
     job1.start();
         
     // Every hour refresh the list of clients and projects
-    var job2 = new CronJob('00 00 7-20 * * 1-5', getInfo, null, true);
+    var job2 = new CronJob('00 00 7-20 * * 1-5', getInfo);
     job2.start();
     
     getInfo();
