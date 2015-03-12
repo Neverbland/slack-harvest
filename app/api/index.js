@@ -40,6 +40,4 @@ module.exports = function (app, config)
     
     // Apply controllers
     controllers(app, config.controllers);
-    
-    
 }
