@@ -59,8 +59,7 @@ function formatTime (timeFloatValue)
             
             return hh + ":" + mm;
             
-        })(timeFloatValue*3600), // Multiply by number of seconds per hour
-        '(' + timeFloatValue + 'h)'
+        })(timeFloatValue*3600) // Multiply by number of seconds per hour
     ].join(' ');
 }
 
@@ -122,7 +121,7 @@ function formatResponse (dayEntries, projects, clients)
         response.push(responsePart);
     });
     
-    
+    response.push('\n');
     response.push('If anything is missing, add it here <' + SlackNotifier.prototype.LINK + '>' )
     
     return response.join("\n");
