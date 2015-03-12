@@ -2,7 +2,6 @@
 'use strict';
 
 var _       =   require('lodash'),
-    async   =   require('async'),
     events  =   require("events");
 
 
