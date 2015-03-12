@@ -73,7 +73,6 @@ handlers.secret.prototype.constructor = handlers.secret;
 
 module.exports = function (auth, config) 
 {
-    return;
     for (var handlerName in config) {
         if (config.hasOwnProperty(handlerName)) {
             var param = config[handlerName];
