@@ -1,8 +1,9 @@
 /*jshint node: true*/
 'use strict';
 
-var httpCodes = require('./codes.js'),
-    controllers = require('./controllers');
+var httpCodes       =   require('./codes.js'),
+    controllers     =   require('./controllers'),
+    logger          =   require('./../services/logger.js')('default');
 
 /**
  * API module
@@ -29,6 +30,7 @@ module.exports = function (app, config)
     require('./../services/auth')(app, config.auth, function (err, res) 
     {
         var errorMsgs = err.getErrors();
+        logger.warn('API request blocked. Errors: ', errorMsgs);
         res.writeHead(httpCodes.UNAUTHORIZED); // Unauthorized
         res.write(JSON.stringify({
             success : false,

@@ -18,7 +18,10 @@
     "express-session": "1.9.3",
     "express-session-json": "0.0.7",
     "syslogh": "1.1.2",
-    "harvest": "0.0.9"
+    "harvest": "0.0.9",
+    "node-uuid": "1.4.2",
+    "moment": "2.9.0",
+    "winston": "0.8.1"
   },
   "devDependencies": {
     "blanket": "1.1.6",

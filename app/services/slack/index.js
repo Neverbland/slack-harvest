@@ -56,9 +56,11 @@ _Slack.prototype = {
      * 
      * @param       {String}        text
      * @param       {Object}        config
+     * @param       {Function}      callback    A callback taking err,
+     *                                          httpResponse, body params
      * @returns     {undefined}
      */
-    sendMessage : function (text, config)
+    sendMessage : function (text, config, callback)
     {
         config = config || {};
         config = _.assign({
@@ -72,11 +74,7 @@ _Slack.prototype = {
                 payload : JSON.stringify(config)
             }
         },
-        function (err, httpResponse, body) {
-            if (err) {
-                
-            }
-        }
+        callback
         );
         
     } 

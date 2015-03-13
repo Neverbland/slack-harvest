@@ -1,10 +1,11 @@
 /*jshint node: true*/
 'use strict';
 
-var httpCodes = require('./../codes.js'),
-    harvest = require('./../../services/harvest')('default'),
-    notifier = require('./../../services/notifier'),
-    _ = require('lodash');
+var httpCodes   =   require('./../codes.js'),
+    harvest     =   require('./../../services/harvest')('default'),
+    notifier    =   require('./../../services/notifier'),
+    _           =   require('lodash'),
+    logger      =   require('./../../services/logger.js')('default');
 
 /**
  * API controllers
@@ -66,6 +67,7 @@ module.exports = function (app, config)
                     anySuccess = true;
                     doNotify(harvestResponse, userId);
                 } else {
+                    logger.error("Failed fetching user timeline from Harvest API for user " + userId, err);
                     errors.push(err);
                 }
                 
@@ -113,6 +115,7 @@ module.exports = function (app, config)
                 if (err === null) {
                     doNotify(harvestResponse, userId);
                 } else {
+                    logger.error("Failed fetching user timeline from Harvest API for user " + userId, err);
                     res.success = false;
                     res.errors = [
                         err

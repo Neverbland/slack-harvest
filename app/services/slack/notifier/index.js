@@ -1,8 +1,9 @@
 /*jshint node: true*/
 'use strict';
 
-var _       =   require('lodash'),
-    events  =   require("events");
+var _           =   require('lodash'),
+    events      =   require("events"),
+    logger      =   require('./../../logger.js')('default');
 
 
 /**
@@ -194,10 +195,12 @@ var SlackNotifierPrototype = function ()
                             userName : userName,
                             text : formatResponse(dayEntries, projects, clients)
                         });
+                    } else{
+                        logger.error('Failed fetching clients for given clients ids', clientsIds);
                     }
                 });
             } else {
-                console.log(err);
+                logger.error('Failed fetching projects for given projects ids', projectsIds);
             }
         });
     };
@@ -208,6 +211,12 @@ var SlackNotifierPrototype = function ()
         var that = this;
         that.slack.sendMessage(data.text, {
             channel : '@' + data.userName
+        }, function (err, httpResponse, body) {
+            if (err === null) {
+                logger.info('Successfully sent a reminder message to user ' + data.userName);
+            } else {
+                logger.info('Reminder for user ' + data.userName + ' not sent. Error: ', err);
+            }
         });
     };
     
