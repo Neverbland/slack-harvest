@@ -58,11 +58,24 @@ function formatTime (timeFloatValue)
             
             return hh + ":" + mm;
             
-        })(timeFloatValue*3600) // Multiply by number of seconds per hour
+        })(timeFloatValue * 3600) // Multiply by number of seconds per hour
     ].join(' ');
 }
 
 
+/**
+ * 
+ * @param       {Array}     entries     An array of entry objects
+ * 
+ * @param       {String}    mainKey     The property under which the object is
+ *                                      stored in single object resource. 
+ *                                      Fot clients client, for day resource 
+ *                                      - day_resource, etc.
+ *                                      
+ * @param       {String}    indexKey    The index of the id to be returned
+ * 
+ * @returns     {Array}                 An array of integer numbers
+ */
 function getIds (entries, mainKey, indexKey)
 {
     var ids = [];
@@ -72,6 +85,21 @@ function getIds (entries, mainKey, indexKey)
     });
     
     return ids;
+}
+
+
+/**
+ * Returns the hours time for day entry resource
+ * 
+ * @param       {Object}    resource    The day entry resource
+ * @returns     {Number}
+ */
+function getHours (resource)
+{
+    var regularTime = resource.hours;
+    var timeWithTimer = !!resource.hours_with_timer ? resource.hours_with_timer : 0;
+    
+    return Math.max(regularTime, timeWithTimer);
 }
 
 
@@ -110,11 +138,10 @@ function formatResponse (dayEntries, projects, clients)
         var resource = resourceObject.day_entry;
         var project = projectsById[resource.project_id] || null;
         var client = (project && !!clientsById[project.client_id]) ? clientsById[project.client_id] : null;
-        
         var responsePart = [
             (client ? client.name : "Unknown client"),
             (project ? project.name : resource.project_id),
-            formatTime(resource.hours + (!!resource.hours_with_timer ? resource.hours_with_timer : 0))
+            formatTime(getHours(resource))
         ].join(' - ');
         
         response.push(responsePart);
