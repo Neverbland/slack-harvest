@@ -19,9 +19,9 @@ function generateHash (secret, seed, action)
         seed,
         action
     ].join('|');
-    
+
     var shasum = crypto.createHash('sha1');
-    shasum.update(hashBase);
+    shasum.update(hashBase, 'utf8');
     
     return shasum.digest('hex');
 }
@@ -56,7 +56,7 @@ handlers.secret.prototype = {
     validate : function (req)
     {
         var requestToken = req.body.token;
-        var action = req.params.action;
+        var action = req.body.action;
         var seed = req.body.seed;
         var hash = generateHash(this.secret, seed, action);
         
@@ -73,7 +73,6 @@ handlers.secret.prototype.constructor = handlers.secret;
 
 module.exports = function (auth, config) 
 {
-    return;
     for (var handlerName in config) {
         if (config.hasOwnProperty(handlerName)) {
             var param = config[handlerName];

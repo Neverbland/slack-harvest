@@ -22,8 +22,13 @@ module.exports = function (app, config, errorCallback)
     applyHandlers(auth, config);
     
     // Assign action name to the request
-    app.use('/api/:action([a-zA-Z-_]+)', function (req, res, next) 
+    app.use(function (req, res, next) 
     {
+        var url = req.originalUrl;
+        var noSlash = url.substr(1);
+        var parts = noSlash.split('/');
+        req.body.action = parts[1];
+
         next();
     });
     
