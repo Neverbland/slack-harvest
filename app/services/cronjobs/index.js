@@ -14,7 +14,7 @@ var cron        =       require('cron'),
             logger.info('Trying to send notifications to user: ' + userId, {});
             harvest.getUserTimeTrack(userId, new Date(), new Date(), function (err, harvestResponse) {
                 if (err === null) {
-                    notifier.notify({
+                    notifier.notify('users', {
                         harvestUserId : userId,
                         harvestResponse : harvestResponse
                     });

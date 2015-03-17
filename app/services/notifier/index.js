@@ -13,7 +13,7 @@ var _ = require('lodash');
  */
 var Notifier = function () 
 {
-    this.notifiers = [];
+    this.notifiers = {};
 }
 
 
@@ -22,12 +22,15 @@ Notifier.prototype = {
     /**
      * Registers a notifier
      * 
+     * @param       {String}        channel         The notification channel name
      * @param       {Object}        notifier
      * @returns     {Notifier}      This instance
      */
-    addNotifier : function (notifier)
+    addNotifier : function (channel, notifier)
     {
-        this.notifiers.push(notifier);
+        this.notifiers[channel] = this.notifiers[channel] || [];
+        this.notifiers[channel].push(notifier);
+        
         return this;
     },
     
@@ -36,12 +39,14 @@ Notifier.prototype = {
      * Runs all aggregated notifiers
      * 
      * @param       {Object}        context
+     * @param       {String}        channel         The notification channel name
      * @returns     {Notifier}      This instance
      */
-    notify : function (context)
+    notify : function (channel, context)
     {
-        _.each(this.notifiers, function (notifier) {
-            notifier.notify(context);
+        this.notifiers[channel] = this.notifiers[channel] || [];
+        _.each(this.notifiers[channel], function (notifier) {
+            notifier.notify('users', context);
         });
         
         return this;

@@ -15,11 +15,13 @@ var express = require('express'),
     harvest = require('./app/services/harvest')('default', config.harvest),
     slack = require('./app/services/slack')('default', config.slack),
     notifier = require('./app/services/notifier'),
+    reportNotifier = require('./app/services/report')(),
     slackNotifier = require('./app/services/slack/notifier')(slack, harvest);
 
 harvest.setUsers(config.users);
 slack.setUsers(config.users);
-notifier.addNotifier(slackNotifier);
+notifier.addNotifier('users', slackNotifier);
+notifier.addNotifier('management', reportNotifier);
 
 require('./app/event_listeners')(app);
 require('./app/api')(app, config.api);

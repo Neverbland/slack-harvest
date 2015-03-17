@@ -21,7 +21,8 @@
     "harvest": "0.0.9",
     "node-uuid": "1.4.2",
     "moment": "2.9.0",
-    "winston": "0.8.1"
+    "winston": "0.8.1",
+    "q" : "1.2.0"
   },
   "devDependencies": {
     "blanket": "1.1.6",

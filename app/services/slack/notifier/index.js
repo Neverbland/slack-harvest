@@ -3,7 +3,8 @@
 
 var _           =   require('lodash'),
     events      =   require("events"),
-    logger      =   require('./../../logger.js')('default');
+    logger      =   require('./../../logger.js')('default'),
+    tools       =   require('./../../tools.js');
 
 
 /**
@@ -42,54 +43,6 @@ function SlackNotifier (slack, harvest)
 
 
 /**
- * Formats the time spent on project
- * 
- * @param   {Number}        timeFloatValue      Float value of hours spent
- * @returns {String}
- */
-function formatTime (timeFloatValue)
-{
-    return [
-        (function (sec) {
-            var date = new Date(sec * 1000);
-            var hh = date.getUTCHours();
-            var mm = date.getUTCMinutes();
-            hh = (hh < 10) ? ("0" + hh) : hh;
-            mm = (mm < 10) ? ("0" + mm) : mm;
-            
-            return hh + ":" + mm;
-            
-        })(timeFloatValue * 3600) // Multiply by number of seconds per hour
-    ].join(' ');
-}
-
-
-/**
- * 
- * @param       {Array}     entries     An array of entry objects
- * 
- * @param       {String}    mainKey     The property under which the object is
- *                                      stored in single object resource. 
- *                                      Fot clients client, for day resource 
- *                                      - day_resource, etc.
- *                                      
- * @param       {String}    indexKey    The index of the id to be returned
- * 
- * @returns     {Array}                 An array of integer numbers
- */
-function getIds (entries, mainKey, indexKey)
-{
-    var ids = [];
-    _.each(entries, function (entryObject) {
-        var entry = entryObject[mainKey];
-        ids.push(entry[indexKey]);
-    });
-    
-    return ids;
-}
-
-
-/**
  * Returns the hours time for day entry resource
  * 
  * @param       {Object}    resource    The day entry resource
@@ -111,29 +64,9 @@ function formatResponse (dayEntries, projects, clients)
     ];
 
 
-    var clientsById = (function (clients) {
-        var results = {};
-        _.each(clients, function (clientObject) {
-            var client = clientObject.client;
-            var id = client.id;
-            results[id] = client;
-        });
-        
-        return results;
-    })(clients || {});
-
-    var projectsById = (function (projects) {
-        var results = {};
-        _.each(projects, function (projectObject) {
-            var project = projectObject.project;
-            var id = project.id;
-            results[id] = project;
-        });
-        
-        return results;
-    })(projects || {});
-    
-    
+    var clientsById = tools.byId(clients || {}, 'client');
+    var projectsById = tools.byId(projects || {}, 'project');
+   
     _.each(dayEntries, function (resourceObject) {
         
         var resource = resourceObject.day_entry;
@@ -142,7 +75,7 @@ function formatResponse (dayEntries, projects, clients)
         var responsePart = [
             (client ? client.name : "Unknown client"),
             (project ? project.name : resource.project_id),
-            formatTime(getHours(resource))
+            tools.formatTime(getHours(resource))
         ].join(' - ');
         
         response.push(responsePart);
@@ -185,10 +118,10 @@ var SlackNotifierPrototype = function ()
     this.prepareText = function (userName, dayEntries)
     {
         var that = this;
-        var projectsIds = getIds(dayEntries, 'day_entry', 'project_id');
+        var projectsIds = tools.getIds(dayEntries, 'day_entry', 'project_id');
         this.harvest.getProjectsByIds(projectsIds, function (err, projects) {
             if (err === null) {
-                var clientsIds = getIds(projects, 'project', 'client_id');
+                var clientsIds = tools.getIds(projects, 'project', 'client_id');
                 that.harvest.getClientsByIds(clientsIds, function (err, clients) {
                     if (err === null) {
                         that.emit('responseReady', {

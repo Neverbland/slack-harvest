@@ -2,7 +2,8 @@
 'use strict';
 
 var harvest     =   require('harvest'),
-    _           =   require('lodash');
+    _           =   require('lodash'),
+    tools       =   require('./../tools.js');
 
 /**
  * Takes the Date object and formats it to YYYYMMDD
@@ -130,20 +131,7 @@ _Harvest.prototype = {
         var projects = [];
         var notPresentIds = [];
         var that = this;
-        
-//        var promises = [];
-//        _.each(ids, function(id) {
-//            var def = Q.defer();
-//            that.getProject(id, function(err, project) {
-//               def.resolve(project);
-//            });
-//            promises.push(def.promise);
-//        });
-//        
-//        Q.all(promises).then(function(projects) {
-//            
-//        });
-        
+       
         _.each(ids, function (id) {
             if (!!that.projects[id]) {
                 projects.push(that.projects[id]);

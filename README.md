@@ -2,13 +2,21 @@
 
 The project aims to create a standalone application for automated integration between Harvest time tracking tool and Slack messaging system that will notify all configured team users about the amount of time they've spent on each project according to their Harvest timesheet.
 
+## Setup
+
+To download the application, check it out with `git`. Next thing to do is installing all dependencies with the `npm` node packages manager tool.
+
+```bash
+$ cd /path/to/project
+$ npm install
+```
+
+Next thing to do is preparing the **config file**. The file must be located in the repository root and named `config.json` A template file is stored in `config.json.dist`. The fiel is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
+
 ## Architecture
 
 The application is written 100% in `Node.JS` and at this point consists of two blocks: The **cron-like time schedule** that sends notification messages to slack users and a simple **HTTP API** to trigger the notifications (for the moment for a single user and all users set up in the configuration file).
 
-## The config file
-
-The config file is located in the repository root and called `config.json` A template file is stored in `config.json.dist`. The fiel is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
 
 ### The HARVEST configuration
 

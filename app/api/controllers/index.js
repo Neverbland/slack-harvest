@@ -142,7 +142,7 @@ module.exports = function (app, config)
      */
     function doNotify (harvestResponse, userId)
     {
-        notifier.notify({
+        notifier.notify('users', {
             harvestUserId : userId,
             harvestResponse : harvestResponse
         });
