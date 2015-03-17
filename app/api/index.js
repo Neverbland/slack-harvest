@@ -30,7 +30,7 @@ module.exports = function (app, config)
     require('./../services/auth')(app, config.auth, function (err, res) 
     {
         var errorMsgs = err.getErrors();
-        logger.warn('API request blocked. Errors: ', errorMsgs);
+        logger.warn('API request blocked. Errors: ', errorMsgs, {});
         res.writeHead(httpCodes.UNAUTHORIZED); // Unauthorized
         res.write(JSON.stringify({
             success : false,
