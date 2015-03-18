@@ -20,6 +20,8 @@ var express = require('express'),
 
 harvest.setUsers(config.users);
 slack.setUsers(config.users);
+
+// Defining two notification channels
 notifier.addNotifier('users', slackNotifier);
 notifier.addNotifier('management', reportNotifier);
 

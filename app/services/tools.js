@@ -71,5 +71,21 @@ module.exports = {
         });
         
         return results;
+    },
+    
+    
+    /**
+     * Returns the hours time for day entry resource
+     * 
+     * @param       {Object}    resource    The day entry resource
+     * @returns     {Number}
+     */
+    getHours : function (resource)
+    {
+        var regularTime = resource.hours;
+        var timeWithTimer = !!resource.hours_with_timer ? resource.hours_with_timer : 0;
+
+        return Math.max(regularTime, timeWithTimer);
     }
+    
 };

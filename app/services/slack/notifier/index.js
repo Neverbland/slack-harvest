@@ -42,21 +42,6 @@ function SlackNotifier (slack, harvest)
 }
 
 
-/**
- * Returns the hours time for day entry resource
- * 
- * @param       {Object}    resource    The day entry resource
- * @returns     {Number}
- */
-function getHours (resource)
-{
-    var regularTime = resource.hours;
-    var timeWithTimer = !!resource.hours_with_timer ? resource.hours_with_timer : 0;
-    
-    return Math.max(regularTime, timeWithTimer);
-}
-
-
 function formatResponse (dayEntries, projects, clients)
 {
     var response = [
@@ -75,7 +60,7 @@ function formatResponse (dayEntries, projects, clients)
         var responsePart = [
             (client ? client.name : "Unknown client"),
             (project ? project.name : resource.project_id),
-            tools.formatTime(getHours(resource))
+            tools.formatTime(tools.getHours(resource))
         ].join(' - ');
         
         response.push(responsePart);

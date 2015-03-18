@@ -7,49 +7,100 @@ var cron        =       require('cron'),
     _           =       require('lodash'),
     logger      =       require('./../logger.js')('default');
     
-    
-    function autoNotify ()
-    {
-        _.each(harvest.fromUserMap(harvest.users), function (userId) {
-            logger.info('Trying to send notifications to user: ' + userId, {});
-            harvest.getUserTimeTrack(userId, new Date(), new Date(), function (err, harvestResponse) {
-                if (err === null) {
-                    notifier.notify('users', {
-                        harvestUserId : userId,
-                        harvestResponse : harvestResponse
-                    });
-                } else {
-                    logger.error("Failed fetching user timeline from Harvest API for user " + userId, err, {});
-                }
-            });
-        });
+/**
+ * Defines some constants
+ * 
+ * @type {Object}
+ */
+var consts = {
+    preload : {
+        CRON_TIME : '00 00 7-20 * * 1-5'
+    },
+    report : {
+        CRON_TIME : '00 00 20 * * 5',
+        DEFAULT_REPORT_TITLE : "Weekly activity report"
     }
-    
-    
-    function getInfo ()
-    {
-        logger.info('Loading projects from Harvest API...', {});
-        harvest.doGetProjects();
-        logger.info('Loading clients from Harvest API...', {});
-        harvest.doGetClients();
-    }
-    
+};
 
 module.exports = function (app, config) {
-    // Every work day at 16.30 send slack notification
-    // Setting up cron
-    var cronTime1 = '00 ' + config.notify.munutes + ' ' + config.notify.hour + ' * * 1-5';
-    var CronJob = cron.CronJob;
-    logger.info('Setting up cron job for auto notifications with cron time: ', cronTime1, {});
-    var job1 = new CronJob(cronTime1, autoNotify);
+
+    if (!!config.notify) {
+        
+        var autoNotify = function ()
+        {
+            _.each(harvest.fromUserMap(harvest.users), function (userId) {
+                logger.info('Trying to send notifications to user: ' + userId, {});
+                harvest.getUserTimeTrack(userId, new Date(), new Date(), function (err, harvestResponse) {
+                    if (err === null) {
+                        notifier.notify('users', {
+                            harvestUserId : userId,
+                            harvestResponse : harvestResponse
+                        });
+                    } else {
+                        logger.error("Failed fetching user timeline from Harvest API for user " + userId, err, {});
+                    }
+                });
+            });
+        };
     
-    job1.start();
+        /* 
+         * Every work day at 16.30 send slack notification to all users
+         */
+        var cronTime1;
+        if (!config.notify.cronTime) {
+            cronTime1 = '00 ' + config.notify.minutes + ' ' + config.notify.hour + ' * * 1-5';
+        } else {
+            cronTime1 = config.notify.cronTime;
+        }
+        var CronJob = cron.CronJob;
+        logger.info('Setting up cron job for auto notifications with cron time: ', cronTime1, {});
+        var job1 = new CronJob(cronTime1, autoNotify);
+
+        job1.start();
+    }
     
-    var cronTime2 = '00 00 7-20 * * 1-5';
-    logger.info('Setting up cron job for auto fetching clients and projects from Harvest API with cron time: ', cronTime2, {});
-    // Every hour refresh the list of clients and projects
-    var job2 = new CronJob(cronTime2, getInfo);
-    job2.start();
     
-    getInfo();
+    if (config.preload) {
+        var  preloadApiData = function ()
+        {
+            logger.info('Loading projects from Harvest API...', {});
+            harvest.doGetProjects();
+            logger.info('Loading clients from Harvest API...', {});
+            harvest.doGetClients();
+        };
+        
+        /**
+         * Every period populate the projects and clients with fresh data from the
+         * Harvest API
+         */
+        var cronTime2 = !config.preload.cronTime 
+                            ?   config.preload.cronTime 
+                            :   consts.preload.CRON_TIME;   // by default every hour, every week day, from 7am to 8pm
+        logger.info('Setting up cron job for auto fetching clients and projects from Harvest API with cron time: ', cronTime2, {});
+        // Every hour refresh the list of clients and projects
+        var job2 = new CronJob(cronTime2, preloadApiData);
+        job2.start();
+
+        preloadApiData();
+    }
+    
+    
+    
+    if (config.report) {
+        var prepareReport = function ()
+        {
+            notifier.notify('management', {
+                reportTitle : config.report.reportTitle || consts.report.DEFAULT_REPORT_TITLE,
+                channel : config.report.channel
+            });
+        };
+        
+        
+        var cronTime3 = !config.report.cronTime 
+                            ?   config.report.cronTime 
+                            :   consts.report.CRON_TIME;   // by default every hour, every week day, from 7am to 8pm;
+                            
+        var job3 = new CronJob(cronTime3, prepareReport());
+        job3.start();
+    }
 };
