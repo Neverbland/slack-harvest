@@ -25,7 +25,7 @@ function formatSummary (summary)
         totalTime += project.time;
         records.push(responsePart);
     });
-    
+
     records.push('Total: ' + tools.formatTime(totalTime));
     
     return records.join('\n');

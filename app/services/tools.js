@@ -15,13 +15,12 @@ module.exports = {
     formatTime: function (timeFloatValue)
     {
         return [
-            (function (sec) {
-                var date = new Date(sec * 1000);
-                var hh = date.getUTCHours();
-                var mm = date.getUTCMinutes();
-                hh = (hh < 10) ? ("0" + hh) : hh;
-                mm = (mm < 10) ? ("0" + mm) : mm;
-                return hh + ":" + mm;
+            (function (totalSec) {
+                var hours = parseInt( totalSec / 3600 );
+                var minutes = parseInt( totalSec / 60 ) % 60;
+                var result = (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes);
+                
+                return result;
             })(timeFloatValue * 3600) // Multiply by number of seconds per hour
         ].join(' ');
     },
