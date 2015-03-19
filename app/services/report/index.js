@@ -97,7 +97,7 @@ function ReportPrototype ()
             });
             promises.push(def.promise);
         });
-        
+
         Q.all(promises).then(function (dayEntries) {
             var projectsIds = getIdsFromCombined(dayEntries, 'day_entry', 'project_id');
             that.harvest.getProjectsByIds(projectsIds, function (err, projects) {
@@ -128,7 +128,7 @@ function ReportPrototype ()
     this.responseReadyHandler = function (data) 
     {
         var view = this.viewBuilder.prepareView(data);
-        that.slack.sendMessage(view, {
+        this.slack.sendMessage(view, {
             channel : data.channel
         }, function (err, httpResponse, body) {
             if (err === null) {
@@ -149,6 +149,6 @@ ReportPrototype.prototype = new events.EventEmitter();
 Report.prototype = new ReportPrototype();
 
 
-module.exports = function (slack, harvest) {
-    return new Report(slack, harvest, viewBuilder);
+module.exports = function (slack, harvest, builder) {
+    return new Report(slack, harvest, (builder || viewBuilder));
 }

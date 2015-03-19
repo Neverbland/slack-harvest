@@ -55,16 +55,33 @@ The users section contains the mapping of all available users **Harvest ID -> Sl
 
 ## The CRON
 
-For the moment the application is able to notify defined users at configured time every work day (monday - friday). The time is defined in the `cron.notify` section of the config file and uses **the same timezont that the machine the app runs on uses**. For the configuration below, the app will automatically send notifications every working day at `16:30`.
+For the moment the application is able to:
+
+- notify defined users at configured time every work day (monday - friday). The time is defined in the `cron.notify` section of the config file and uses **the same timezont that the machine the app runs on uses**. For the configuration below, the app will automatically send notifications every working day at `16:30`. If a `cron.notify.cronTime` value is provided in the config, **this value will be used instead of the hour and minutes settings**
+
+-  refresh (preload) the information about timesheet related entries (clients and projects) according to cron time provided in `cron.preload.cronTime` section
+
+-  send periodical report notifications on Slack management channel defined in `cron.report.channel` setting according to cron time provided in `cron.report.cronTime` section
 
 ```
 "cron" : {
     "notify" : {
         "hour" : "16",
-        "munutes" : "30"
+        "munutes" : "30",
+        "cronTime" : "00 30 16 * * 1-5" // Optional, instead of hour/minutes
+    },
+    "preload" : {
+        "cronTime" : "00 00 7-20 * * 1-5"
+    },
+    "report" : {
+        "reportTitle" : "Weekly activity report",
+        "channel" : "#channel_name",
+        "cronTime" : "00 00 20 * * 5"
     }
 }
 ```
+
+If any of the section for `cron` settings are not provided, the cron job will not be set up.
 
 
 ## The API

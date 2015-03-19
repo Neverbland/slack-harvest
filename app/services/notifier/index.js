@@ -46,7 +46,7 @@ Notifier.prototype = {
     {
         this.notifiers[channel] = this.notifiers[channel] || [];
         _.each(this.notifiers[channel], function (notifier) {
-            notifier.notify('users', context);
+            notifier.notify(context);
         });
         
         return this;

@@ -5,6 +5,7 @@ var cron        =       require('cron'),
     notifier    =       require('./../notifier'),
     harvest     =       require('./../harvest')('default'),
     _           =       require('lodash'),
+    tools       =       require('./../tools.js'),
     logger      =       require('./../logger.js')('default');
     
 /**
@@ -18,7 +19,9 @@ var consts = {
     },
     report : {
         CRON_TIME : '00 00 20 * * 5',
-        DEFAULT_REPORT_TITLE : "Weekly activity report"
+        DEFAULT_REPORT_TITLE : "Weekly activity report",
+        DATE_FROM_TEXT : "last monday",
+        DATE_TO_TEXT : "+ 0 hours"
     }
 };
 
@@ -73,7 +76,7 @@ module.exports = function (app, config) {
          * Every period populate the projects and clients with fresh data from the
          * Harvest API
          */
-        var cronTime2 = !config.preload.cronTime 
+        var cronTime2 = !!config.preload.cronTime 
                             ?   config.preload.cronTime 
                             :   consts.preload.CRON_TIME;   // by default every hour, every week day, from 7am to 8pm
         logger.info('Setting up cron job for auto fetching clients and projects from Harvest API with cron time: ', cronTime2, {});
@@ -87,20 +90,30 @@ module.exports = function (app, config) {
     
     
     if (config.report) {
-        var prepareReport = function ()
-        {
-            notifier.notify('management', {
-                reportTitle : config.report.reportTitle || consts.report.DEFAULT_REPORT_TITLE,
-                channel : config.report.channel
-            });
-        };
+        var dateFrom = config.report.dateFromText || consts.report.DATE_FROM_TEXT,
+            dateTo = config.report.dateToText || consts.report.DATE_TO_TEXT,
+            prepareReport = function ()
+            {
+
+                var dateFromObject = tools.dateFromString(dateFrom),
+                    dateToObject = tools.dateFromString(dateTo);
+                
+                logger.info('Preparing management report from: ' + dateFromObject + ' to ' + dateToObject, {});
+                notifier.notify('management', {
+                    reportTitle : config.report.reportTitle || consts.report.DEFAULT_REPORT_TITLE,
+                    channel : config.report.channel,
+                    fromDate : dateFromObject,
+                    toDate : dateToObject
+                });
+            },
         
-        
-        var cronTime3 = !config.report.cronTime 
+            cronTime3 = !!config.report.cronTime 
                             ?   config.report.cronTime 
-                            :   consts.report.CRON_TIME;   // by default every hour, every week day, from 7am to 8pm;
-                            
-        var job3 = new CronJob(cronTime3, prepareReport());
+                            :   consts.report.CRON_TIME,   // by default every hour, every week day, from 7am to 8pm;              
+            job3 = new CronJob(cronTime3, prepareReport);
+        
+        logger.info('Setting up cron job for auto management notifications: ', cronTime3, {});
         job3.start();
+        prepareReport();
     }
 };

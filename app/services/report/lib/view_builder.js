@@ -15,15 +15,18 @@ var _       =   require('lodash'),
 function formatSummary (summary)
 {
     var records = [];
+    var totalTime = 0;
     _.each(summary, function (project) {
         var responsePart = [
             project.clientName,
             project.projectName,
             tools.formatTime(project.time)
         ].join(' - ');
-        
+        totalTime += project.time;
         records.push(responsePart);
     });
+    
+    records.push('Total: ' + tools.formatTime(totalTime));
     
     return records.join('\n');
 }
@@ -56,7 +59,6 @@ function projectsSummary(dayEntries, clientsById, projectsById)
             summary[projectId].time = summary[projectId].time + tools.getHours(dayEntry);
         }
     });
-    
     
     return formatSummary(summary);
     
@@ -99,8 +101,9 @@ module.exports = {
      */
     prepareView : function (data)
     {
+        
         var clientsById     =   data.clientsById,
-            projectsById    =   data.proectsById,
+            projectsById    =   data.projectsById,
             dayEntries      =   data.dayEntries,
             results         =   [
                 data.title + '\n'

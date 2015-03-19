@@ -27,8 +27,16 @@
     },
     "cron" : {
         "notify" : {
+            "cronTime" : false,
             "hour" : "16",
-            "munutes" : "30"
+            "minutes" : "30"
+        },
+        "preload" : {
+            "cronTime" : "00 00 7-20 * * 1-5"
+        },
+        "report" : {
+            "reportTitle" : "Weekly activity report",
+            "channel" : "#channel_name"
         }
-    }
+    },
 }

@@ -15,7 +15,7 @@ var express = require('express'),
     harvest = require('./app/services/harvest')('default', config.harvest),
     slack = require('./app/services/slack')('default', config.slack),
     notifier = require('./app/services/notifier'),
-    reportNotifier = require('./app/services/report')(),
+    reportNotifier = require('./app/services/report')(slack, harvest),
     slackNotifier = require('./app/services/slack/notifier')(slack, harvest);
 
 harvest.setUsers(config.users);

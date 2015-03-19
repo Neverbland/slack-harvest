@@ -1,6 +1,8 @@
 /*jshint node: true*/
 'use strict';
 
+var _ = require('lodash');
+require('date-util');
 
 module.exports = {
     
@@ -45,7 +47,6 @@ module.exports = {
             var entry = entryObject[mainKey];
             ids.push(entry[indexKey]);
         });
-
         return ids;
     },
     
@@ -86,6 +87,28 @@ module.exports = {
         var timeWithTimer = !!resource.hours_with_timer ? resource.hours_with_timer : 0;
 
         return Math.max(regularTime, timeWithTimer);
+    },
+    
+    
+    /**
+     * 
+     * @param {type} timeString
+     * @returns {Date}Creates date object from string
+     * 
+     * @param       {String}
+     * @return      {Date}
+     */
+    dateFromString : function (timeString)
+    {
+        var date = new Date().strtotime(timeString);
+        if (date instanceof Date) {
+            return date;
+        }
+        if (parseInt(date) !== NaN) {
+            return new Date(date);
+        } else {
+            return date;
+        }
     }
     
 };
