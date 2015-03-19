@@ -43,15 +43,21 @@ module.exports = {
     {
         var ids = [];
         _.each(entries, function (entryObject) {
-            var entry = entryObject[mainKey];
-            ids.push(entry[indexKey]);
+            var entry = entryObject[mainKey],
+                id = entry[indexKey];
+                if (_.indexOf(ids, id) === -1) {
+                    ids.push(id);
+                } 
         });
-        return ids;
+        
+        return _.sortBy(ids);
     },
     
     
     
     /**
+     * Orders given input collection array by object id simplifying it's 
+     * structure by removing the leading mainKey
      * 
      * @param       {Array}     entries         An array of entry objects
      * @param       {String}    mainKey         The property under which the object is

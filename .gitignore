@@ -15,6 +15,7 @@ build/chef/nodes
 node_modules
 log/*
 !log/.gitkeep
+npm-debug.log
 
 # generated test coverage
 coverage.html

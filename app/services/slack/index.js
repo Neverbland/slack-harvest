@@ -68,13 +68,14 @@ _Slack.prototype = {
         }, this.config, config);
 
 
-        request.post({
-            url : this.endpoint,
-            form : {
-                payload : JSON.stringify(config)
-            }
-        },
-        callback
+        request.post(
+            {
+                url : this.endpoint,
+                form : {
+                    payload : JSON.stringify(config)
+                }
+            },
+            (typeof callback === 'function') ? callback : function () {} 
         );
         
     } 

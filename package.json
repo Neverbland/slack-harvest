@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "blanket": "1.1.6",
-    "chai": "1.9.2",
+    "chai": "2.1.2",
     "chai-as-promised": "4.1.1",
     "gulp": "^3.8.5",
     "gulp-concat": "^2.4.3",
