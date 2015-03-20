@@ -3,7 +3,9 @@
 
 var harvest     =   require('harvest'),
     _           =   require('lodash'),
-    tools       =   require('./../tools.js');
+    tools       =   require('./../tools.js'),
+    logger      =   require('./../logger.js'),
+    Q           =   require('q');
 
 /**
  * Takes the Date object and formats it to YYYYMMDD
@@ -89,15 +91,17 @@ _Harvest.prototype = {
     
     
     /**
-     * Returns all available projects if no callback provided.
+     * Passes loaded projects to callback
      * 
      * @param       {Function}      callback
+     * @param       {Boolean}       force
      * @return      {Object}
      */
-    getProjects : function (callback)
+    getProjects : function (callback, force)
     {
-        if (this.projects === null) {
-            this.projects = this.doGetProjects(callback);
+        force = force || false;
+        if (force || (this.projects === {})) {
+            this.doGetProjects(callback);
         } else {
             callback(null, this.projects);
         }
@@ -113,7 +117,9 @@ _Harvest.prototype = {
             if (err === null) {
                 that.projects = _.assign(that.projects, byId(results, 'project'));
             }
-            callback(err, results);
+            if (typeof callback === 'function') {
+                callback(err, results);
+            }
         });
     },
     
@@ -128,41 +134,45 @@ _Harvest.prototype = {
      */
     getProjectsByIds : function (ids, callback)
     {
-        var projects = [];
-        var notPresentIds = [];
-        var that = this;
-       
-        _.each(ids, function (id) {
-            if (!!that.projects[id]) {
-                projects.push(that.projects[id]);
-            } else {
-                notPresentIds.push(id);
-            }
-        });
-        if (notPresentIds.length) {
-            this.populate('getProject', 'projects', notPresentIds, projects, callback);
-        } else {
-            callback(null, projects);
-        }
+        this.populate('getProject', 'projects', ids, callback);
     },
     
     
-    populate : function (methodName, cacheName, ids, resources, callback)
+    populate : function (methodName, cacheName, ids, callback)
     {
-        var id = ids.pop();
         var that = this;
-        this[methodName].call(this, id, function (err, resource) {
-            if (err === null) {
-                that[cacheName][id] = resource;
-                resources.push(resource);
+        var promises = [];
+        if (!ids.length) {
+            callback(null, ids);
+            return; // No need to do anything for an empty request
+        }
+        _.each(ids, function (id) {
+            var def = Q.defer();
+            if (!!that[cacheName][id]) {
+                def.resolve(that[cacheName][id]);
             } else {
-                console.log(err);
+                that[methodName].call(that, id, function (err, resource) {
+                    if (err !== null) {
+                        logger.log('Not able to load resource for method ' + methodName +  ', id: ' + id, err, {});
+                        def.resolve(null);
+                    } else {
+                        that[cacheName][id] = resource;
+                        def.resolve(resource);
+                    }
+                });
             }
-            if (ids.length) {
-                that.populate(methodName, cacheName, ids, resources, callback);
-            } else {
-                callback(null, resources);
-            }
+            promises.push(def.promise);
+        });
+
+        Q.all(promises).then(function (items) {
+            
+            var validItems = [];
+            _.each(items, function (item) {
+                if (item !== null) {
+                    validItems.push(item);
+                }
+            });
+            callback(null, items);
         });
     },
     
@@ -177,35 +187,21 @@ _Harvest.prototype = {
      */
     getClientsByIds : function (ids, callback)
     {
-        var clients = [];
-        var that = this;
-        var notPresentIds = [];
-        _.each(ids, function (id) {
-            if (!!that.clients[id]) {
-                clients.push(that.clients[id]);
-            } else {
-                notPresentIds.push(id);
-            }
-        });
-        if (notPresentIds.length) {
-
-            this.populate('getClient', 'clients', notPresentIds, clients, callback);
-        } else {
-            callback(null, clients);
-        }
+        this.populate('getClient', 'clients', ids, callback);
     },
     
     
     /**
-     * Returns all available clients
+     * Runs callback on loaded clients
      * 
      * @param       {Function}      callback
+     * @param       {Boolean}       force
      * @return      {Object}
      */
-    getClients : function (callback)
+    getClients : function (callback, force)
     {
-        if (this.clients === null) {
-            this.clients = this.doGetClients(callback);
+        if (force || (this.clients === {})) {
+            this.doGetClients(callback);
         } else {
             callback(null, this.clients);
         }
