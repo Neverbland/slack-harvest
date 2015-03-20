@@ -6,7 +6,8 @@ var notifier    =       require('./../../notifier'),
     _           =       require('lodash'),
     tools       =       require('./../../tools.js'),
     logger      =       require('./../../logger.js')('default'),
-    CronJob     =       require('cron').CronJob;
+    CronJob     =       require('cron').CronJob,
+    consts      =       require('./../../../../consts.json');
     
     
 /**
@@ -64,30 +65,13 @@ JobsHolder.prototype = {
                 handler();
             }
         });
+        
+        return this;
     }
     
 };
 
 JobsHolder.prototype.constructor = JobsHolder;
-
-
-/**
- * Defines some constants
- * 
- * @type {Object}
- */
-var consts = {
-    preload : {
-        CRON_TIME : '00 00 7-20 * * 1-5'
-    },
-    report : {
-        CRON_TIME : '00 00 20 * * 5',
-        DEFAULT_REPORT_TITLE : "Weekly activity report",
-        DATE_FROM_TEXT : "last monday",
-        DATE_TO_TEXT : "+ 0 hours"
-    }
-};
-
 
 var defaultJobs = {
     notify : {
@@ -238,7 +222,7 @@ var defaultJobs = {
                 logger.info('Preparing management report from: ' + dateFromObject + ' to ' + dateToObject, {});
                 notifier.notify('management', {
                     reportTitle : reportTitle,
-                    channel : config.report.channel,
+                    channel : config.channel,
                     fromDate : dateFromObject,
                     toDate : dateToObject
                 });

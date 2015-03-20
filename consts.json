@@ -1,0 +1,11 @@
+{
+    "preload" : {
+        "CRON_TIME" : "00 00 7-20 * * 1-5"
+    },
+    "report" : {
+        "CRON_TIME" : "00 00 20 * * 5",
+        "DEFAULT_REPORT_TITLE" : "Weekly activity report",
+        "DATE_FROM_TEXT" : "last monday",
+        "DATE_TO_TEXT" : "+ 0 hours"
+    }
+}

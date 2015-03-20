@@ -5,7 +5,28 @@ var httpCodes   =   require('./../codes.js'),
     harvest     =   require('./../../services/harvest')('default'),
     notifier    =   require('./../../services/notifier'),
     _           =   require('lodash'),
-    logger      =   require('./../../services/logger.js')('default');
+    logger      =   require('./../../services/logger.js')('default'),
+    consts      =   require('./../../../consts.json'),
+    tools       =   require('./../../services/tools.js');
+    
+    
+/**
+ * Validates the date string and throws a TypeError if invalid. If valid, creates
+ * the date
+ * 
+ * @param       {String}        dateString
+ * @returns     {Date}
+ * @throws      {TypeError}     If invalid input string provided
+ */
+function validateCreateDate (dateString) 
+{
+    var date = new Date(dateString);
+    if (date.toString() === 'Invalid Date') {
+        throw new TypeError('Provided date ' + dateString + ' is invalid!');
+    }
+    
+    return date;
+}
 
 /**
  * API controllers
@@ -91,9 +112,9 @@ module.exports = function (app, config)
     /**
      * Notifies a single user given either by slack name or harvest id
      * 
-     * @param {type} req
-     * @param {type} res
-     * @param {type} next
+     * @param   {Object}        req         The request object
+     * @param   {Object}        res         The response object
+     * @param   {Function}      next        The next callback to apply
      * @returns {undefined}
      */
     function notifyUserController (req, res, next)
@@ -149,8 +170,61 @@ module.exports = function (app, config)
     }
     
     
+    /**
+     * Notifies management about stats of given user(s) work
+     * 
+     * @param   {Object}        req         The request object
+     * @param   {Object}        res         The response object
+     * @param   {Function}      next        The next callback to apply
+     * @returns {undefined}
+     */
+    function notifyManagementController (req, res, next)
+    {
+        var from            = req.body.from    || null,
+            to              = req.body.to      || null,
+            channel         = req.body.channel,
+            reportTitle     = req.body.reportTitle || consts.report.DEFAULT_REPORT_TITLE,
+            dateFromObject  = from ? (function (date) {
+                try {
+                    return validateCreateDate(date);
+                } catch (err) {
+                    if (err instanceof TypeError) {
+                        res.success = false;
+                        res.errors = res.errors || [];
+                        res.errors.push(err.message);
+                        next();
+                        return;
+                    }
+                }
+            })(from) : tools.dateFromString(consts.report.DATE_FROM_TEXT),
+            dateToObject  = to ? (function (date) {
+                try {
+                    return validateCreateDate(date);
+                } catch (err) {
+                    if (err instanceof TypeError) {
+                        res.success = false;
+                        res.errors = res.errors || [];
+                        res.errors.push(err.message);
+                        next();
+                        return;
+                    }
+                }
+            })(to) : tools.dateFromString(consts.report.DATE_TO_TEXT);
+            
+            
+        logger.info('Preparing management report from: ' + dateFromObject + ' to ' + dateToObject, {});
+        notifier.notify('management', {
+            reportTitle : reportTitle,
+            channel : channel,
+            fromDate : dateFromObject,
+            toDate : dateToObject
+        });
+    }
+    
+    
     app.use('/api/notify-all', notifyAllController);
     app.use('/api/notify-user/:user', notifyUserController);
+    app.use('/api/notify-management', notifyManagementController);
     
     app.use(setResponse);
 };
