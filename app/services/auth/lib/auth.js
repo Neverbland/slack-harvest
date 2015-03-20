@@ -62,6 +62,18 @@ Auth.prototype = {
     
     
     /**
+     * Clears all the handlers
+     * 
+     * @return  {Auth}      This instance
+     */
+    resetHandlers : function ()
+    {
+        this.handlers = [];
+        return this;
+    },
+    
+    
+    /**
      * Validates if given request can be processed
      * 
      * @param   {Object}    req
