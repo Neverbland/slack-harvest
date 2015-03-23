@@ -35,7 +35,7 @@ describe('auth/lib/handlers', function () {
                 seed = generateRandom(10),
                 secret = generateRandom(20);
             
-            handlersApplier(auth, {
+            handlersApplier(auth.resetHandlers(), {
                 secret : secret
             });
             
