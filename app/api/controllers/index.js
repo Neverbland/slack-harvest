@@ -210,8 +210,17 @@ module.exports = function (app, config)
                     }
                 }
             })(to) : tools.dateFromString(consts.report.DATE_TO_TEXT);
-            
-            
+        
+        if (!channel) {
+            res.success = false;
+            res.errors = [
+                'A channel must be provided in \'channel\' post field.'
+            ];
+            next();
+            return;
+        }
+        
+        res.success = true;
         logger.info('Preparing management report from: ' + dateFromObject + ' to ' + dateToObject, {});
         notifier.notify('management', {
             reportTitle : reportTitle,
@@ -219,6 +228,8 @@ module.exports = function (app, config)
             fromDate : dateFromObject,
             toDate : dateToObject
         });
+        
+        next();
     }
     
     

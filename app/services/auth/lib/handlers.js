@@ -1,8 +1,9 @@
 /*jshint node: true*/
 'use strict';
 
-var crypto = require('crypto'),
-    authErrorFactory = require('./error.js');
+var crypto              = require('crypto'),
+    authErrorFactory    = require('./error.js'),
+    _                   = require('lodash');
 
 /**
  * Generates/recreates hash for given secret, seed and action
@@ -73,14 +74,11 @@ handlers.secret.prototype.constructor = handlers.secret;
 
 module.exports = function (auth, config) 
 {
-    for (var handlerName in config) {
-        if (config.hasOwnProperty(handlerName)) {
-            var param = config[handlerName];
-            if (!handlers[handlerName]) {
-                continue;
-            }
-            var handler = new handlers[handlerName](param);
-            auth.addHandler(handler);
+   _.each(config, function (param, handlerName) {
+        if (!handlers[handlerName]) {
+            return;
         }
-    }
+        var handler = new handlers[handlerName](param);
+        auth.addHandler(handler);
+    });
 }

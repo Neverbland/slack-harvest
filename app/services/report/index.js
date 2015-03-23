@@ -24,8 +24,9 @@ function validate (config, field)
  * Reports provides a way to generate a full report of activity for users and send
  * it on given channel on Slack
  * 
- * @param       {Object}    slack       The slack object
- * @param       {Object}    harvest     The harvest object
+ * @param       {Object}    slack           The slack object
+ * @param       {Object}    harvest         The harvest object
+ * @param       {Object}    viewBuilder     Provides the report string
  * @constructor
  * @returns {undefined}
  */
@@ -33,7 +34,7 @@ function Report (slack, harvest, viewBuilder)
 {
     this.slack = slack;
     this.harvest = harvest;
-    this.viewBuilder = viewBuilder
+    this.viewBuilder = viewBuilder;
 }
 
 
@@ -127,9 +128,12 @@ function ReportPrototype ()
     
     this.responseReadyHandler = function (data) 
     {
-        var view = this.viewBuilder.prepareView(data);
-        this.slack.sendMessage(view, {
-            channel : data.channel
+        var attachments = this.viewBuilder.prepareView(data),
+            title = this.viewBuilder.prepareTitle(data);
+    
+        this.slack.sendMessage(title, {
+            channel : data.channel,
+            attachments : attachments
         }, function (err, httpResponse, body) {
             if (err === null) {
                 logger.info('Successfully sent a report message to channel ' + data.channel, {});

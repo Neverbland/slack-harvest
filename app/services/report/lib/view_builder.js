@@ -77,12 +77,14 @@ function projectsSummary(dayEntries, clientsById, projectsById)
  */
 function userReport (userEntriesObject, clientsById, projectsById)
 {
-    var resultsRow = [
-        '*' + userEntriesObject.slackName + '*',
-        projectsSummary(userEntriesObject.dayEntries, clientsById, projectsById)
-    ];
+    var resultsRow = {
+        title : userEntriesObject.slackName,
+        text : projectsSummary(userEntriesObject.dayEntries, clientsById, projectsById),
+        mrkdwn_in : ["text", "title"],
+        color: "FFA200"
+    };
     
-    return resultsRow.join('\n') + '\n';
+    return resultsRow;
 }
 
 /**
@@ -97,7 +99,7 @@ module.exports = {
      * Returns a complete message for given data
      * 
      * @param   {Object}    data
-     * @return  {String}    the view for slack
+     * @return  {Array}     The array of attachments
      */
     prepareView : function (data)
     {
@@ -105,15 +107,24 @@ module.exports = {
         var clientsById     =   data.clientsById,
             projectsById    =   data.projectsById,
             dayEntries      =   data.dayEntries,
-            results         =   [
-                data.title + '\n'
-            ]
+            results         =   []
         ;
     
         _.each(dayEntries, function (dayEntriesObject) {
             results.push(userReport(dayEntriesObject, clientsById, projectsById));
         });
         
-        return results.join('\n');
+        return results;
+    },
+    
+    /**
+     * Returns the title of the report
+     * 
+     * @param       {Object}        data
+     * @returns     {String}
+     */
+    prepareTitle : function (data)
+    {
+        return '*' + data.title + '*\n';
     }
 };
