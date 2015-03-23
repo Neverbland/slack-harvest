@@ -86,10 +86,13 @@ If any of the section for `cron` settings are not provided, the cron job will no
 
 ## The API
 
-The API for the moment provides only two endpoints:
+The API provides given endpoints:
 
 - `http|https://your.domain.you/notify-all` Notifies all users present in the users config
+
 - `http|https://your.domain.you/notify-user/user_id` Notifies user given by `user_id` which represents **either Harvest user ID or Slack username**
+
+- `http|https://your.domain.you/notify-management` Notifies management channel provided in the `channel` property of the `POST` request
 
 The `notify-all` and `notify-user` are **actions names**; this will be useful when creating authorization token.
 
