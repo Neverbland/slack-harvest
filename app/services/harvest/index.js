@@ -5,6 +5,7 @@ var harvest     =   require('harvest'),
     _           =   require('lodash'),
     tools       =   require('./../tools.js'),
     logger      =   require('./../logger.js'),
+    humps       =   require('humps'),
     Q           =   require('q');
 
 /**
@@ -82,11 +83,21 @@ _Harvest.prototype = {
     
     load : function (component) 
     {   
-        var Component = require('../../../node_modules/harvest/lib/' + component.toLowerCase() + '.js');
+        var Component = require('../../../node_modules/harvest/lib/' + this.decamelize(component) + '.js');
         return new Component(this.harvest);
     },
     
     
+    /**
+     * Turns a camel case string into a dash separated string
+     * 
+     * @param       {String}    inputString
+     * @returns     {String}
+     */
+    decamelize : function (inputString)
+    {
+        return humps.decamelize(inputString, '-');
+    },
     
     
     
@@ -116,10 +127,10 @@ _Harvest.prototype = {
         projects.list({}, function (err, results) {
             if (err === null) {
                 that.projects = _.assign(that.projects, byId(results, 'project'));
+            } else {
+                logger.log('Not able to load all projects.', err, {});
             }
-            if (typeof callback === 'function') {
-                callback(err, results);
-            }
+            callback(err, results);
         });
     },
     
@@ -263,7 +274,30 @@ _Harvest.prototype = {
         clients.list({}, function (err, results) {
             if (err === null) {
                 that.clients = _.assign(that.clients, byId(results, 'client'));
+            } else {
+                logger.log('Not able to load all clients.', err, {});
             }
+            callback(err, results);
+        });
+    },
+    
+    
+    /**
+     * Loads all user daily tasks and performs a callback on the results
+     * 
+     * @param       {Number}        userId      The integer value of the user id
+     * @param       {Function}      callback
+     * @returns     {undefined}
+     */
+    getTasks : function (userId, callback)
+    {
+        var timeTrack = this.load('TimeTracking');
+        timeTrack.daily({
+            of_user : userId
+        }, function (err, results) {
+            if (err !== null) {
+                logger.log('Not able to load tasks for user ' + userId, err, {});
+            } 
             callback(err, results);
         });
     },

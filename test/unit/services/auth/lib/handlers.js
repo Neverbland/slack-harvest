@@ -158,4 +158,40 @@ describe('auth/lib/handlers', function () {
             expect(auth.hasAccess(requestMock)).to.equal(false);
         });
     });
+    
+    
+    
+    describe("handlers.token.validate", function () {
+        
+        it ("Should allow valid requests containing correct, matching tokens.", function () {
+            
+            handlersApplier(auth.resetHandlers(), {
+                token : 'thisisatoken'
+            });
+            
+            var requestMock = {
+                body : {
+                    token : 'thisisatoken'
+                }
+            };
+            
+            expect(auth.handlers.length).to.equal(1);
+            expect(auth.hasAccess(requestMock)).to.equal(true);
+        });
+        
+        it ("Should disallow invalid requests containing incorrect, non-matching tokens.", function () {
+            handlersApplier(auth.resetHandlers(), {
+                token : 'thisisatoken'
+            });
+            
+            var requestMock = {
+                body : {
+                    token : 'thisisanon-matchingtoken'
+                }
+            };
+            
+            expect(auth.handlers.length).to.equal(1);
+            expect(auth.hasAccess(requestMock)).to.equal(false);
+        });
+    });
 });

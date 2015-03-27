@@ -114,6 +114,27 @@ module.exports = {
         } else {
             return date;
         }
+    },
+    
+    
+    /**
+     * Validates if the param exists within the object and returns 
+     * the value. If it doesn't exist, throws an error.
+     * 
+     * @param       {Object}        obj
+     * @param       {String}        param
+     * @param       {String}        errorMessage
+     * @returns     {Object}
+     * @throws      {Error}         If param does not exist within the object
+     */
+    validateGet : function (obj, param, errorMessage)
+    {
+        if (typeof obj[param] === 'undefined') {
+            errorMessage = errorMessage || 'Param ' + param + ' does not exist.';
+            throw new Error(errorMessage);
+        }
+        
+        return obj[param];
     }
     
 };

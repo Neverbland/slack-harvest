@@ -7,7 +7,8 @@ var httpCodes   =   require('./../codes.js'),
     _           =   require('lodash'),
     logger      =   require('./../../services/logger.js')('default'),
     consts      =   require('./../../../consts.json'),
-    tools       =   require('./../../services/tools.js');
+    tools       =   require('./../../services/tools.js'),
+    tasksParser =   require('./../../services/timer.js');
     
     
 /**
@@ -27,6 +28,20 @@ function validateCreateDate (dateString)
     
     return date;
 }
+
+
+function getHarvestUserId (users, userId)
+{
+    var harvestUserId = null;
+    _.each(users, function (slackName, harvestId) {
+        if ((String(harvestId) === String(userId)) || (String(slackName) === String(userId))) {
+            harvestUserId = harvestId;
+        }
+    });
+
+    return harvestUserId;
+}
+
 
 /**
  * API controllers
@@ -119,17 +134,7 @@ module.exports = function (app, config)
      */
     function notifyUserController (req, res, next)
     {
-        var userId = (function (users, userId) {
-            var harvestUserId = null;
-            _.each(users, function (slackName, harvestId) {
-                if ((String(harvestId) === String(userId)) || (String(slackName) === String(userId))) {
-                    harvestUserId = harvestId;
-                }
-            });
-            
-            return harvestUserId;
-        })(harvest.users, req.params.user);
-        
+        var userId = getHarvestUserId(harvest.users, req.params.user);
         if (userId) {
             res.success = true;
             harvest.getUserTimeTrack(userId, new Date(), new Date(), function (err, harvestResponse) {
@@ -233,9 +238,78 @@ module.exports = function (app, config)
     }
     
     
+    /**
+     * Notifies management about stats of given user(s) work
+     * 
+     * @param   {Object}        req         The request object
+     * @param   {Object}        res         The response object
+     * @param   {Function}      next        The next callback to apply
+     * @returns {undefined}
+     */
+    function manageTimerController (req, res, next)
+    {
+        var text = req.body.text || '',
+            config,
+            userName = (function () {
+                try {
+                    return tools.validateGet(req.body, 'user_name', "Invalid username provided!");
+                } catch (err) {
+                    res.success = false;
+                    res.errors = [
+                        err.message
+                    ];
+                    
+                }
+            })();
+            if (!userName) {
+                next();
+                return;
+            }
+            
+        try {
+            config = tasksParser.parseTimerConfig(text);
+            config.userId = getHarvestUserId(userName);
+        } catch (err) {
+            res.success = false;
+            res.errors = [
+                err.message
+            ];
+            next();
+            return;
+        }
+        
+        harvest.getTasks(config.userId, function (err, results) {
+            if (err !== null) {
+                res.success = false;
+                res.errors = [
+                    err
+                ];
+            } else {
+                res.success = true;
+                var project = tasksParser.findProject(config.projectData, results.projects);
+                if (!project.client) {
+                    res.success = false;
+                    res.errors = res.errors || [];
+                    res.errors.push('Such client does not exist');
+                }
+                
+                if (!project.project) {
+                    res.success = false;
+                    res.errors = res.errors || [];
+                    res.errors.push('Such project does not exist');
+                }
+            }
+            
+            next();
+        });
+    };
+    
+    
     app.use('/api/notify-all', notifyAllController);
     app.use('/api/notify-user/:user', notifyUserController);
     app.use('/api/notify-management', notifyManagementController);
+    
+    app.use('/api/timer', manageTimerController);
     
     app.use(setResponse);
 };

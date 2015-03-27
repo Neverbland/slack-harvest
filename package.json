@@ -18,12 +18,13 @@
     "express-session": "1.9.3",
     "express-session-json": "0.0.7",
     "syslogh": "1.1.2",
-    "harvest": "0.0.9",
+    "harvest": "gacek85/node-harvest#master",
     "node-uuid": "1.4.2",
     "moment": "2.9.0",
     "winston": "0.8.1",
     "q" : "1.2.0",
-    "date-util" : "1.2.1"
+    "date-util" : "1.2.1",
+    "humps" : "0.5.1"
   },
   "devDependencies": {
     "blanket": "1.1.6",
