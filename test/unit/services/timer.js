@@ -244,6 +244,18 @@ describe('api.controllers.timer', function () {
             {
                 projectData : ['Sample', 'client', '3', 'Sample', 'project', '3'],
                 expected : {client : 1447817, project : 6031218}
+            },
+            {
+                projectData : ['Sample', 'client', '3'],
+                expected : {client : 1447817}
+            },
+            {
+                projectData : ['Non', 'existing', 'stuff'],
+                expected : {}
+            },
+            {
+                projectData : ['Slate', 'Old', 'Stuff', 'maintenance'],
+                expected : {project : 7492008, client: 1549998}
             }
         ];
        
@@ -254,7 +266,18 @@ describe('api.controllers.timer', function () {
                     
                 var project = timer.findProject(projectData, projects);
                 expect(project).to.be.a('object');
-                expect(project).to.deep.equal(expected);
+                if (expected.client && expected.project) {
+                    expect(project).to.have.deep.property('client', expected.client);
+                    expect(project).to.have.deep.property('project', expected.project);
+                } else if (expected.client) {
+                    expect(project).to.have.deep.property('client');
+                    expect(project).to.not.have.deep.property('project');
+                } else if (expected.project) {
+                    expect(project).to.have.deep.property('project');
+                    expect(project).to.not.have.deep.property('client');
+                } else {
+                    expect(project).to.deep.equal(expected);
+                }
             });
         });
     });
