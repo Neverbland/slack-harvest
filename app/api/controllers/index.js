@@ -1,14 +1,15 @@
 /*jshint node: true*/
 'use strict';
 
-var httpCodes   =   require('./../codes.js'),
-    harvest     =   require('./../../services/harvest')('default'),
-    notifier    =   require('./../../services/notifier'),
-    _           =   require('lodash'),
-    logger      =   require('./../../services/logger.js')('default'),
-    consts      =   require('./../../../consts.json'),
-    tools       =   require('./../../services/tools.js'),
-    tasksParser =   require('./../../services/timer.js');
+var httpCodes               =   require('./../codes.js'),
+    harvest                 =   require('./../../services/harvest')('default'),
+    notifier                =   require('./../../services/notifier'),
+    _                       =   require('lodash'),
+    logger                  =   require('./../../services/logger.js')('default'),
+    consts                  =   require('./../../../consts.json'),
+    tools                   =   require('./../../services/tools.js'),
+    timerCommandParser             =   require('./../../services/timer.js'),
+    commandSessionResolver  =   require('./../../services/interactive_session');
     
     
 /**
@@ -65,11 +66,11 @@ module.exports = function (app, config)
     {
         var httpCode;
         if (!!res.success === false) {
-            httpCode = httpCodes.BAD_REQUEST;
+            httpCode = httpCodes.BAD_REQUEST; // Unauthorized
         } else {
             httpCode = httpCodes.OK;
         }
-        res.writeHead(httpCode); // Unauthorized
+        res.writeHead(httpCode);
         var responseJson = {
             success : Boolean(res.success),
             code: httpCode
@@ -267,8 +268,8 @@ module.exports = function (app, config)
             }
             
         try {
-            config = tasksParser.parseTimerConfig(text);
-            config.userId = getHarvestUserId(userName);
+            config = timerCommandParser.parseTimerConfig(text);
+            config.userId = getHarvestUserId(harvest.users, userName);
         } catch (err) {
             res.success = false;
             res.errors = [
@@ -277,30 +278,17 @@ module.exports = function (app, config)
             next();
             return;
         }
-        
-        harvest.getTasks(config.userId, function (err, results) {
-            if (err !== null) {
-                res.success = false;
-                res.errors = [
-                    err
-                ];
+
+        commandSessionResolver.getStep(config, function (err, view) {
+            if (err === null) {
+                res.writeHead(httpCodes.OK);
+                res.write(view);
+                res.send();
             } else {
-                res.success = true;
-                var project = tasksParser.findProject(config.projectData, results.projects);
-                if (!project.client) {
-                    res.success = false;
-                    res.errors = res.errors || [];
-                    res.errors.push('Such client does not exist');
-                }
-                
-                if (!project.project) {
-                    res.success = false;
-                    res.errors = res.errors || [];
-                    res.errors.push('Such project does not exist');
-                }
+                res.writeHead(httpCodes.BAD_REQUEST);
+                res.write(view);
+                res.send();
             }
-            
-            next();
         });
     };
     

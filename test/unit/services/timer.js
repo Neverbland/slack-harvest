@@ -10,41 +10,30 @@ describe('api.controllers.timer', function () {
     
     describe('timer.parseTimerConfig', function () {
         
-        it('Should prepare proper harvest request config object for a correctly defined input command containing note', function () {
-            var validCommand = "start project_name   task_name This is some note.";
+        it('Should prepare proper harvest request config object for a correctly defined input command nontaining action name', function () {
+            var validCommand = "start project_name";
             var config = timer.parseTimerConfig(validCommand);
             
             expect(config.action).to.be.equal('start');
-            expect(config.projectData).to.be.a('array');
-            expect(config.projectData).to.include.members([
-                'project_name',
-                'task_name',
-                'This',
-                'is', 
-                'some', 
-                'note.'
-            ]);
+            expect(config.name).to.be.a('string');
+            expect(config.name).to.be.equal('project_name');
            
         });
         
-        it('Should throw error for invalid action name', function () {
-            var invalidCommand = "invalid_action project_name   task_name ";
-            expect(function () {
-                timer.parseTimerConfig(invalidCommand);
-            }).to.throw(Error, /Invalid action/);
-            
-        });
         
-        it('Should throw error when invalid number of parameters in the command passed.', function () {
-            var invalidCommand = "project_name   task_name ";
-            expect(function () {
-                timer.parseTimerConfig(invalidCommand);
-            }).to.throw(Error, /Invalid number of paramerers/);
+        it('Should prepare proper harvest request config object for a correctly defined input command not containing action name', function () {
+            var validCommand = "1";
+            var config = timer.parseTimerConfig(validCommand);
+            
+            expect(config.action).to.be.equal(null);
+            expect(config.name).to.be.a('undefined');
+            expect(config.value).to.be.equal("1");
+           
         });
     });
     
     
-    describe('timer.findProject', function () {
+    describe('timer.findMatchingClientsOrProjects', function () {
         var projects = [{name: 'Website Maintenance',
                 code: '',
                 id: 3906589,
@@ -111,15 +100,6 @@ describe('api.controllers.timer', function () {
             {name: 'Internal',
                 code: '',
                 id: 3058542,
-                billable: false,
-                tasks: [Object],
-                client: 'NEVERBLAND',
-                client_id: 1441113,
-                client_currency: 'British Pound - GBP',
-                client_currency_symbol: '£'},
-            {name: 'Testing',
-                code: '',
-                id: 3071493,
                 billable: false,
                 tasks: [Object],
                 client: 'NEVERBLAND',
@@ -238,46 +218,39 @@ describe('api.controllers.timer', function () {
         
         var projectDataSamples = [
             {
-                projectData : ['NEVERBLAND', 'Internal'],
-                expected : {client : 1441113, project : 3058542}
+                name : 'NEVERBLAND',
+                expected : [
+                    {
+                        client : 'NEVERBLAND',
+                        project : 'Holiday',
+                        clientId : 1441113,
+                        projectId : 4445437
+                    },
+                    {
+                        client : 'NEVERBLAND',
+                        project : 'Sample Task 8',
+                        clientId : 1441113,
+                        projectId : 4847113
+                    },
+                    {
+                        client : 'NEVERBLAND',
+                        project : 'Internal',
+                        clientId : 1441113,
+                        projectId : 3058542
+                    }
+                ]
             },
-            {
-                projectData : ['Sample', 'client', '3', 'Sample', 'project', '3'],
-                expected : {client : 1447817, project : 6031218}
-            },
-            {
-                projectData : ['Sample', 'client', '3'],
-                expected : {client : 1447817}
-            },
-            {
-                projectData : ['Non', 'existing', 'stuff'],
-                expected : {}
-            },
-            {
-                projectData : ['Slate', 'Old', 'Stuff', 'maintenance'],
-                expected : {project : 7492008, client: 1549998}
-            }
+            
         ];
        
-        it('Should find best matches for given array of project name/task name keys and daily harvest available projects.', function () {
+        it('Should find best matches for given array of projects and name', function () {
             _.each(projectDataSamples, function (sample) {
                 var expected = sample.expected,
-                    projectData = sample.projectData;
+                    name = sample.name,
+                    matching = timer.findMatchingClientsOrProjects(name, projects);
                     
-                var project = timer.findProject(projectData, projects);
-                expect(project).to.be.a('object');
-                if (expected.client && expected.project) {
-                    expect(project).to.have.deep.property('client', expected.client);
-                    expect(project).to.have.deep.property('project', expected.project);
-                } else if (expected.client) {
-                    expect(project).to.have.deep.property('client');
-                    expect(project).to.not.have.deep.property('project');
-                } else if (expected.project) {
-                    expect(project).to.have.deep.property('project');
-                    expect(project).to.not.have.deep.property('client');
-                } else {
-                    expect(project).to.deep.equal(expected);
-                }
+                expect(matching).to.be.a('array');
+                expect(matching).to.deep.equal(expected);
             });
         });
     });

@@ -48,73 +48,64 @@ module.exports = {
         {
             var config = {},
                 parts = postText.split(' '),
+                partsBase = postText.split(' '),
                 cleanParts = clear(parts);
             
-            if (cleanParts.length < 3) {
-                throw new Error("Invalid number of paramerers provided! Required: `action`, `client name`, `project name` respectively.");
+            if (cleanParts.length < 1) {
+                throw new Error("Invalid number of paramerers provided! Required at least one parameter!");
             }
-            config.action = validateAction(parts.shift());
-            config.projectData = clear(parts);
+            try {
+                config.action = validateAction(parts.shift());
+                config.name = clear(parts).join(' ');
+            } catch (err) {
+                config.action = null;
+                config.value = clear(partsBase).join(' ');
+            }
             
             return config;
         };
     })(),
     
     
-    _find : function (name, key, entries)
-    {
-        var matching = [];
-        for (var i in entries) {
-            var entry = entries[i];
-            if (String(entry[key]).trim() === String(name).trim()) {
-                matching.push(entry);
-            }
-        }
-        
-        return matching;
-    },
-    
-    
     /**
+     * Finds clients/projects entries matching name
      * 
-     * @param       {Array}         The proejcts 
-     * @param       {Object}        dailyEntries
-     * @returns     {Object}        Returns an object containing "task" and "project" keys
-     *                              or at least the one the function was able to find
+     * @param   {String}    name
+     * @param   {Array}     dailyEntries
+     * @returns {Array}
      */
-    findProject : function (projectCommandParts, dailyEntries)
-    {
-        var clientName = '',
-            projectName = '',
-            clients = null,
-            projects = null,
-            parts = projectCommandParts.slice(0)
-        ;
-
+    findMatchingClientsOrProjects : (function () {
         
-        for (var i = 0; i < projectCommandParts.length; i++) {
-            clientName = parts.join(' ');
-            var values = this._find(clientName, 'client', dailyEntries);
-            if (values.length) {
-                clients = values;
-                break;
-            }
-            parts.pop();
+        /**
+         * Finds if project name or client name for given entry match the 
+         * given name
+         * 
+         * @param   {String}    name
+         * @param   {Object}    entry
+         * @returns {Boolean}
+         */
+        function entryMatches (name, entry)
+        {
+            var regexp = new RegExp(name, 'ig');
+            return (regexp.test(entry.project) || regexp.test(entry.client));
         }
         
-        if (clients) {
-            parts = projectCommandParts.join(' ').replace(clientName + ' ', '').split(' ');
-            for (var j = 0; j < projectCommandParts.length; j++) {
-                projectName = parts.join(' ');
-                var values = this._find(projectName, 'name', clients);
-                if (values.length) {
-                    projects = values;
-                    break;
+        return function (name, dailyEntries)
+        {
+            var matching = [];
+            _.each(dailyEntries, function (entry) {
+                if (entryMatches(name, entry)) {
+                    matching.push({
+                        client : entry.client,
+                        project : entry.name,
+                        clientId : entry.client_id,
+                        projectId : entry.id
+                    });
                 }
-                parts.pop();
-            }
+            });
+
+            return matching;
         }
         
-        return projects ? {project : projects[0].id, client : projects[0].client_id} : (clients ? {client : clients[0].client_id} : {});
-    }
+    })()
 };
