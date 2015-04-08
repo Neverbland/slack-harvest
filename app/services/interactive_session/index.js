@@ -349,8 +349,9 @@ var interactiveSession = require('./lib/user_session.js'),
                 if (err) {
                     step.addParam('error', err);
                 }
+
                 if (!step.getParam('entry')) {
-                    step.setParam('entry', result.day_entry);
+                    step.addParam('entry', result);
                 }
                 interactiveSession
                         .getDefault()
