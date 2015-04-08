@@ -307,4 +307,47 @@ describe('harvest', function () {
             harvest.clients = {};
         });
     });
+    
+    
+    describe('harvest.toggle', function () {
+        it('Should send a request to Harvest API for given day entry id url.', function () {
+            
+            var dayEntryId = 12345,
+                userId = 23456,
+                expectedUrl = '/daily/timer/' + dayEntryId + '?of_user=' + userId,
+                cb = function (err, result) {};
+                
+            harvestModule.client.get = function (url, data, cb) {
+                expect(url).to.be.equal(expectedUrl);
+                expect(cb).to.be.equal(cb);
+            };  
+            
+            harvest.toggle(userId, dayEntryId, cb);
+        });
+    });
+    
+    
+    describe('harvest.createEntry', function () {
+        it('Should send a request to Harvest API making a POST call with proper params.', function () {
+            
+            var dayEntryId = 12345,
+                projectId = 23456,
+                userId = 9876,
+                taskId = 6789,
+                expectedUrl = '/daily/add?of_user=' + userId,
+                cb = function (err, result) {};
+                
+            harvestModule.client.post = function (url, data, cb) {
+                expect(url).to.be.equal(expectedUrl);
+                expect(cb).to.be.equal(cb);
+                expect(data).to.be.deep.equal({
+                    task_id : taskId,
+                    project_id : projectId,
+                    hours: ''
+                });
+            };  
+            
+            harvest.createEntry(userId, projectId, taskId, cb);
+        });
+    });
 });

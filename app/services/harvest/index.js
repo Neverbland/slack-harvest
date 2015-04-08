@@ -326,6 +326,31 @@ _Harvest.prototype = {
     
     
     /**
+     * Creates the day entry
+     * 
+     * @param   {Number}    userId
+     * @param   {Number}    projectId
+     * @param   {Number}    taskId
+     * @param   {Function}  callback
+     */
+    createEntry : function (userId, projectId, taskId, callback)
+    {
+        var timeTrack = this.load('TimeTracking');
+        timeTrack.create({
+            of_user : userId,
+            task_id : taskId,
+            project_id : projectId,
+            hours : ''
+        }, function (err, results) {
+            if (err !== null) {
+                logger.log('Not able to create an entry for user ' + userId + ' and taskId ' + taskId, err, {});
+            } 
+            callback(err, results);
+        });
+    },
+    
+    
+    /**
      * Returns all harvest user ids
      * 
      * @param       {Object}        userMap     A map of harvest id -> slack id

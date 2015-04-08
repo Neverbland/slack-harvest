@@ -27,6 +27,15 @@ var interactiveSession = require('./lib/user_session.js'),
     resolver.addStepProvider(stepFactory({
         
         postStepActionProviders : {
+            status : {
+                execute : function (step, callback) {
+                    var userId = step.getParam('userId');
+                    interactiveSession
+                                .getDefault()
+                                .clear(userId)
+                    ;
+                }
+            },
             stop : {
                 execute : function (step, callback)
                 {
@@ -41,6 +50,11 @@ var interactiveSession = require('./lib/user_session.js'),
                             if (err !== null) {
                                 step.addParam('stopError', 'An error occured, please try again later.');
                             }
+                            interactiveSession
+                                    .getDefault()
+                                    .clear(userId)
+                            ;
+                            
                             callback();
                         });
                     }
@@ -266,7 +280,10 @@ var interactiveSession = require('./lib/user_session.js'),
                     return options;
                 })(tasks), action);
                 
-                step.addParam('previousStep', previousStep);
+                step
+                    .addParam('previousStep', previousStep)
+                    .addParam('selectedOption', option)
+                ;
                 callback(null, that.createView(step), step);
         },
         
@@ -323,46 +340,54 @@ var interactiveSession = require('./lib/user_session.js'),
         execute : function (params, previousStep, callback) {
             var value = tools.validateGet(params, 'value'),
                 option = previousStep.getOption(value),
-                entries = interactiveSession
-                                    .getDefault()
-                                    .getStep(params.userId, 1)
-                                    .getParam('entries'),
+                step1 = previousStep.getParam('previousStep'),
+                projectId = step1.getParam('selectedOption').id,
+                taskId = option.id,
+                entries = step1
+                            .getParam('previousStep')
+                            .getParam('entries'),
                 dailyEntries = entries.day_entries,
-                action = previousStep.getAction(),
                 that = this,
-                step;
+                step,
+                dailyEntry,
+                resultsCallback;
 
             if (this.prototype.isRejectResponse(option, value)) {
                 this.prototype.executeRejectResponse(params.userId, callback);
                 return;
             }
             
+            dailyEntry = timerParser.getDailyEntry(taskId, dailyEntries);
             
-
+            var resultsCallback = function (err, result) {
+                if (err) {
+                    step.addParam('error', err);
+                }
+                if (!step.getParam('entry')) {
+                    step.setParam('entry', result.day_entry);
+                }
+                callback(null, that.createView(step), step);
+            };
             
-            callback(null, that.createView(step), step);
+            if (dailyEntry === null) {
+                harvest.createEntry(params.userId, projectId, taskId, resultsCallback);
+            } else {
+                harvest.toggle(params.userId, dailyEntry.id, resultsCallback);
+            }
         },
         
         
         createView : function (step)
         {
-            var view = [
-                'Cool, love that project!',
-                '\n',
-                'What task are you on?',
-                '\n'
-            ];
-            
-            _.each(step.getOptions(), function (option, value) {
-                if (option.type === 'task') {
-                    view.push(value + '. ' + option.name);
-                }
-            });
-
-            view.push('');
-            view.push('Just type the number to choose it or write \'no\' if you picked the wrong project.');
-
-            return view.join('\n');
+            var entry = step.getParam('entry');
+            if (step.getParam('error')) {
+                return 'An error occured, please try again later';
+            } else {
+                return [
+                    'Successfully created and started an entry for',
+                    entry.client + ' - ' + entry.project + ' - ' + entry.task 
+                ].join('\n');
+            }
         }
     }));
 
