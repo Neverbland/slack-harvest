@@ -317,6 +317,7 @@ _Harvest.prototype = {
             of_user : userId,
             id : dayEntryId
         }, function (err, results) {
+
             if (err !== null) {
                 logger.log('Not able to toggle task day entry for user ' + userId + ' and id ' + dayEntryId, err, {});
             } 

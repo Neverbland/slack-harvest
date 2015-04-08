@@ -50,6 +50,7 @@ Resolver.prototype = {
         if (stepProvider !== null) {
             stepProvider.execute(params, previousStep, function (err, view, newStep) {
                 if (err === null) {
+                    
                     if (newStep !== null) {
                         that.userSession.addStep(userId, newStep);
                     }

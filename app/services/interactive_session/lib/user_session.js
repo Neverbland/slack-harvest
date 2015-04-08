@@ -186,7 +186,6 @@ UserSession.prototype = (function () {
          */
         addStep : function (userId, step)
         {
-            step.addParam('userId', userId);
             this.users[userId] = this.users[userId] || [];          
             this.users[userId].push(validateStep(step));
             
@@ -277,6 +276,7 @@ UserSession.prototype = (function () {
                 previousStep
             ;
          
+            step.addParam('userId', userId);
             step.addParam('stepNumber', stepNo);
             try {
                 previousStep = this.getStep(userId);

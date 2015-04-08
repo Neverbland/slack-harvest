@@ -34,15 +34,31 @@ var interactiveSession = require('./lib/user_session.js'),
                                 .getDefault()
                                 .clear(userId)
                     ;
+                    callback();
+                },
+                prepareStep : function (step)
+                {
+                    return null;
                 }
             },
             stop : {
+                prepareStep : function (step)
+                {
+                    return null;
+                },
+                
                 execute : function (step, callback)
                 {
                     var entry = timerParser.filterCurrentEntry(step.getParam('entries').day_entries),
                         userId = step.getParam('userId');
+                
                     if (entry === null) {
                         step.addParam('stopError', 'Currently you have no running tasks.');
+                        interactiveSession
+                                .getDefault()
+                                .clear(userId)
+                        ;
+
                         callback();
                     } else {
                         step.addParam('entry', entry);
@@ -171,13 +187,11 @@ var interactiveSession = require('./lib/user_session.js'),
                     postStepAction = that.getPostStepAction(step);
                     if (postStepAction) {
                         postStepAction.execute(step, function () {
-                            callback(null, that.createView(step), step);
+                            callback(null, that.createView(step), postStepAction.prepareStep(step));
                         });
                     } else {
                         callback(null, that.createView(step), step);
                     }
-
-                        
                 }
             });
         },
