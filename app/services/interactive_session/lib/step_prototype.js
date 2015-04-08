@@ -27,7 +27,13 @@ var interactiveSession = require('./user_session.js'),
     executeRejectResponse : function (userId, callback)
     {
         interactiveSession.getDefault().clear(userId);
-        callback(null, "Cool, try again later!", interactiveSession.createStep({}, '', true));
+        callback(
+            null, 
+            "Cool, try again later!",
+            interactiveSession
+                    .getDefault()
+                    .createStep(userId, {}, '')
+        );
     }
     
     

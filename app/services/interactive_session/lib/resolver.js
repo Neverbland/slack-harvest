@@ -34,7 +34,7 @@ Resolver.prototype = {
     getStep : function (params, viewCallback)
     {
         var userId = params.userId,
-            step = this.userSession.hasSession(userId) ? this.userSession.getStep(userId) : null,
+            previousStep = this.userSession.hasSession(userId) ? this.userSession.getStep(userId) : null,
             that = this,
             stepProvider = null;
 
@@ -42,20 +42,17 @@ Resolver.prototype = {
             if (stepProvider !== null) {
                 return;
             } 
-            if (provider.validate(params, step)) {
+            if (provider.validate(params, previousStep)) {
                 stepProvider = provider;
             }
         });
         
         if (stepProvider !== null) {
-            stepProvider.execute(params, step, function (err, view, newStep) {
+            stepProvider.execute(params, previousStep, function (err, view, newStep) {
                 if (err === null) {
-                    if (newStep.isLast) {
-                        that.userSession.clear(userId);
-                    } else {
+                    if (newStep !== null) {
                         that.userSession.addStep(userId, newStep);
                     }
-                    
                     viewCallback(null, view);
                 } else {
                     viewCallback(err, view);

@@ -6,11 +6,10 @@ InvalidOptionError.prototype = new Error();
 InvalidOptionError.prototype.constructor = InvalidOptionError;
 
 
-function UserSessionStep (options, action, isLast)
+function UserSessionStep (options, action)
 {
     this.options = options;
     this.action = action;
-    this.isLast = Boolean(isLast) || false;
     this.params = {};
 }
 
@@ -102,6 +101,17 @@ UserSessionStep.prototype = (function () {
         
         
         /**
+         * Returns all params stored in the step
+         * 
+         * @returns {Object}
+         */
+        getParams : function ()
+        {
+            return this.params;
+        },
+        
+        
+        /**
          * Bulk sets step params
          * 
          * @param       {Object}                params
@@ -176,8 +186,10 @@ UserSession.prototype = (function () {
          */
         addStep : function (userId, step)
         {
-            this.users[userId] = this.users[userId] || [];
+            step.addParam('userId', userId);
+            this.users[userId] = this.users[userId] || [];          
             this.users[userId].push(validateStep(step));
+            
             return this;
         },
         
@@ -234,6 +246,46 @@ UserSession.prototype = (function () {
             }
             
             return value;
+        },
+        
+        
+        /**
+         * Returns the number of steps stored for the user
+         * 
+         * @param       {Number}        userId
+         * @returns     {Number}
+         */
+        countSteps : function (userId)
+        {
+            var steps = this.users[userId] || [];
+            return steps.length;
+        },
+        
+        
+        /**
+         * Creates new session step
+         * 
+         * @param       {Number}        userId
+         * @param       {Object}        options
+         * @param       {String}        action
+         * @returns     {UserSessionStep}
+         */
+        createStep: function (userId, options, action)
+        {
+            var step = new UserSessionStep(options, action),
+                stepNo = (this.countSteps(userId) + 1),
+                previousStep
+            ;
+         
+            step.addParam('stepNumber', stepNo);
+            try {
+                previousStep = this.getStep(userId);
+            } catch (err) {
+                previousStep = null;
+            }
+            step.addParam('previousStep', previousStep);  
+
+            return step;
         }
     };
     
@@ -275,17 +327,4 @@ module.exports = {
         
         return instance;
     },
-    
-    /**
-     * Creates new session step
-     * 
-     * @param       {Object}        options
-     * @param       {String}        action
-     * @param       {Boolean}       isLast
-     * @returns     {UserSessionStep}
-     */
-    createStep : function (options, action, isLast)
-    {
-        return new UserSessionStep(options, action, isLast);
-    }
 };

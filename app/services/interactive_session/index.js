@@ -129,6 +129,7 @@ var interactiveSession = require('./lib/user_session.js'),
 
         execute : function (params, previousStep, callback) {
             var action = tools.validateGet(params, 'action'),
+                userId = params.userId,
                 name = params.name,
                 that = this,
                 postStepAction
@@ -139,7 +140,9 @@ var interactiveSession = require('./lib/user_session.js'),
                     callback(err, that.createView(null), null);
                 } else {
                     var projects = timerParser.findMatchingClientsOrProjects(name, results.projects),
-                        step = interactiveSession.createStep((function (entries) {
+                        step = interactiveSession
+                                .getDefault()
+                                .createStep(userId, (function (entries) {
 
                             var options = {};
                             options['no'] = {
@@ -163,7 +166,6 @@ var interactiveSession = require('./lib/user_session.js'),
                         step
                                 .addParam('projects', results.projects)
                                 .addParam('entries', results)
-                                .addParam('userId', params.userId)
                         ;
                         
                     postStepAction = that.getPostStepAction(step);
@@ -227,21 +229,11 @@ var interactiveSession = require('./lib/user_session.js'),
 
         validate : function (params, step)
         {
-            var value = tools.validateGet(params, 'value'),
-                option;
             if (step === null) {
                 return false;
             }
 
-            try {
-                option = step.getOption(value);
-            } catch (err) {
-                if (err instanceof interactiveSession.error) {
-                    return false;
-                }
-            }
-
-            return true;
+            return (step.getParam('stepNumber') === 1);
         },
 
         execute : function (params, previousStep, callback) {
@@ -249,17 +241,20 @@ var interactiveSession = require('./lib/user_session.js'),
                 option = previousStep.getOption(value),
                 action = previousStep.getAction(),
                 projects = previousStep.getParam('projects'),
+                userId = params.userId,
                 that = this,
                 tasks, step;
 
             if (this.prototype.isRejectResponse(option, value)) {
-                this.prototype.executeRejectResponse(params.userId, callback);
+                this.prototype.executeRejectResponse(userId, callback);
                 return;
             }
             
             tasks = timerParser.getProjectTasks(option.id, projects);
             
-            step = interactiveSession.createStep((function (tasks) {
+            step = interactiveSession
+                    .getDefault()
+                    .createStep(userId, (function (tasks) {
 
                     var options = {};
                     options['no'] = {
@@ -281,7 +276,6 @@ var interactiveSession = require('./lib/user_session.js'),
                 })(tasks), action);
                 
                 step
-                    .addParam('previousStep', previousStep)
                     .addParam('selectedOption', option)
                 ;
                 callback(null, that.createView(step), step);
@@ -320,35 +314,27 @@ var interactiveSession = require('./lib/user_session.js'),
 
         validate : function (params, step)
         {
-            var value = tools.validateGet(params, 'value'),
-                option;
             if (step === null) {
                 return false;
             }
 
-            try {
-                option = step.getOption(value);
-            } catch (err) {
-                if (err instanceof interactiveSession.error) {
-                    return false;
-                }
-            }
-
-            return true;
+            return (step.getParam('stepNumber') === 2);
         },
 
         execute : function (params, previousStep, callback) {
             var value = tools.validateGet(params, 'value'),
                 option = previousStep.getOption(value),
                 step1 = previousStep.getParam('previousStep'),
-                projectId = step1.getParam('selectedOption').id,
+                projectId = previousStep.getParam('selectedOption').id,
+                userId = params.userId,
                 taskId = option.id,
                 entries = step1
-                            .getParam('previousStep')
                             .getParam('entries'),
                 dailyEntries = entries.day_entries,
                 that = this,
-                step,
+                step = interactiveSession
+                    .getDefault()
+                    .createStep(userId, {}, previousStep.getAction()),
                 dailyEntry,
                 resultsCallback;
 
@@ -366,7 +352,12 @@ var interactiveSession = require('./lib/user_session.js'),
                 if (!step.getParam('entry')) {
                     step.setParam('entry', result.day_entry);
                 }
-                callback(null, that.createView(step), step);
+                interactiveSession
+                        .getDefault()
+                        .clear(userId)
+                ;
+                
+                callback(null, that.createView(step), null);
             };
             
             if (dailyEntry === null) {
