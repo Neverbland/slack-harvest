@@ -280,6 +280,7 @@ module.exports = function (app, config)
         }
 
         commandSessionResolver.getStep(config, function (err, view) {
+            res.set('Content-Type', 'text/html')
             if (err === null) {
                 res.writeHead(httpCodes.OK);
                 res.write(view);

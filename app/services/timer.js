@@ -5,7 +5,6 @@ var _ = require('lodash');
 
 module.exports = {
     
-    
     /**
      * Takes the timer command text and changes it tnto a bunch of parameters
      * for the projects
@@ -19,7 +18,7 @@ module.exports = {
         var validActions = [
             'start',
             'stop',
-            'toggle'
+            'status'
         ];
         
         var validateAction  = function (action) 
@@ -105,7 +104,86 @@ module.exports = {
             });
 
             return matching;
-        }
+        };
+    })(),
+    
+    
+    /**
+     * Returns tasks for matching project id or an empty object
+     * if no project matches the project id.
+     * 
+     * @param       {Number}    projectId
+     * @param       {Object}    projects
+     * @returns     {Object}
+     */
+    getProjectTasks : function (projectId, projects)
+    {
+        var tasks = null;
+        _.each(projects, function (project) {
+            if (parseInt(project.id) === parseInt(projectId)) {
+                tasks = project.tasks;
+            }
+        });
         
-    })()
+        return tasks ? tasks : {};
+    },
+    
+    
+    /**
+     * Provides daily entry id for given task id from given day entries
+     * 
+     * @param       {Number}        taskId
+     * @param       {Array}         dailyEntries
+     * @returns     {Object|null}
+     */
+    getDailyEntry : function (taskId, dailyEntries) 
+    {
+        var entry = null;
+        _.each(dailyEntries, function (dailyEntry) {
+            if (parseInt(dailyEntry.task_id) === parseInt(taskId)) {
+                entry = dailyEntry;
+            }
+        });
+        
+        return entry;
+    },
+    
+    
+    /**
+     * Checks if given taskId is in the currently running daily entries
+     * 
+     * @param       {Number}    taskId
+     * @param       {Array}     dailyEntries
+     * @returns     {Boolean}
+     */
+    isRunningTask : function (taskId, dailyEntries)
+    {
+        var isRunning = false;
+        _.each(dailyEntries, function (dailyEntry) {
+            if (parseInt(dailyEntry.task_id) === parseInt(taskId) && !!dailyEntry.timer_started_at) {
+                isRunning = true;
+            }
+        });
+        
+        return isRunning;
+    },
+    
+    
+    /**
+     * Finds current entry
+     * 
+     * @param   {Array}         dailyEntries
+     * @returns {Object|null}
+     */
+    filterCurrentEntry : function (dailyEntries)
+    {
+        var entry = null;
+        _.each(dailyEntries, function (dailyEntry) {
+            if (!!dailyEntry.timer_started_at) {
+                entry = dailyEntry;
+            }
+        });
+        
+        return entry;
+    }
 };

@@ -6,10 +6,12 @@ InvalidOptionError.prototype = new Error();
 InvalidOptionError.prototype.constructor = InvalidOptionError;
 
 
-function UserSessionStep (options, isLast)
+function UserSessionStep (options, action, isLast)
 {
     this.options = options;
+    this.action = action;
     this.isLast = Boolean(isLast) || false;
+    this.params = {};
 }
 
 
@@ -59,6 +61,77 @@ UserSessionStep.prototype = (function () {
         getOptions : function ()
         {
             return this.options;
+        },
+        
+        
+        /**
+         * Returns the string action name
+         * 
+         * @returns {String}
+         */
+        getAction : function () 
+        {
+            return this.action;
+        },
+        
+        /**
+         * Sets the session step param. If one exists already, gets overriden.
+         * 
+         * @param       {String}            paramName
+         * @param       {Object}            paramValue
+         * @returns     {UserSessionStep}   This instance of session step
+         */
+        addParam : function (paramName, paramValue)
+        {
+            this.params[paramName] = paramValue;
+            return this;
+        },
+        
+        
+        /**
+         * Returns stored value for given param or undefined if such
+         * param does not exist.
+         * 
+         * @param   {String}            paramName
+         * @returns {Object|undefined}
+         */
+        getParam : function (paramName) 
+        {
+            return this.params[paramName];
+        },
+        
+        
+        /**
+         * Bulk sets step params
+         * 
+         * @param       {Object}                params
+         * @returns     {UserSessionStep}       This instance of session step
+         */
+        addParams : function (params)
+        {
+            for (var i in params) {
+                if (params.hasOwnProperty(i)) {
+                    this.addParam(i, params[i]);
+                }
+            }
+            
+            return this;
+        },
+        
+        
+        /**
+         * Unsets the param given by name. Returns 
+         * this param's value
+         * 
+         * @param       {String}    paramName
+         * @returns     {Object}
+         */
+        clearParam : function (paramName)
+        {
+            var value = this.getParam(paramName);
+            delete this.params[paramName];
+            
+            return value;
         }
 
     };
@@ -207,11 +280,12 @@ module.exports = {
      * Creates new session step
      * 
      * @param       {Object}        options
+     * @param       {String}        action
      * @param       {Boolean}       isLast
      * @returns     {UserSessionStep}
      */
-    createStep : function (options, isLast)
+    createStep : function (options, action, isLast)
     {
-        return new UserSessionStep(options, isLast);
+        return new UserSessionStep(options, action, isLast);
     }
 };

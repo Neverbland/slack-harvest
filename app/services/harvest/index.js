@@ -304,6 +304,28 @@ _Harvest.prototype = {
     
     
     /**
+     * Stops a running task
+     * 
+     * @param   {Number}    userId
+     * @param   {Number}    dayEntryId
+     * @param   {Function}  the callback
+     */
+    toggle : function (userId, dayEntryId, callback)
+    {
+        var timeTrack = this.load('TimeTracking');
+        timeTrack.toggleTimer({
+            of_user : userId,
+            id : dayEntryId
+        }, function (err, results) {
+            if (err !== null) {
+                logger.log('Not able to toggle task day entry for user ' + userId + ' and id ' + dayEntryId, err, {});
+            } 
+            callback(err, results);
+        });
+    },
+    
+    
+    /**
      * Returns all harvest user ids
      * 
      * @param       {Object}        userMap     A map of harvest id -> slack id
