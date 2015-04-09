@@ -133,14 +133,15 @@ module.exports = {
      * Provides daily entry id for given task id from given day entries
      * 
      * @param       {Number}        taskId
+     * @param       {Number}        projectId
      * @param       {Array}         dailyEntries
      * @returns     {Object|null}
      */
-    getDailyEntry : function (taskId, dailyEntries) 
+    getDailyEntry : function (taskId, projectId, dailyEntries) 
     {
         var entry = null;
         _.each(dailyEntries, function (dailyEntry) {
-            if (parseInt(dailyEntry.task_id) === parseInt(taskId)) {
+            if (parseInt(dailyEntry.task_id) === parseInt(taskId) && parseInt(dailyEntry.project_id) === parseInt(projectId)) {
                 entry = dailyEntry;
             }
         });
@@ -153,14 +154,15 @@ module.exports = {
      * Checks if given taskId is in the currently running daily entries
      * 
      * @param       {Number}    taskId
+     * @param       {Number}    projectId
      * @param       {Array}     dailyEntries
      * @returns     {Boolean}
      */
-    isRunningTask : function (taskId, dailyEntries)
+    isRunningTask : function (taskId, projectId, dailyEntries)
     {
         var isRunning = false;
         _.each(dailyEntries, function (dailyEntry) {
-            if (parseInt(dailyEntry.task_id) === parseInt(taskId) && !!dailyEntry.timer_started_at) {
+            if (parseInt(dailyEntry.task_id) === parseInt(taskId) && parseInt(projectId) === dailyEntry.project_id && !!dailyEntry.timer_started_at) {
                 isRunning = true;
             }
         });

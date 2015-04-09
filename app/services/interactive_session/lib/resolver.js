@@ -3,7 +3,8 @@
 
 var _               = require('lodash'),
     userSession     = require('./user_session.js'),
-    consts          = require('../../../../consts.json')
+    consts          = require('../../../../consts.json'),
+    logger          = require('./../../../services/logger.js')('default')
 ;
 
 function Resolver (userSession, sessionTime)
@@ -79,14 +80,15 @@ Resolver.prototype = {
      */
     addTimeout : function (userId)
     {
-        
         this.clearTimeout(userId);
         this.timeouts[userId] = setTimeout(function () {
             userSession
                     .getDefault()
                     .clear(userId)
             ;
+            logger.info('Cleared user session for userId ' + userId, {});
         }, this.sessionTime);
+        logger.info('Added user session for userId ' + userId, {});
     },
     
     
