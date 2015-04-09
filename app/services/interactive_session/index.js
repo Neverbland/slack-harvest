@@ -8,7 +8,8 @@ var     interactiveSession  = require('./lib/user_session.js'),
         _                   = require('lodash'),
         timerParser         = require('./../timer'),
         harvest             = require('./../harvest')('default'),
-        stepTools           = require('./lib/step_tools.js')
+        stepTools           = require('./lib/step_tools.js'),
+        errOutput           = 'Wrong input provided, try following the instructions...';
 ;
 
 if (resolver === null) {
@@ -229,8 +230,7 @@ if (resolver === null) {
          */
         getView: function (step)
         {
-            var action,
-                errOutput = 'Wrong input provided, try following the instructions...';
+            var action;
             try {
                 action = step.getAction();
             } catch (err) {
@@ -262,15 +262,25 @@ if (resolver === null) {
         {
             return this.tools.validate(this.stepNumber, step);
         },
+        
         execute: function (params, previousStep, callback) {
-            var value = tools.validateGet(params, 'value'),
-                    option = previousStep.getOption(value),
-                    projectId = option.id,
-                    action = previousStep.getAction(),
-                    projects = previousStep.getParam('entries').projects,
-                    userId = params.userId,
-                    that = this,
-                    tasks, step;
+            var value,
+                option,
+                projectId,
+                action = previousStep.getAction(),
+                projects = previousStep.getParam('entries').projects,
+                userId = params.userId,
+                that = this,
+                tasks, 
+                step;
+            
+            try {
+                value = tools.validateGet(params, 'value');
+                option = previousStep.getOption(value);
+                projectId = option.id;
+            } catch (err) {
+                callback(null, that.createView(null), null);
+            }
 
             if (this.tools.isRejectResponse(option, value)) {
                 this.tools.executeRejectResponse(userId, callback);
@@ -306,8 +316,12 @@ if (resolver === null) {
             step.addParam('selectedOption', option);
             callback(null, that.createView(step), step);
         },
+        
         createView: function (step)
         {
+            if (step === null) {
+                return errOutput;
+            }
             var view = [
                 'Cool, love that project!',
                 '\n',
@@ -340,22 +354,31 @@ if (resolver === null) {
         {
             return this.tools.validate(this.stepNumber, step);
         },
+        
         execute: function (params, previousStep, callback) {
-            var value = tools.validateGet(params, 'value'),
-                    option = previousStep.getOption(value),
-                    step1 = previousStep.getParam('previousStep'),
-                    projectId = previousStep.getParam('selectedOption').id,
-                    userId = params.userId,
-                    taskId = option.id,
-                    entries = step1
-                    .getParam('entries'),
-                    dailyEntries = entries.day_entries,
-                    that = this,
-                    step = interactiveSession
-                    .getDefault()
-                    .createStep(userId, {}, previousStep.getAction()),
-                    dailyEntry,
-                    resultsCallback;
+            var value,
+                option,
+                taskId,
+                step1 = previousStep.getParam('previousStep'),
+                projectId = previousStep.getParam('selectedOption').id,
+                userId = params.userId,
+                entries = step1.getParam('entries'),
+                dailyEntries = entries.day_entries,
+                that = this,
+                step = interactiveSession
+                .getDefault()
+                .createStep(userId, {}, previousStep.getAction()),
+                dailyEntry,
+                resultsCallback
+            ;
+            
+            try {
+                value = tools.validateGet(params, 'value');
+                option = previousStep.getOption(value);
+                taskId = option.id;
+            } catch (err) {
+                callback(null, that.createView(null), null);
+            }
 
             if (this.tools.isRejectResponse(option, value)) {
                 this.tools.executeRejectResponse(params.userId, callback);
@@ -388,6 +411,9 @@ if (resolver === null) {
         },
         createView: function (step)
         {
+            if (step === null) {
+                return errOutput;
+            }
             var entry = step.getParam('entry');
             if (step.getParam('error')) {
                 return 'An error occured, please try again later';
