@@ -8,7 +8,7 @@ var httpCodes               =   require('./../codes.js'),
     logger                  =   require('./../../services/logger.js')('default'),
     consts                  =   require('./../../../consts.json'),
     tools                   =   require('./../../services/tools.js'),
-    timerCommandParser             =   require('./../../services/timer.js'),
+    timerCommandParser      =   require('./../../services/timer.js'),
     commandSessionResolver  =   require('./../../services/interactive_session');
     
     
@@ -279,7 +279,7 @@ module.exports = function (app, config)
             return;
         }
 
-        commandSessionResolver.getStep(config, function (err, view) {
+        commandSessionResolver.runStep(config, function (err, view) {
             res.set('Content-Type', 'text/html')
             if (err === null) {
                 res.writeHead(httpCodes.OK);

@@ -22,7 +22,6 @@ describe('user_session', function () {
     
     describe('user_session.error', function () {
         it('Should reference the constructor of InvalidOptionError', function () {
-            expect(new user_session.error()).to.be.an.instanceof(Error);
             expect((new user_session.error()).constructor.name).to.be.equal('InvalidOptionError');
         });
     });

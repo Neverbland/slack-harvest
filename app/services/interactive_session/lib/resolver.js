@@ -1,12 +1,17 @@
 /*jshint node: true*/
 'use strict';
 
-var _ = require('lodash');
+var _               = require('lodash'),
+    userSession     = require('./user_session.js'),
+    consts          = require('../../../../consts.json')
+;
 
-function Resolver (userSession)
+function Resolver (userSession, sessionTime)
 {
+    this.sessionTime = sessionTime || consts.userSession.lifeSpan;
     this.userSession = userSession;
     this.stepProviders = [];
+    this.timeouts = {};
 }
 
 Resolver.prototype = {
@@ -26,22 +31,25 @@ Resolver.prototype = {
     
     
     /**
+     * Runs slack -> server dialogue step
      * 
      * @param       {Object}        params          The timer config
      * @param       {Function}      viewCallback    The callback that processes the view
      * @returns     {undefined}
      */
-    getStep : function (params, viewCallback)
+    runStep : function (params, viewCallback)
     {
         var userId = params.userId,
             previousStep = this.userSession.hasSession(userId) ? this.userSession.getStep(userId) : null,
             that = this,
-            stepProvider = null;
+            stepProvider = null
+        ;
 
         _.each(this.stepProviders, function (provider) {
             if (stepProvider !== null) {
                 return;
             } 
+
             if (provider.validate(params, previousStep)) {
                 stepProvider = provider;
             }
@@ -50,9 +58,9 @@ Resolver.prototype = {
         if (stepProvider !== null) {
             stepProvider.execute(params, previousStep, function (err, view, newStep) {
                 if (err === null) {
-                    
                     if (newStep !== null) {
                         that.userSession.addStep(userId, newStep);
+                        that.addTimeout(userId);
                     }
                     viewCallback(null, view);
                 } else {
@@ -60,12 +68,44 @@ Resolver.prototype = {
                 }
             });
         }
+    },
+    
+    
+    /**
+     * Adds a timeout to clear user session for given userId
+     * 
+     * @param       {Number}        userId
+     * @returns     {undefined}
+     */
+    addTimeout : function (userId)
+    {
+        
+        this.clearTimeout(userId);
+        this.timeouts[userId] = setTimeout(function () {
+            userSession
+                    .getDefault()
+                    .clear(userId)
+            ;
+        }, this.sessionTime);
+    },
+    
+    
+    /**
+     * Clears the timeout for given userId
+     * 
+     * @param   {Number}        userId
+     * @returns {undefined}
+     */
+    clearTimeout : function (userId)
+    {
+        if (!!this.timeouts[userId]) {
+            clearTimeout(this.timeouts[userId]);
+            delete this.timeouts[userId];
+        }
     }
 };
 
 Resolver.prototype.constructor = Resolver;
 
 
-module.exports = {
-    resolver : Resolver
-}; // The constructor
+module.exports = Resolver; // The constructor
