@@ -85,8 +85,7 @@ var interactiveSession = require('./lib/user_session.js'),
                     var entry = timerParser.filterCurrentEntry(step.getParam('entries').day_entries);
                     if (entry !== null) {
                         return  [
-                            'You are currently working on ',
-                            '\n',
+                            'You are currently working on \n',
                             entry.client + ' - ' + entry.project + ' - ' + entry.task 
                         ].join('\n');
                     } else {
@@ -179,10 +178,7 @@ var interactiveSession = require('./lib/user_session.js'),
                             return options;
                         })(projects), action);
                         
-                        step
-                                .addParam('projects', results.projects)
-                                .addParam('entries', results)
-                        ;
+                        step.addParam('entries', results);
                         
                     postStepAction = that.getPostStepAction(step);
                     if (postStepAction) {
@@ -241,20 +237,13 @@ var interactiveSession = require('./lib/user_session.js'),
     // Step 2 provider
     resolver.addStepProvider(stepFactory({
 
-        validate : function (params, step)
-        {
-            if (step === null) {
-                return false;
-            }
-
-            return (step.getParam('stepNumber') === 1);
-        },
+        stepNumber : 1,
 
         execute : function (params, previousStep, callback) {
             var value = tools.validateGet(params, 'value'),
                 option = previousStep.getOption(value),
                 action = previousStep.getAction(),
-                projects = previousStep.getParam('projects'),
+                projects = previousStep.getParam('entries').projects,
                 userId = params.userId,
                 that = this,
                 tasks, step;
@@ -289,9 +278,7 @@ var interactiveSession = require('./lib/user_session.js'),
                     return options;
                 })(tasks), action);
                 
-                step
-                    .addParam('selectedOption', option)
-                ;
+                step.addParam('selectedOption', option);
                 callback(null, that.createView(step), step);
         },
         
@@ -325,15 +312,8 @@ var interactiveSession = require('./lib/user_session.js'),
     
     // Step 3 provider
     resolver.addStepProvider(stepFactory({
-
-        validate : function (params, step)
-        {
-            if (step === null) {
-                return false;
-            }
-
-            return (step.getParam('stepNumber') === 2);
-        },
+        
+        stepNumber : 2,
 
         execute : function (params, previousStep, callback) {
             var value = tools.validateGet(params, 'value'),

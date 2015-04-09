@@ -202,6 +202,7 @@ UserSession.prototype = (function () {
         clear : function (userId)
         {
             this.users[userId] = [];
+            return this;
         },
         
         
@@ -213,7 +214,7 @@ UserSession.prototype = (function () {
          */
         hasSession : function (userId)
         {
-            return (!!this.users[userId] && this.users[userId].length);
+            return Boolean(!!this.users[userId] && this.users[userId].length);
         },
         
         
