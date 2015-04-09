@@ -145,12 +145,17 @@ if (resolver === null) {
         },
         execute: function (params, previousStep, callback) {
             var action = tools.validateGet(params, 'action'),
-                    userId = params.userId,
-                    name = params.name,
-                    that = this,
-                    postStepAction,
-                    view
-                    ;
+                userId = params.userId,
+                name = params.name,
+                that = this,
+                postStepAction,
+                view
+            ;
+                 
+            if (action === null) {
+                callback(null, this.createView(null), null);
+                return;
+            }
             harvest.getTasks(params.userId, function (err, results) {
 
                 if (err !== null) {
@@ -217,19 +222,17 @@ if (resolver === null) {
         },
         
         
-        createView: function (step)
-        {
-            var view = this.getView(step);
-            return view;
-        },
         /**
          * Returns view provider depending on what the step params are
          * 
          * @param       {Object}    step
          * @returns     {String}
          */
-        getView: function (step)
+        createView: function (step)
         {
+            if (step === null) {
+                return errOutput;
+            }
             var action;
             try {
                 action = step.getAction();
@@ -245,6 +248,8 @@ if (resolver === null) {
 
             return provider.getView(step);
         },
+        
+        
         getPostStepAction: function (step)
         {
             var action = step.getAction(),
