@@ -160,11 +160,10 @@ if (resolver === null) {
             harvest.getTasks(userId, function (err, results) {
 
                 if (err !== null) {
-                    logger.error('Could not load tasks for user ' + userId, {});
                     callback(err, that.createView(null), null);
                 } else {
                     logger.error('Successfully loaded tasks for user ' + userId, {});
-                    console.log(results.projects);
+
                     var projects = timerParser.findMatchingClientsOrProjects(name, results.projects),
                             step = interactiveSession
                             .getDefault()
