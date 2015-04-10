@@ -9,7 +9,8 @@ var     interactiveSession  = require('./lib/user_session.js'),
         timerParser         = require('./../timer'),
         harvest             = require('./../harvest')('default'),
         stepTools           = require('./lib/step_tools.js'),
-        errOutput           = 'Wrong input provided, try following the instructions...';
+        errOutput           = 'Wrong input provided, try following the instructions...',
+        logger              = require('./../../services/logger.js')('default')
 ;
 
 if (resolver === null) {
@@ -156,11 +157,13 @@ if (resolver === null) {
                 callback(null, this.createView(null), null);
                 return;
             }
-            harvest.getTasks(params.userId, function (err, results) {
+            harvest.getTasks(userId, function (err, results) {
 
                 if (err !== null) {
+                    logger.error('Could not load tasks for user ' + userId, {});
                     callback(err, that.createView(null), null);
                 } else {
+                    logger.error('Successfully loaded tasks for user ' + userId, {});
                     var projects = timerParser.findMatchingClientsOrProjects(name, results.projects),
                             step = interactiveSession
                             .getDefault()
