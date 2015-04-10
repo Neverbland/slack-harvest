@@ -164,6 +164,7 @@ if (resolver === null) {
                     callback(err, that.createView(null), null);
                 } else {
                     logger.error('Successfully loaded tasks for user ' + userId, {});
+                    console.log(results.projects);
                     var projects = timerParser.findMatchingClientsOrProjects(name, results.projects),
                             step = interactiveSession
                             .getDefault()
@@ -336,9 +337,9 @@ if (resolver === null) {
                 'What task are you on?',
                 '\n'
             ],
-                    previousStep = step.getParam('previousStep'),
-                    dailyEntries = previousStep.getParam('entries').day_entries
-                    ;
+                    
+            previousStep = step.getParam('previousStep'),
+            dailyEntries = previousStep.getParam('entries').day_entries;
 
             _.each(step.getOptions(), function (option, value) {
                 if (option.type === 'task') {
