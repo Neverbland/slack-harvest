@@ -158,39 +158,54 @@ if (resolver === null) {
                 return;
             }
             harvest.getTasks(userId, function (err, results) {
-
+                
+                var projects,
+                    step,
+                    options
+                ;
+                
                 if (err !== null) {
                     callback(err, that.createView(null), null);
+                    return;
                 } else {
-                    logger.error('Successfully loaded tasks for user ' + userId, {});
+                    logger.info('Successfully loaded tasks for user ' + userId, {});
+                    projects = timerParser.findMatchingClientsOrProjects(name, results.projects);
 
-                    var projects = timerParser.findMatchingClientsOrProjects(name, results.projects),
-                            step = interactiveSession
-                            .getDefault()
-                            .createStep(userId, (function (entries) {
+                    if (!projects.length) {
+                        callback(null, "No projects matching given string found!", null);
+                        return;
+                    }
+                    
+                    options = (function (entries) {
 
-                                var options = {};
-                                options['no'] = {
-                                    name: 'Quit',
-                                    id: null,
-                                    type: 'system'
-                                };
+                        var options = {};
+                        options['no'] = {
+                            name: 'Quit',
+                            id: null,
+                            type: 'system'
+                        };
 
-                                _.each(entries, function (entry, index) {
+                        _.each(entries, function (entry, index) {
 
-                                    options['' + (index + 1) + ''] = {
-                                        name: entry.client + ' - ' + entry.project,
-                                        id: entry.projectId,
-                                        type: 'project'
-                                    };
-                                });
+                            options['' + (index + 1) + ''] = {
+                                name: entry.client + ' - ' + entry.project,
+                                id: entry.projectId,
+                                type: 'project'
+                            };
+                        });
 
-                                return options;
-                            })(projects), action);
+                        return options;
+                    })(projects);
+
+                    step = interactiveSession
+                                .getDefault()
+                                .createStep(userId, options, action)
+                    ;
+
 
                     step.addParam('entries', results);
                     postStepAction = that.getPostStepAction(step);
-
+                    
                     if (postStepAction) {
                         postStepAction.execute(step, function () {
                             try {

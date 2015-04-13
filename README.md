@@ -15,7 +15,10 @@ Next thing to do is preparing the **config file**. The file must be located in t
 
 ## Architecture
 
-The application is written 100% in `Node.JS` and at this point consists of two blocks: The **cron-like time schedule** that sends notification messages to slack users and a simple **HTTP API** to trigger the notifications (for the moment for a single user and all users set up in the configuration file).
+The application is written 100% in `Node.JS` and at this point consists of thre blocks:
+- the **cron-like time schedule** that sends notification messages to slack users,
+- a simple **HTTP API** to trigger notifications (single user and all users notifications, management report),
+- a **Slack Command API endpoint** that manages Harvest timer setup.
 
 
 ### The HARVEST configuration
@@ -99,7 +102,11 @@ The `notify-all` and `notify-user` are **actions names**; this will be useful wh
 
 ### The API configuration
 
-The `api.auth` section of the config file contains settings for the authorization parameters. The `secret` parameter is necessary to setup a security layer for the HTTP access. To validate the request and grant access, a `POST` payload must be sent containing a **token** and a **seed**. The token is generated with an `SHA1` hash of the same **secret as provided in the application config file**, **seed** and the **action name** from the URL (see above) joined by **|**.
+The `api.auth` section of the config file contains settings for the authorization parameters. There are two built in methods of authorization:
+
+- **Static token method** - will be used if an `api.auth.token` setting is present. The incoming requests will be checked if they contain a `POST` value with the name `token` and if the value matches the `api.auth.token` value.
+
+- **Dynamic token method** - will be used if an `api.auth.secret` setting is present.  To validate the request and grant access, a `POST` payload must contain a **token** and a **seed**. The token is generated with an `SHA1` hash of the same **secret as provided in the application config file**, **seed** and the **action name** from the URL (see above) joined by **|**.
 
 Example PHP implementation of the token generation:
 
