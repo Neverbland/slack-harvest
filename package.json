@@ -24,7 +24,8 @@
     "winston": "0.8.1",
     "q" : "1.2.0",
     "date-util" : "1.2.1",
-    "humps" : "0.5.1"
+    "humps" : "0.5.1",
+    "walk" : "2.3.9"
   },
   "devDependencies": {
     "blanket": "1.1.6",
