@@ -59,7 +59,7 @@ function notifyUserController (req, res, next)
 }
 
 
-module.exports = function (app)
+module.exports = function (app, config)
 {
     app.use('/api/notify-user/:user', notifyUserController);
 };

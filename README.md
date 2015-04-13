@@ -124,3 +124,84 @@ $token = sha1(implode("|", array(
 
 ```
 
+
+##Harvest timer management
+
+The app provides an endpoint for a **Slack slash command** that enables management of the **Harvest day entries** directly from Slack. The command needs to be configured according to Slack slash command configuration guide [https://api.slack.com/slash-commands](https://api.slack.com/slash-commands). The timer management, in the most advanced case, works as a dialogue between the user (via Slack UI) and the server.
+
+###Command syntax
+
+The command syntax contains the configured slack command name (e.g. `/timer`) and following `action` name. Available actions:
+
+- `status` shows the Harvest client, project and task name for the current user task. This is a single step task that doesn't follow a dialogue with the server.
+
+- `stop` stops the work for the task that is currently running for given user. This is a single step task that doesn't follow a dialogue with the server.
+
+- `start` aims to start a task. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
+
+###Examples
+Command: 
+```
+/timer status
+```
+Example output:
+```
+You are currently working on 
+NEVERBLAND - Internal - Admin
+```
+
+
+Command:
+```
+/timer stop
+```
+Example output:
+```
+Successfully stopped the timer for 
+NEVERBLAND - Internal - Admin
+```
+
+
+Dialogue command 1:
+```
+/timer start neverb
+```
+Example dialogue output:
+```
+Choose the awesome project you are working on today!
+
+1. NEVERBLAND - Project 1
+2. NEVERBLAND - Project 2
+3. NEVERBLAND - Project 3
+4. NEVERBLAND - Project 4
+
+Just type the number to choose it or write 'no' to quit the timer setup
+```
+Dialogue command 2:
+```
+/timer 2
+```
+Example dialogue output:
+```
+Cool, love that project!
+
+What task are you on?
+
+1. Admin
+2. Backend
+3. Bug Fixing
+4. Design
+5. Frontend
+6. Support
+
+Just type the number to choose it or write 'no' if you picked the wrong project.
+```
+Dialogue command 3:
+```
+/timer 2
+```
+Example dialogue output:
+```
+Successfully created and started an entry for
+NEVERBLAND - Project 2 - Backend
+```

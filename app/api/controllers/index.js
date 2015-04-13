@@ -53,8 +53,10 @@ module.exports = function (app, config)
     // Load all actions
     
     walker.on('file', function (root, stat, next) {
-        var file = __dirname + '/actions/' + stat.name;
-        require(file)(app);
+        var file = __dirname + '/actions/' + stat.name,
+            baseName = stat.name.substr(0, stat.name.length - 3),
+            conf = config[baseName] || {};
+        require(file)(app, conf);
         next();
     });
     

@@ -3,13 +3,12 @@
 
 var _               = require('lodash'),
     userSession     = require('./user_session.js'),
-    consts          = require('../../../../consts.json'),
     logger          = require('./../../../services/logger.js')('default')
 ;
 
 function Resolver (userSession, sessionTime)
 {
-    this.sessionTime = sessionTime || consts.userSession.lifeSpan;
+    this.sessionTime = sessionTime;
     this.userSession = userSession;
     this.stepProviders = [];
     this.timeouts = {};
@@ -17,6 +16,18 @@ function Resolver (userSession, sessionTime)
 
 Resolver.prototype = {
     
+    
+    /**
+     * Sets the session time
+     * 
+     * @param       {Number}        sessionTime
+     * @returns     {Resolver}      This instance
+     */
+    setSesstionTime : function (sessionTime)
+    {
+        this.sessionTime = parseInt(sessionTime);
+        return this;
+    },
     
     /**
      * Registers a step provider

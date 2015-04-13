@@ -65,7 +65,7 @@ function notifyAllController (req, res, next)
    });
 }
 
-module.exports = function (app)
+module.exports = function (app, config)
 {
     app.use('/api/notify-all', notifyAllController);
 };

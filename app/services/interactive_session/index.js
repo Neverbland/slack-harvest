@@ -89,7 +89,7 @@ if (resolver === null) {
                     var entry = timerParser.filterCurrentEntry(step.getParam('entries').day_entries);
                     if (entry !== null) {
                         return  [
-                            'You are currently working on \n',
+                            'You are currently working on ',
                             entry.client + ' - ' + entry.project + ' - ' + entry.task
                         ].join('\n');
                     } else {
@@ -347,9 +347,7 @@ if (resolver === null) {
             }
             var view = [
                 'Cool, love that project!',
-                '\n',
-                'What task are you on?',
-                '\n'
+                'What task are you on?'
             ],
                     
             previousStep = step.getParam('previousStep'),

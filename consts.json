@@ -9,6 +9,6 @@
         "DATE_TO_TEXT" : "+ 0 hours"
     },
     "userSession" : {
-        "lifeSpan" : 120000
+        "sessionTime" : 120000
     }
 }

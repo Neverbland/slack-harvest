@@ -7,6 +7,7 @@ var httpCodes               =   require('./../../codes.js'),
     logger                  =   require('./../../../services/logger.js')('default'),
     tools                   =   require('./../../../services/tools.js'),
     timerCommandParser      =   require('./../../../services/timer.js'),
+    consts                  =   require('../../../../consts.json'),
     commandSessionResolver  =   require('./../../../services/interactive_session');
 
 
@@ -78,7 +79,9 @@ function manageTimerController(req, res, next)
 }
 
 
-module.exports = function (app)
+module.exports = function (app, config)
 {
+    var sessionTime = config.sessionTime || consts.userSession.sessionTime;
+    commandSessionResolver.setSesstionTime(sessionTime);
     app.use('/api/timer', manageTimerController);
 };
