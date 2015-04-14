@@ -133,7 +133,7 @@ if (resolver === null) {
                     }
                     var error = step.getParam('stopError'),
                             entry = step.getParam('entry')
-                            ;
+                    ;
 
                     if (typeof error !== 'undefined') {
                         return error;

@@ -1,15 +1,15 @@
 'use strict';
 
-var app                 = require('./../../../app.js'),
+var app                 = require('./../../app.js'),
     expect              = require('chai').expect,
     http                = require('http'),
-    codes               = require('./../../../app/api/codes.js'),
+    codes               = require('./../../app/api/codes.js'),
     request             = require('request'),
-    auth                = require('./../../../app/services/auth/lib/auth.js'),
-    applyHandlers       = require('./../../../app/services/auth/lib/handlers.js'),
+    auth                = require('./../../app/services/auth/lib/auth.js'),
+    applyHandlers       = require('./../../app/services/auth/lib/handlers.js'),
     sinon               = require("sinon"),
     sinonChai           = require("sinon-chai"),
-    harvest             = require('./../../../app/services/harvest')('default', {
+    harvest             = require('./../../app/services/harvest')('default', {
         subdomain   : "test",
         email       : "test@test.com",
         password    : "password"
