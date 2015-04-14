@@ -15,7 +15,7 @@ var app                 = require('./../../../app.js'),
         password    : "password"
     }),
     harvestModule       = harvest.harvest,
-    sampleTimelineData  = timelineData = {
+    sampleTimelineData  = {
                         day_entries:
                                 [
                                     {
@@ -121,6 +121,68 @@ describe('Functional: Non-dialogue commands', function () {
                 expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
                 expect(body).to.be.equal([
                     'You are currently working on ',
+                    'Test Client - Test Project - Test Task'
+                ].join('\n'));
+                done();
+            });
+        });
+    });
+    
+    
+    describe ('Command: /timer stop', function () {
+        it ('Should call harvest API and provide a proper text response containing information, that there is no project to stop.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy(),
+                timelineData = {}
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(timelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, timelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'stop'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(timelineData);
+                expect(body).to.be.equal('Currently you have no running tasks.');
+                done();
+            });
+        });
+        
+        
+        it ('Should call harvest API and provide a proper text response containing information, which project is currently worked on by the user.', function (done) {
+            var userId = 23456,
+                expectedUrlTasks = '/daily?of_user=' + userId,
+                expectedUrl = '/daily/timer/320497172?of_user=' + userId
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                if (url === expectedUrlTasks) {
+                    cb(null, sampleTimelineData);
+                } else {
+                    expect(url).to.be.equal(expectedUrl);
+                    cb(null, {});
+                }
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'stop'
+                }
+            }, function (err, res, body) {
+                expect(body).to.be.equal([
+                    'Successfully stopped the timer for',
                     'Test Client - Test Project - Test Task'
                 ].join('\n'));
                 done();

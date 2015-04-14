@@ -140,7 +140,7 @@ if (resolver === null) {
                     }
 
                     return [
-                        'Successfully stopped the timer for ',
+                        'Successfully stopped the timer for',
                         entry.client + ' - ' + entry.project + ' - ' + entry.task
                     ].join('\n');
                 }
