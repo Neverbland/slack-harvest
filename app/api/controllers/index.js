@@ -28,12 +28,13 @@ module.exports = function (app, config)
     function setResponse (req, res, next) 
     {
         var httpCode;
+
         if (!!res.success === false) {
-            httpCode = httpCodes.BAD_REQUEST; // Unauthorized
+            httpCode = (res.statusCode === httpCodes.NOT_FOUND) ? res.statusCode : httpCodes.BAD_REQUEST; // Unauthorized
         } else {
             httpCode = httpCodes.OK;
         }
-        res.writeHead(httpCode);
+        res.statusCode = httpCode;
         var responseJson = {
             success : Boolean(res.success),
             code: httpCode
@@ -44,6 +45,12 @@ module.exports = function (app, config)
         res.write(JSON.stringify(responseJson));
         res.send();
     }
+    
+    // Default response should be 404
+    app.use(function (req, res, next) {
+        res.statusCode = httpCodes.NOT_FOUND;
+        next();
+    });
     
     
     walker  = walk.walk(__dirname + '/actions', {

@@ -9,7 +9,9 @@
             "secret" : "thisissomeauthsecret"
         },
         "controllers" : {
-            
+            "timer" : {
+                "sessionTime" : 120000
+            }
         }
     },
     "users": {

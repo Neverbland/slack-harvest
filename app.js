@@ -16,7 +16,9 @@ var express = require('express'),
     slack = require('./app/services/slack')('default', config.slack),
     notifier = require('./app/services/notifier'),
     reportNotifier = require('./app/services/report')(slack, harvest),
-    slackNotifier = require('./app/services/slack/notifier')(slack, harvest);
+    slackNotifier = require('./app/services/slack/notifier')(slack, harvest),
+    server
+;
 
 harvest.setUsers(config.users);
 slack.setUsers(config.users);
@@ -29,6 +31,10 @@ require('./app/event_listeners')(app);
 require('./app/api')(app, config.api);
 require('./app/services/cronjobs')(app, config.cron);
 
-var server = app.listen(config.app.port, function () {
-    logger.info('Started web server with config : ', config, {});
-});
+module.exports = app;
+
+if (!module.parent) {
+    server = app.listen(config.app.port, function () {
+        logger.info('Started web server with config : ', config, {});
+    });
+}

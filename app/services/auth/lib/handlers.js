@@ -107,6 +107,7 @@ handlers.token.prototype.constructor = handlers.token;
 
 module.exports = function (auth, config) 
 {
+   auth.resetHandlers();
    _.each(config, function (param, handlerName) {
         if (!handlers[handlerName]) {
             return;
@@ -114,4 +115,4 @@ module.exports = function (auth, config)
         var handler = new handlers[handlerName](param);
         auth.addHandler(handler);
     });
-}
+};
