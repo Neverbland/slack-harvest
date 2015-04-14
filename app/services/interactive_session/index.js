@@ -455,6 +455,7 @@ if (resolver === null) {
             } else {
                 return [
                     'Successfully created and started an entry for',
+                    '',
                     entry.client + ' - ' + entry.project + ' - ' + entry.task
                 ].join('\n');
             }
