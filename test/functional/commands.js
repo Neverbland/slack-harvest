@@ -20,9 +20,9 @@ var app                 = require('./../../app.js'),
                                 [
                                     {
                                         timer_started_at: '2015-04-14T07:28:26Z',
-                                        project_id: '3058542',
+                                        project_id: '7585993',
                                         project: 'Test Project',
-                                        user_id: 449849,
+                                        user_id: 23456,
                                         spent_at: '2015-04-14',
                                         task_id: '1815946',
                                         task: 'Test Task',
@@ -42,9 +42,26 @@ var app                 = require('./../../app.js'),
                                         code: '',
                                         id: 7585993,
                                         billable: true,
-                                        tasks: [Object],
+                                        tasks: [
+                                            { name: 'Test Task', billable: false, id: 1815946 },
+                                            { name: 'Design', billable: false, id: 1815943 }
+                                        ],
                                         client: 'Test Client',
-                                        client_id: 1685324,
+                                        client_id: 1234567,
+                                        client_currency: 'British Pound - GBP',
+                                        client_currency_symbol: '£'
+                                    },
+                                    {
+                                        name: 'Test Project 2',
+                                        code: '',
+                                        id: 7585994,
+                                        billable: true,
+                                        tasks: [
+                                            { name: 'Test Task', billable: false, id: 1915946 },
+                                            { name: 'Support', billable: false, id: 1918076 }
+                                        ],
+                                        client: 'Test Client',
+                                        client_id: 1234567,
                                         client_currency: 'British Pound - GBP',
                                         client_currency_symbol: '£'
                                     }
@@ -186,6 +203,135 @@ describe('Functional: Non-dialogue commands', function () {
                     'Test Client - Test Project - Test Task'
                 ].join('\n'));
                 done();
+            });
+        });
+    });
+    
+    
+    describe ('Command: /timer start', function () {
+        
+        it('Should call the api and provide info, that no project/client is matching given input string.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'start nonexistingproject'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal('No projects matching given string found!');
+                done();
+            });
+        });
+        
+        
+        it('Should call the api and return step 1 dialogue message. After sending \'no\' response, should quit the dislogue.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'start test'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal([
+                    'Choose the awesome project you are working on today!',
+                    '',
+                    '1. Test Client - Test Project',
+                    '2. Test Client - Test Project 2',
+                    '',
+                    'Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup'
+                ].join('\n'));
+                
+                request.post({
+                    url : 'http://localhost:3333/api/timer',
+                    form : {
+                        token : 'thisissomeauthtoken',
+                        user_name : 'some_user',
+                        text : 'no'
+                    }
+                }, function (err, res, body) {
+                    expect(body).to.be.equal('Cool, try again later!');
+                    done();
+                });
+            });
+        });
+    
+    
+    
+        it('Should call the api and return step 1 dialogue message. After sending \'no\' response, should quit the dislogue.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'start test'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal([
+                    'Choose the awesome project you are working on today!',
+                    '',
+                    '1. Test Client - Test Project',
+                    '2. Test Client - Test Project 2',
+                    '',
+                    'Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup'
+                ].join('\n'));
+                
+                request.post({
+                    url : 'http://localhost:3333/api/timer',
+                    form : {
+                        token : 'thisissomeauthtoken',
+                        user_name : 'some_user',
+                        text : '1'
+                    }
+                }, function (err, res, body) {
+                    expect(body).to.be.equal([
+                        'Cool, love that project!',
+                        'What task are you on?',
+                        '',
+                        '1. Test Task (Currently running)',
+                        '2. Design',
+                        '',
+                        'Just type /timer followed by a number to choose it or write \'/timer no\' if you picked the wrong project.'
+                    ].join('\n'));
+                    done();
+                });
             });
         });
     });

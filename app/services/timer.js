@@ -162,7 +162,7 @@ module.exports = {
     {
         var isRunning = false;
         _.each(dailyEntries, function (dailyEntry) {
-            if (parseInt(dailyEntry.task_id) === parseInt(taskId) && parseInt(projectId) === dailyEntry.project_id && !!dailyEntry.timer_started_at) {
+            if ((parseInt(dailyEntry.task_id) === parseInt(taskId)) && (parseInt(projectId) === parseInt(dailyEntry.project_id)) && !!dailyEntry.timer_started_at) {
                 isRunning = true;
             }
         });

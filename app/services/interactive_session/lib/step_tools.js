@@ -31,7 +31,7 @@ stepTools.prototype = {
         interactiveSession.getDefault().clear(userId);
         callback(
             null, 
-            "Cool, try again later!",
+            'Cool, try again later!',
             null
         );
     },

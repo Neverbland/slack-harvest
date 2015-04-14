@@ -119,7 +119,7 @@ if (resolver === null) {
                     });
 
                     view.push('');
-                    view.push('Just type the number to choose it or write \'no\' to quit the timer setup');
+                    view.push('Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup');
 
 
                     return view.join('\n');
@@ -360,7 +360,8 @@ if (resolver === null) {
             }
             var view = [
                 'Cool, love that project!',
-                'What task are you on?'
+                'What task are you on?',
+                ''
             ],
                     
             previousStep = step.getParam('previousStep'),
@@ -373,7 +374,7 @@ if (resolver === null) {
             });
 
             view.push('');
-            view.push('Just type the number to choose it or write \'no\' if you picked the wrong project.');
+            view.push('Just type /timer followed by a number to choose it or write \'/timer no\' if you picked the wrong project.');
 
             return view.join('\n');
         }
