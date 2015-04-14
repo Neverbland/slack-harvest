@@ -298,6 +298,7 @@ _Harvest.prototype = {
             if (err !== null) {
                 logger.log('Not able to load tasks for user ' + userId, err, {});
             } 
+            console.log(results);
             callback(err, results);
         });
     },

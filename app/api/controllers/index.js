@@ -28,6 +28,10 @@ module.exports = function (app, config)
     function setResponse (req, res, next) 
     {
         var httpCode;
+        
+        if (typeof res.success === 'undefined') {
+            res.statusCode = httpCodes.NOT_FOUND;
+        }
 
         if (!!res.success === false) {
             httpCode = (res.statusCode === httpCodes.NOT_FOUND) ? res.statusCode : httpCodes.BAD_REQUEST; // Unauthorized
@@ -46,13 +50,6 @@ module.exports = function (app, config)
         res.send();
     }
     
-    // Default response should be 404
-    app.use(function (req, res, next) {
-        res.statusCode = httpCodes.NOT_FOUND;
-        next();
-    });
-    
-    
     walker  = walk.walk(__dirname + '/actions', {
         followLinks : false 
     });
@@ -69,6 +66,7 @@ module.exports = function (app, config)
     
     
     walker.on('end', function () {
+        // Default response should be 404
         app.use(setResponse);
     });
 };

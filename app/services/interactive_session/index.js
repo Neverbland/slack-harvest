@@ -86,6 +86,10 @@ if (resolver === null) {
             status: {
                 getView: function (step)
                 {
+                    var errorString = 'Currently you have no running tasks.';
+                    if (step === null) {
+                        return errorString;
+                    }
                     var entry = timerParser.filterCurrentEntry(step.getParam('entries').day_entries);
                     if (entry !== null) {
                         return  [
@@ -93,13 +97,16 @@ if (resolver === null) {
                             entry.client + ' - ' + entry.project + ' - ' + entry.task
                         ].join('\n');
                     } else {
-                        return 'Currently you have no running tasks.';
+                        return errorString;
                     }
                 }
             },
             start: {
                 getView: function (step)
                 {
+                    if (step === null) {
+                        return 'No projects matching given string found!';
+                    }
                     var view = [
                         'Choose the awesome project you are working on today!',
                         ''
@@ -121,6 +128,9 @@ if (resolver === null) {
             stop: {
                 getView: function (step)
                 {
+                    if (step === null) {
+                        return 'Currently you have no running tasks.';
+                    }
                     var error = step.getParam('stopError'),
                             entry = step.getParam('entry')
                             ;
@@ -145,6 +155,7 @@ if (resolver === null) {
             return false;
         },
         execute: function (params, previousStep, callback) {
+            
             var action = tools.validateGet(params, 'action'),
                 userId = params.userId,
                 name = params.name,
@@ -172,7 +183,9 @@ if (resolver === null) {
                     projects = timerParser.findMatchingClientsOrProjects(name, results.projects);
 
                     if (!projects.length) {
-                        callback(null, "No projects matching given string found!", null);
+                        var viewProvider = that.viewsProviders[action],
+                            view = viewProvider.getView(null);
+                        callback(null, view, null);
                         return;
                     }
                     

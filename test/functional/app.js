@@ -21,7 +21,7 @@ describe('Functional: Server response', function () {
     
     describe('Server UNAUTHORIZED error response', function () {
 
-        it('Should show an \'access dennied\' code/message, JSON object as a response body, containing success, code and error reasons.', function (done) {
+        it('Should show an \'access dennied\' code/message/success result, error reasons for non-authorized request/valid endpoint.', function (done) {
             request.post({
                 url : 'http://localhost:3333/api/timer'
             }, function (err, res, body) {
@@ -37,14 +37,31 @@ describe('Functional: Server response', function () {
 
                 done();
             });
+        });
+        
+        it('Should show an \'access dennied\' code/message/success result, error reasons for non-authorized request/invalid endpoint.', function (done) {
+            request.post({
+                url : 'http://localhost:3333/api/non-existing-endpoint'
+            }, function (err, res, body) {
+                
+                var json = JSON.parse(body);
+                expect(res.statusCode).to.be.equal(codes.UNAUTHORIZED);
+                expect(json.code).to.be.equal(codes.UNAUTHORIZED);        
+                expect(json.success).to.be.equal(false);    
+                expect(json.errors).to.be.a('array');
+                expect(json.errors).to.include.members([
+                    'Provided token is invalid'
+                ]);
 
+                done();
+            });
         });
     });
     
     
     describe('Server 404 error response', function () {
 
-        it('Should show a 404 code/message if accessed url does not exist', function (done) {
+        it('Should show a 404 code/message if accessed url does not exist but user is authenticated', function (done) {
             applyHandlers(auth, {
                 token : 'thisissomeauthtoken'
             });
