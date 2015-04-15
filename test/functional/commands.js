@@ -7,8 +7,9 @@ var app                 = require('./../../app.js'),
     request             = require('request'),
     auth                = require('./../../app/services/auth/lib/auth.js'),
     applyHandlers       = require('./../../app/services/auth/lib/handlers.js'),
-    sinon               = require("sinon"),
-    sinonChai           = require("sinon-chai"),
+    sinon               = require('sinon'),
+    sinonChai           = require('sinon-chai'),
+    commandName         = require('./../../config').api.controllers.timer.command,
     harvest             = require('./../../app/services/harvest')('default', {
         subdomain   : "test",
         email       : "test@test.com",
@@ -87,7 +88,7 @@ describe('Functional: Non-dialogue commands', function () {
     });
     
     
-    describe ('Command: /timer status', function () {
+    describe ('Command: ' + commandName + ' status', function () {
         it ('Should call harvest API and provide a proper text response containing information, that there is no project currently being worked on.', function (done) {
             var userId = 23456,
                 expectedUrl = '/daily?of_user=' + userId,
@@ -146,7 +147,7 @@ describe('Functional: Non-dialogue commands', function () {
     });
     
     
-    describe ('Command: /timer projects', function () {
+    describe ('Command: ' + commandName + ' projects', function () {
         it ('Should call harvest API and provide a proper text response containing information, that there are no projects currently available.', function (done) {
             var userId = 23456,
                 expectedUrl = '/daily?of_user=' + userId,
@@ -207,7 +208,7 @@ describe('Functional: Non-dialogue commands', function () {
     });
     
     
-    describe ('Command: /timer stop', function () {
+    describe ('Command: ' + commandName + ' stop', function () {
         it ('Should call harvest API and provide a proper text response containing information, that there is no project to stop.', function (done) {
             var userId = 23456,
                 expectedUrl = '/daily?of_user=' + userId,
@@ -269,7 +270,7 @@ describe('Functional: Non-dialogue commands', function () {
     });
     
     
-    describe ('Command: /timer start', function () {
+    describe ('Command: ' + commandName + ' start', function () {
         
         it('Should call the api and provide info, that no project/client is matching given input string.', function (done) {
             var userId = 23456,
@@ -325,7 +326,7 @@ describe('Functional: Non-dialogue commands', function () {
                     '1. Test Client - Test Project',
                     '2. Test Client - Test Project 2',
                     '',
-                    'Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup'
+                    'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup'
                 ].join('\n'));
                 
                 request.post({
@@ -371,7 +372,7 @@ describe('Functional: Non-dialogue commands', function () {
                     '1. Test Client - Test Project',
                     '2. Test Client - Test Project 2',
                     '',
-                    'Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup'
+                    'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup'
                 ].join('\n'));
                 
                 request.post({
@@ -389,7 +390,7 @@ describe('Functional: Non-dialogue commands', function () {
                         '1. Test Task (Currently running)',
                         '2. Design',
                         '',
-                        'Just type /timer followed by a number to choose it or write \'/timer no\' if you picked the wrong project.'
+                        'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' if you picked the wrong project.'
                     ].join('\n'));
                     
                     request.post({
@@ -435,7 +436,7 @@ describe('Functional: Non-dialogue commands', function () {
                     '1. Test Client - Test Project',
                     '2. Test Client - Test Project 2',
                     '',
-                    'Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup'
+                    'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup'
                 ].join('\n'));
                 
                 request.post({
@@ -453,7 +454,7 @@ describe('Functional: Non-dialogue commands', function () {
                         '1. Test Task (Currently running)',
                         '2. Design',
                         '',
-                        'Just type /timer followed by a number to choose it or write \'/timer no\' if you picked the wrong project.'
+                        'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' if you picked the wrong project.'
                     ].join('\n'));
                     
                     
@@ -534,7 +535,7 @@ describe('Functional: Non-dialogue commands', function () {
                     '1. Test Client - Test Project',
                     '2. Test Client - Test Project 2',
                     '',
-                    'Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup'
+                    'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup'
                 ].join('\n'));
                 
                 request.post({
@@ -552,7 +553,7 @@ describe('Functional: Non-dialogue commands', function () {
                         '1. Test Task (Currently running)',
                         '2. Design',
                         '',
-                        'Just type /timer followed by a number to choose it or write \'/timer no\' if you picked the wrong project.'
+                        'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' if you picked the wrong project.'
                     ].join('\n'));
                     
                     

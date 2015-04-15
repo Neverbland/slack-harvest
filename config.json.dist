@@ -10,7 +10,8 @@
         },
         "controllers" : {
             "timer" : {
-                "sessionTime" : 120000
+                "sessionTime" : 120000,
+                "command" : "/t"
             }
         }
     },

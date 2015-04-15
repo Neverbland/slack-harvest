@@ -10,7 +10,8 @@ var     interactiveSession  = require('./lib/user_session.js'),
         harvest             = require('./../harvest')('default'),
         stepTools           = require('./lib/step_tools.js'),
         errOutput           = 'Wrong input provided, try following the instructions...',
-        logger              = require('./../../services/logger.js')('default')
+        logger              = require('./../../services/logger.js')('default'),
+        commandName         = require('./../../../config').api.controllers.timer.command
 ;
 
 if (resolver === null) {
@@ -162,7 +163,7 @@ if (resolver === null) {
                     });
 
                     view.push('');
-                    view.push('Just type /timer followed by a number to choose it or write \'/timer no\' to quit the timer setup');
+                    view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup');
 
 
                     return view.join('\n');
@@ -417,7 +418,7 @@ if (resolver === null) {
             });
 
             view.push('');
-            view.push('Just type /timer followed by a number to choose it or write \'/timer no\' if you picked the wrong project.');
+            view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' if you picked the wrong project.');
 
             return view.join('\n');
         }

@@ -21,7 +21,7 @@ The application is written 100% in `Node.JS` and at this point consists of thre 
 - a **Slack Command API endpoint** that manages Harvest timer setup.
 
 
-### The HARVEST configuration
+###HARVEST configuration
 
 For the moment, harvest communication may be only set up using an account. To have a complete list of projects in all user notifications, an account with access to prefferably all available projects, users and clients should be used. Mandatory parameters in the configuration object are `subdomain`, `email` and `password`.
 
@@ -33,7 +33,7 @@ For the moment, harvest communication may be only set up using an account. To ha
 }
 ```
 
-### The SLACK configuration
+###SLACK configuration
 
 The Slack part uses a simple **incoming WebHook** that need to be created within the Slack application itself (See [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)). The only mandatory parameter that need to be set is `endpoint` which is the webhook endpoint. The configuration below contains additional params which are overriding the default settings for the webhook. All [params available for the webhook](https://api.slack.com/incoming-webhooks) can be used except `channel`, which will always be overridden by **slack username** of the user that receives the notifications.
 
@@ -45,7 +45,7 @@ The Slack part uses a simple **incoming WebHook** that need to be created within
 }
 ```
 
-### The users configuration
+### Users configuration
 
 The users section contains the mapping of all available users **Harvest ID -> Slack username** map. Only these users will be available for notification.
 
@@ -56,7 +56,7 @@ The users section contains the mapping of all available users **Harvest ID -> Sl
 ```
 
 
-## The CRON
+##CRON
 
 For the moment the application is able to:
 
@@ -87,7 +87,7 @@ For the moment the application is able to:
 If any of the section for `cron` settings are not provided, the cron job will not be set up.
 
 
-## The API
+##API
 
 The API provides given endpoints:
 
@@ -100,7 +100,7 @@ The API provides given endpoints:
 The `notify-all` and `notify-user` are **actions names**; this will be useful when creating authorization token.
 
 
-### The API configuration
+###API configuration
 
 The `api.auth` section of the config file contains settings for the authorization parameters. There are two built in methods of authorization:
 
@@ -135,6 +135,8 @@ The command syntax contains the configured slack command name (e.g. `/timer`) an
 
 - `status` shows the Harvest client, project and task name for the current user task. This is a single step task that doesn't follow a dialogue with the server.
 
+- `projects` lists out all currently available projects with the client names.
+
 - `stop` stops the work for the task that is currently running for given user. This is a single step task that doesn't follow a dialogue with the server.
 
 - `start` aims to start a task. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
@@ -149,6 +151,20 @@ Example output:
 You are currently working on 
 NEVERBLAND - Internal - Admin
 ```
+
+
+Command: 
+```
+/timer projects
+```
+Example output:
+```
+Available projects
+
+1. Test Client - Test Project
+2. Test Client - Test Project 2
+```
+
 
 
 Command:
