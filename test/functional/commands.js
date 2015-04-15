@@ -146,6 +146,67 @@ describe('Functional: Non-dialogue commands', function () {
     });
     
     
+    describe ('Command: /timer projects', function () {
+        it ('Should call harvest API and provide a proper text response containing information, that there are no projects currently available.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy(),
+                timelineData = {}
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(timelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, timelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'projects'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(timelineData);
+                expect(body).to.be.equal('Currently you have no available projects.');
+                done();
+            });
+        });
+        
+        
+        it ('Should call harvest API and provide a proper text response containing information, which projects are available.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'projects'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal([
+                    'Available projects',
+                    '',
+                    '1. Test Client - Test Project',
+                    '2. Test Client - Test Project 2'
+                ].join('\n'));
+                done();
+            });
+        });
+    });
+    
+    
     describe ('Command: /timer stop', function () {
         it ('Should call harvest API and provide a proper text response containing information, that there is no project to stop.', function (done) {
             var userId = 23456,

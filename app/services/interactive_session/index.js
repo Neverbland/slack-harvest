@@ -47,6 +47,20 @@ if (resolver === null) {
                     return null;
                 }
             },
+            projects: {
+                execute: function (step, callback) {
+                    var userId = step.getParam('userId');
+                    interactiveSession
+                            .getDefault()
+                            .clear(userId)
+                            ;
+                    callback();
+                },
+                prepareStep: function (step)
+                {
+                    return null;
+                }
+            },
             stop: {
                 prepareStep: function (step)
                 {
@@ -99,6 +113,35 @@ if (resolver === null) {
                     } else {
                         return errorString;
                     }
+                }
+            },
+            projects: {
+                getView: function (step)
+                {
+                    var errorString = 'Currently you have no available projects.',
+                        hasProjects = false;
+                    if (step === null) {
+                        return errorString;
+                    }
+                    
+                    var view = [
+                        'Available projects',
+                        ''
+                    ];
+
+                    hasProjects;
+                    _.each(step.getOptions(), function (option, value) {
+                        if (option.type === 'project') {
+                            hasProjects = true;
+                            view.push(value + '. ' + option.name);
+                        }
+                    });
+                    
+                    if (!hasProjects) {
+                        return errorString;
+                    }
+
+                    return view.join('\n');
                 }
             },
             start: {

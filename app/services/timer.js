@@ -18,7 +18,8 @@ module.exports = {
         var validActions = [
             'start',
             'stop',
-            'status'
+            'status',
+            'projects'
         ];
         
         var validateAction  = function (action) 
