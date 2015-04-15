@@ -6,7 +6,9 @@ var harvest     =   require('harvest'),
     tools       =   require('./../tools.js'),
     logger      =   require('./../logger.js'),
     humps       =   require('humps'),
-    Q           =   require('q');
+    Q           =   require('q'),
+    instances   =   {}
+;
 
 /**
  * Takes the Date object and formats it to YYYYMMDD
@@ -183,7 +185,7 @@ _Harvest.prototype = {
                     validItems.push(item);
                 }
             });
-            callback(null, items);
+            callback(null, validItems);
         });
     },
     
@@ -298,7 +300,6 @@ _Harvest.prototype = {
             if (err !== null) {
                 logger.log('Not able to load tasks for user ' + userId, err, {});
             } 
-            console.log(results);
             callback(err, results);
         });
     },
@@ -384,13 +385,6 @@ _Harvest.prototype = {
     }
 };
 _Harvest.prototype.constructor = _Harvest;
-
-
-/**
- * 
- * @type        {Object}        An object containing _Harvest instances
- */
-var instances = {};
 
 /**
  * Creates a new instance if such instance does not exist. If exists, returns

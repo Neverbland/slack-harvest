@@ -24,6 +24,19 @@ function doNotify (harvestResponse, userId)
 }
 
 
+function getHarvestUserId (users, userId)
+{
+    var harvestUserId = null;
+    _.each(users, function (slackName, harvestId) {
+        if ((String(harvestId) === String(userId)) || (String(slackName) === String(userId))) {
+            harvestUserId = harvestId;
+        }
+    });
+
+    return harvestUserId;
+}
+
+
 /**
  * Notifies a single user given either by slack name or harvest id
  * 
