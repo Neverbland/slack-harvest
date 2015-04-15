@@ -4,7 +4,7 @@
 var harvest     =   require('harvest'),
     _           =   require('lodash'),
     tools       =   require('./../tools.js'),
-    logger      =   require('./../logger.js'),
+    logger      =   require('./../logger.js')('default'),
     humps       =   require('humps'),
     Q           =   require('q'),
     instances   =   {}

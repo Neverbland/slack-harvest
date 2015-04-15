@@ -86,8 +86,9 @@ module.exports = {
          */
         function entryMatches (name, entry)
         {
-            var regexp = new RegExp(name, 'ig');
-            return (regexp.test(entry.project) || regexp.test(entry.client));
+            var lowerName = String(name).toLowerCase();
+            var regexp = new RegExp(lowerName, 'ig');
+            return (regexp.test(String(entry.name).toLowerCase()) || regexp.test(String(entry.client).toLowerCase()));
         }
         
         return function (name, dailyEntries)
