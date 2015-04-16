@@ -2,8 +2,7 @@
   "name": "sh-middleman",
   "private": true,
   "scripts": {
-    "test": "env env=test mocha --recursive",
-    "test-coverage": "env env=test mocha --recursive --require blanket -R html-cov > coverage.html"
+    "test": "env env=test mocha --recursive"
   },
   "dependencies": {
     "express": "4.7.2",
