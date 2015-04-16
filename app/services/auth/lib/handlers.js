@@ -33,6 +33,7 @@ function generateHash (secret, seed, action)
  * @author      Maciej Garycki <maciej@neverbland.com>
  */
 var handlers = {
+    
     /**
      * Secret based handler
      * 
@@ -41,6 +42,16 @@ var handlers = {
     secret : function (secret) 
     {
         this.secret = secret;
+    },
+    
+    /**
+     * Token based handler
+     * 
+     * @constructor         Creates a secret handler 
+     */
+    token : function (token)
+    {
+        this.token = token;
     }
 }
 
@@ -71,9 +82,32 @@ handlers.secret.prototype = {
 handlers.secret.prototype.constructor = handlers.secret;
 
 
+handlers.token.prototype = {
+    
+    /**
+     * Validates the request
+     * 
+     * @param       {Object}          req
+     * @returns     {undefined}
+     */
+    validate : function (req)
+    {
+        var requestToken = req.body.token;
+        
+        if (this.token !== requestToken) {
+            throw new authErrorFactory.create("Invalid token", [
+                "Provided token is invalid"
+            ]);
+        }
+    }
+};
+handlers.token.prototype.constructor = handlers.token;
+
+
 
 module.exports = function (auth, config) 
 {
+   auth.resetHandlers();
    _.each(config, function (param, handlerName) {
         if (!handlers[handlerName]) {
             return;
@@ -81,4 +115,4 @@ module.exports = function (auth, config)
         var handler = new handlers[handlerName](param);
         auth.addHandler(handler);
     });
-}
+};

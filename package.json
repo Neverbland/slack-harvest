@@ -13,17 +13,19 @@
     "mysql": "2.5.2",
     "cron": "1.0.9",
     "lodash": "2.4.1",
-    "request": "2.45.0",
+    "request": "2.55.0",
     "express-validator": "2.7.0",
     "express-session": "1.9.3",
     "express-session-json": "0.0.7",
     "syslogh": "1.1.2",
-    "harvest": "0.0.9",
+    "harvest": "gacek85/node-harvest#master",
     "node-uuid": "1.4.2",
     "moment": "2.9.0",
     "winston": "0.8.1",
     "q" : "1.2.0",
-    "date-util" : "1.2.1"
+    "date-util" : "1.2.1",
+    "humps" : "0.5.1",
+    "walk" : "2.3.9"
   },
   "devDependencies": {
     "blanket": "1.1.6",
@@ -38,7 +40,8 @@
     "nodemon": "1.2.1",
     "rewire": "2.1.3",
     "sinon": "1.11.1",
-    "sinon-chai" : "2.7.0"
+    "sinon-chai" : "2.7.0",
+    "zombie" : "3.1.*"
   },
   "config": {
     "blanket": {

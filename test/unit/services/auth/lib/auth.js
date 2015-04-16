@@ -15,7 +15,7 @@ describe('auth/lib/auth', function () {
             body : {}
         };
         it("Should be able to register handlers and call them when asked if access is granted.", function () {
-            auth.addHandler({
+            auth.resetHandlers().addHandler({
                 validate : function (req) {
                     expect(req).to.equal(requestMock);
                 }

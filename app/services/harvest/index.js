@@ -4,8 +4,11 @@
 var harvest     =   require('harvest'),
     _           =   require('lodash'),
     tools       =   require('./../tools.js'),
-    logger      =   require('./../logger.js'),
-    Q           =   require('q');
+    logger      =   require('./../logger.js')('default'),
+    humps       =   require('humps'),
+    Q           =   require('q'),
+    instances   =   {}
+;
 
 /**
  * Takes the Date object and formats it to YYYYMMDD
@@ -82,11 +85,21 @@ _Harvest.prototype = {
     
     load : function (component) 
     {   
-        var Component = require('../../../node_modules/harvest/lib/' + component.toLowerCase() + '.js');
+        var Component = require('../../../node_modules/harvest/lib/' + this.decamelize(component) + '.js');
         return new Component(this.harvest);
     },
     
     
+    /**
+     * Turns a camel case string into a dash separated string
+     * 
+     * @param       {String}    inputString
+     * @returns     {String}
+     */
+    decamelize : function (inputString)
+    {
+        return humps.decamelize(inputString, '-');
+    },
     
     
     
@@ -116,10 +129,10 @@ _Harvest.prototype = {
         projects.list({}, function (err, results) {
             if (err === null) {
                 that.projects = _.assign(that.projects, byId(results, 'project'));
+            } else {
+                logger.log('Not able to load all projects.', err, {});
             }
-            if (typeof callback === 'function') {
-                callback(err, results);
-            }
+            callback(err, results);
         });
     },
     
@@ -172,7 +185,7 @@ _Harvest.prototype = {
                     validItems.push(item);
                 }
             });
-            callback(null, items);
+            callback(null, validItems);
         });
     },
     
@@ -263,7 +276,78 @@ _Harvest.prototype = {
         clients.list({}, function (err, results) {
             if (err === null) {
                 that.clients = _.assign(that.clients, byId(results, 'client'));
+            } else {
+                logger.log('Not able to load all clients.', err, {});
             }
+            callback(err, results);
+        });
+    },
+    
+    
+    /**
+     * Loads all user daily tasks and performs a callback on the results
+     * 
+     * @param       {Number}        userId      The integer value of the user id
+     * @param       {Function}      callback
+     * @returns     {undefined}
+     */
+    getTasks : function (userId, callback)
+    {
+        var timeTrack = this.load('TimeTracking');
+        timeTrack.daily({
+            of_user : userId
+        }, function (err, results) {
+            if (err !== null) {
+                logger.log('Not able to load tasks for user ' + userId, err, {});
+            } 
+            callback(err, results);
+        });
+    },
+    
+    
+    /**
+     * Stops a running task
+     * 
+     * @param   {Number}    userId
+     * @param   {Number}    dayEntryId
+     * @param   {Function}  the callback
+     */
+    toggle : function (userId, dayEntryId, callback)
+    {
+        var timeTrack = this.load('TimeTracking');
+        timeTrack.toggleTimer({
+            of_user : userId,
+            id : dayEntryId
+        }, function (err, results) {
+
+            if (err !== null) {
+                logger.log('Not able to toggle task day entry for user ' + userId + ' and id ' + dayEntryId, err, {});
+            } 
+            callback(err, results);
+        });
+    },
+    
+    
+    /**
+     * Creates the day entry
+     * 
+     * @param   {Number}    userId
+     * @param   {Number}    projectId
+     * @param   {Number}    taskId
+     * @param   {Function}  callback
+     */
+    createEntry : function (userId, projectId, taskId, callback)
+    {
+        var timeTrack = this.load('TimeTracking');
+        timeTrack.create({
+            of_user : userId,
+            task_id : taskId,
+            project_id : projectId,
+            hours : ''
+        }, function (err, results) {
+            if (err !== null) {
+                logger.log('Not able to create an entry for user ' + userId + ' and taskId ' + taskId, err, {});
+            } 
             callback(err, results);
         });
     },
@@ -301,13 +385,6 @@ _Harvest.prototype = {
     }
 };
 _Harvest.prototype.constructor = _Harvest;
-
-
-/**
- * 
- * @type        {Object}        An object containing _Harvest instances
- */
-var instances = {};
 
 /**
  * Creates a new instance if such instance does not exist. If exists, returns

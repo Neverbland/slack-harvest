@@ -149,7 +149,10 @@ SlackNotifierPrototype.prototype = new events.EventEmitter();
 SlackNotifier.prototype = new SlackNotifierPrototype();
 SlackNotifier.prototype.constructor = SlackNotifier;
 
+var instance = null;
 
 module.exports = function (slack, harvest) {
-    return new SlackNotifier(slack, harvest);
-}
+    instance = new SlackNotifier(slack, harvest);
+    module.exports.instance = instance;
+    return instance;
+};
