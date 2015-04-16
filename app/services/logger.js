@@ -22,15 +22,17 @@ function Logger(config) {
  */
 Logger.prototype._init = function () {
     // prepare logger transports
-    var transports = [
-        new winston.transports.File({
+    var transports = [];
+    
+    if (this.config.file) {
+        transports.push(new winston.transports.File({
             filename: this.config.file,
             json: true,
             stringify: function (obj) {
                 return JSON.stringify(obj);
             }
-        })
-    ];
+        }));
+    }
 
     // add console transport if defined
     if (this.config.console) {

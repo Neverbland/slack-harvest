@@ -8,9 +8,12 @@
  * @author Maciej Garycki <maciej@neverbland.com>
  */
 
-var express = require('express'),
+
+
+var 
+    express = require('express'),
     app = express(),
-    config = require('./config.json'),
+    config = require('./config/index.js'),
     logger = require('./app/services/logger.js')('default', config.logger),
     harvest = require('./app/services/harvest')('default', config.harvest),
     slack = require('./app/services/slack')('default', config.slack),

@@ -11,7 +11,7 @@ $ cd /path/to/project
 $ npm install
 ```
 
-Next thing to do is preparing the **config file**. The file must be located in the repository root and named `config.json` A template file is stored in `config.json.dist`. The fiel is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
+Next thing to do is preparing the **config file**. The file must be located in the repository root and named `config.json` A template file is stored in `config.dist.json`. The fiel is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
 
 ## Architecture
 
