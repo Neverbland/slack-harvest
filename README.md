@@ -15,10 +15,13 @@ Next thing to do is preparing the **config file**. The file must be located in t
 
 ## Architecture
 
-The application is written 100% in `Node.JS` and at this point consists of two blocks: The **cron-like time schedule** that sends notification messages to slack users and a simple **HTTP API** to trigger the notifications (for the moment for a single user and all users set up in the configuration file).
+The application is written 100% in `Node.JS` and at this point consists of thre blocks:
+- the **cron-like time schedule** that sends notification messages to slack users,
+- a simple **HTTP API** to trigger notifications (single user and all users notifications, management report),
+- a **Slack Command API endpoint** that manages Harvest timer setup.
 
 
-### The HARVEST configuration
+###HARVEST configuration
 
 For the moment, harvest communication may be only set up using an account. To have a complete list of projects in all user notifications, an account with access to prefferably all available projects, users and clients should be used. Mandatory parameters in the configuration object are `subdomain`, `email` and `password`.
 
@@ -30,7 +33,7 @@ For the moment, harvest communication may be only set up using an account. To ha
 }
 ```
 
-### The SLACK configuration
+###SLACK configuration
 
 The Slack part uses a simple **incoming WebHook** that need to be created within the Slack application itself (See [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)). The only mandatory parameter that need to be set is `endpoint` which is the webhook endpoint. The configuration below contains additional params which are overriding the default settings for the webhook. All [params available for the webhook](https://api.slack.com/incoming-webhooks) can be used except `channel`, which will always be overridden by **slack username** of the user that receives the notifications.
 
@@ -42,7 +45,7 @@ The Slack part uses a simple **incoming WebHook** that need to be created within
 }
 ```
 
-### The users configuration
+### Users configuration
 
 The users section contains the mapping of all available users **Harvest ID -> Slack username** map. Only these users will be available for notification.
 
@@ -53,7 +56,7 @@ The users section contains the mapping of all available users **Harvest ID -> Sl
 ```
 
 
-## The CRON
+##CRON
 
 For the moment the application is able to:
 
@@ -84,7 +87,7 @@ For the moment the application is able to:
 If any of the section for `cron` settings are not provided, the cron job will not be set up.
 
 
-## The API
+##API
 
 The API provides given endpoints:
 
@@ -97,9 +100,13 @@ The API provides given endpoints:
 The `notify-all` and `notify-user` are **actions names**; this will be useful when creating authorization token.
 
 
-### The API configuration
+###API configuration
 
-The `api.auth` section of the config file contains settings for the authorization parameters. The `secret` parameter is necessary to setup a security layer for the HTTP access. To validate the request and grant access, a `POST` payload must be sent containing a **token** and a **seed**. The token is generated with an `SHA1` hash of the same **secret as provided in the application config file**, **seed** and the **action name** from the URL (see above) joined by **|**.
+The `api.auth` section of the config file contains settings for the authorization parameters. There are two built in methods of authorization:
+
+- **Static token method** - will be used if an `api.auth.token` setting is present. The incoming requests will be checked if they contain a `POST` value with the name `token` and if the value matches the `api.auth.token` value.
+
+- **Dynamic token method** - will be used if an `api.auth.secret` setting is present.  To validate the request and grant access, a `POST` payload must contain a **token** and a **seed**. The token is generated with an `SHA1` hash of the same **secret as provided in the application config file**, **seed** and the **action name** from the URL (see above) joined by **|**.
 
 Example PHP implementation of the token generation:
 
@@ -117,3 +124,100 @@ $token = sha1(implode("|", array(
 
 ```
 
+
+##Harvest timer management
+
+The app provides an endpoint for a **Slack slash command** that enables management of the **Harvest day entries** directly from Slack. The command needs to be configured according to Slack slash command configuration guide [https://api.slack.com/slash-commands](https://api.slack.com/slash-commands). The timer management, in the most advanced case, works as a dialogue between the user (via Slack UI) and the server.
+
+###Command syntax
+
+The command syntax contains the configured slack command name (e.g. `/timer`) and following `action` name. Available actions:
+
+- `status` shows the Harvest client, project and task name for the current user task. This is a single step task that doesn't follow a dialogue with the server.
+
+- `projects` lists out all currently available projects with the client names.
+
+- `stop` stops the work for the task that is currently running for given user. This is a single step task that doesn't follow a dialogue with the server.
+
+- `start` aims to start a task. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
+
+###Examples
+Command: 
+```
+/timer status
+```
+Example output:
+```
+You are currently working on 
+NEVERBLAND - Internal - Admin
+```
+
+
+Command: 
+```
+/timer projects
+```
+Example output:
+```
+Available projects
+
+1. Test Client - Test Project
+2. Test Client - Test Project 2
+```
+
+
+
+Command:
+```
+/timer stop
+```
+Example output:
+```
+Successfully stopped the timer for 
+NEVERBLAND - Internal - Admin
+```
+
+
+Dialogue command 1:
+```
+/timer start neverb
+```
+Example dialogue output:
+```
+Choose the awesome project you are working on today!
+
+1. NEVERBLAND - Project 1
+2. NEVERBLAND - Project 2
+3. NEVERBLAND - Project 3
+4. NEVERBLAND - Project 4
+
+Just type the number to choose it or write 'no' to quit the timer setup
+```
+Dialogue command 2:
+```
+/timer 2
+```
+Example dialogue output:
+```
+Cool, love that project!
+
+What task are you on?
+
+1. Admin
+2. Backend
+3. Bug Fixing
+4. Design
+5. Frontend
+6. Support
+
+Just type the number to choose it or write 'no' if you picked the wrong project.
+```
+Dialogue command 3:
+```
+/timer 2
+```
+Example dialogue output:
+```
+Successfully created and started an entry for
+NEVERBLAND - Project 2 - Backend
+```

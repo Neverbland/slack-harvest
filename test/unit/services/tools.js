@@ -204,4 +204,45 @@ describe('tools', function () {
             });
         });
     });
+    
+    
+    
+    describe('tools.validateGet', function () {
+        it ('Should return a value of given object for given key', function () {
+            var input = [
+                {given : {someKey : 'Some Value'}, expected : "Some Value"},
+                {given : {someKey : 1}, expected : 1},
+                {given : {someKey : true}, expected : true},
+                {given : {someKey : false}, expected : false}
+            ];
+            
+
+            _.each(input, function (value) {
+                var expected = value.expected,
+                    given = value.given,
+                    returned = tools.validateGet(given, 'someKey');
+
+                    expect(returned).to.equal(expected);
+            });
+        });
+        
+        it ('Should throw an error with expected default message if value is not present', function () {
+            var given = {
+                someKey : 'Some value'
+            };
+            expect(function () {
+                tools.validateGet(given, 'param');
+            }).to.throw(Error, 'Param param does not exist.')
+        });
+        
+        it ('Should throw an error with expected defined message if value is not present', function () {
+            var given = {
+                    someKey : 'Some value'
+                },
+                errorMessage = 'Some error message';
+            expect(function () {
+                tools.validateGet(given, 'param', errorMessage);
+            }).to.throw(Error, errorMessage)
+        });
+    });
 });
