@@ -11,7 +11,7 @@ var     interactiveSession  = require('./lib/user_session.js'),
         stepTools           = require('./lib/step_tools.js'),
         errOutput           = 'Wrong input provided, try following the instructions...',
         logger              = require('./../../services/logger.js')('default'),
-        commandName         = require('./../../../config').api.controllers.timer.command
+        commandName         = require('./../../../config/index.js').api.controllers.timer.command
 ;
 
 if (resolver === null) {

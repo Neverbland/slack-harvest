@@ -1,0 +1,37 @@
+{
+    "app": {
+        "hostname" : "localhost",
+        "ip" : "127.0.0.1",
+        "port" : "3333"
+    },
+    "api": {
+        "auth" : {
+            "token" : "thisissomeauthtoken"
+        },
+        "controllers" : {
+            "timer" : {
+                "sessionTime" : 120000,
+                "command" : "/t"
+            }
+        }
+    },
+    "users": {
+        "2345" : "some_user"
+    },
+    "harvest" : {
+        
+    },
+    "slack" : {
+        
+    },
+    "cron" : {
+        
+    },
+    "logger" : {
+        "console": false,
+        "syslog": false,
+        "file" : false,
+        "processName" : "slack_harvest_middleman",
+        "appHostname" : "slack-harvest-middleman.dev"
+    }
+}

@@ -9,7 +9,7 @@ var app                 = require('./../../app.js'),
     applyHandlers       = require('./../../app/services/auth/lib/handlers.js'),
     sinon               = require('sinon'),
     sinonChai           = require('sinon-chai'),
-    commandName         = require('./../../config').api.controllers.timer.command,
+    commandName         = require('./../config.json').api.controllers.timer.command,
     harvest             = require('./../../app/services/harvest')('default', {
         subdomain   : "test",
         email       : "test@test.com",

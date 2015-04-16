@@ -2,6 +2,7 @@
 Berksfile.lock
 nbproject
 config.json
+!test/config.json
 .idea
 docs/
 
