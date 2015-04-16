@@ -1,8 +1,8 @@
 {
     "app": {
         "hostname" : "slack-harvest-middleman.dev",
-        "ip" : "192.168.10.12",
-        "port" : "3000"
+        "ip" : "localhost",
+        "port" : "3333"
     },
     "api": {
         "auth" : {
@@ -42,4 +42,11 @@
             "channel" : "#channel_name"
         }
     },
+    "logger" : {
+        "console": false,
+        "syslog": false,
+        "file" : false,
+        "processName" : "slack_harvest_middleman",
+        "appHostname" : "slack-harvest-middleman.dev"
+    }
 }
