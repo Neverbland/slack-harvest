@@ -8,7 +8,10 @@
  * @author Maciej Garycki <maciej@neverbland.com>
  */
 
-var express = require('express'),
+
+
+var 
+    express = require('express'),
     app = express(),
     config = require('./config/index.js'),
     logger = require('./app/services/logger.js')('default', config.logger),

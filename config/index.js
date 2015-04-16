@@ -1,13 +1,25 @@
 /*jshint node: true*/
 'use strict';
 
-module.exports = (function () {
-    var config;
-    try {
-        config = require('./../config.json');
-    } catch (err) {
-        config = require('./../config.dist.json');
-    }
+var ConfigResolver = new function ()
+{
+    var env = process.env.env || 'live';
 
-    return config;
-})();
+    this.getConfig = function ()
+    {
+        var config;
+        if (env === 'test') {
+            config = require('./../test/config.json');
+        } else {
+            try {
+                config = require('./../config.json');
+            } catch (err) {
+                config = require('./../config.dist.json');
+            }
+        }
+
+        return config;
+    };
+};
+
+module.exports = ConfigResolver.getConfig();
