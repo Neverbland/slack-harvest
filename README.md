@@ -1,3 +1,5 @@
+![Travis CI](https://travis-ci.org/Neverbland/slack-harvest.svg)
+
 # Slack - Harvest integration
 
 The project aims to create a standalone application for automated integration between Harvest time tracking tool and Slack messaging system that will notify all configured team users about the amount of time they've spent on each project according to their Harvest timesheet.
