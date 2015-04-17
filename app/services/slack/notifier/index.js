@@ -141,7 +141,7 @@ var SlackNotifierPrototype = function ()
     
     // Send the message when all content populated and the text is prepared
     this.on('responseReady', this.responseReadyHandler);
-}
+};
 
 SlackNotifierPrototype.prototype = new events.EventEmitter();
 

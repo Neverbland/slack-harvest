@@ -20,6 +20,7 @@ var
     notifier = require('./app/services/notifier'),
     reportNotifier = require('./app/services/report')(slack, harvest),
     slackNotifier = require('./app/services/slack/notifier')(slack, harvest),
+    slackReminder = require('./app/services/slack/notifier/remind')(slack, harvest),
     server
 ;
 
@@ -28,6 +29,7 @@ slack.setUsers(config.users);
 
 // Defining two notification channels
 notifier.addNotifier('users', slackNotifier);
+notifier.addNotifier('reminder', slackReminder);
 notifier.addNotifier('management', reportNotifier);
 
 require('./app/event_listeners')(app);
