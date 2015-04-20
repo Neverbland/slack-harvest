@@ -81,7 +81,7 @@ describe('reminder', function () {
             };
             
             reminder.remind(users, null, function (results) {
-                console.log(results);
+
                 slack.sendMessage = sendMessage;
                 expect(counter).to.be.equal(3);
                 expect(results).to.be.a('object');

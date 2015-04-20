@@ -4,6 +4,16 @@
 var _ = require('lodash');
 require('date-util');
 
+if (typeof Object.size === 'undefined') {
+    Object.size = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    };
+}
+
 module.exports = {
     
     /**

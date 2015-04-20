@@ -120,6 +120,38 @@ var expect   = require('chai').expect,
     ];
 
 
+describe ('Prototypes and object modifications', function () {
+    
+    describe('Object.size', function () {
+    
+        it ('Should add a method that would result with similar output to Array.prototype.length property but on hash table-ish objects.', function () {
+            var input = [
+                {
+                    given : {},
+                    expected : 0
+                },
+                {
+                    given : {
+                        property1: "value 1",
+                        property2: "value 2",
+                        'property 3': "value 3"
+                    },
+                    expected : 3
+                }
+            ];
+
+            _.each(input, function (givenObject) {
+                var given = givenObject.given,
+                    expected = givenObject.expected
+                ;
+
+                expect(Object.size(given)).to.be.equal(expected);
+            });
+        });
+    });
+});
+
+
 describe('tools', function () {
     describe('tools.formatTime', function () {
         it ('Should return time in HH:MM format for given float number of hours.', function () {

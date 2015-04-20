@@ -6,12 +6,13 @@ var     interactiveSession  = require('./lib/user_session.js'),
         resolver            = null,
         tools               = require('./../tools'),
         _                   = require('lodash'),
-        timerParser         = require('./../timer'),
+        timerTools          = require('./../timer'),
         harvest             = require('./../harvest')('default'),
         stepTools           = require('./lib/step_tools.js'),
         errOutput           = 'Wrong input provided, try following the instructions...',
         logger              = require('./../../services/logger.js')('default'),
-        commandName         = require('./../../../config/index.js').api.controllers.timer.command
+        commandName         = require('./../../../config/index.js').api.controllers.timer.command,
+        reminder            = require('./../reminder/index.js')
 ;
 
 if (resolver === null) {
@@ -26,21 +27,51 @@ if (resolver === null) {
      * @returns {Object}
      */
     var stepFactory = function (stepProvider)
-    {
-        stepProvider.tools = new stepTools(stepProvider);
-        return stepProvider;
-    };
+        {
+            stepProvider.tools = new stepTools(stepProvider);
+            return stepProvider;
+        },
+        availableActions = [
+            'start',
+            'stop',
+            'status',
+            'projects',
+            'remind'
+        ];
+    ;
+    
+    
+    timerTools.setAvailableActions(availableActions);
+    
 
     // Step 1 provider
     resolver.addStepProvider(stepFactory({
         postStepActionProviders: {
+            
+            remind : {
+                
+                execute : function (step, callback) 
+                {
+                    reminder.remind(harvest.users, null, function (results) {
+                        step.addParam('results', results);
+                        callback();
+                    });
+                },
+                
+                prepareStep: function (step)
+                {
+                    return null;
+                }
+            },
+            
             status: {
-                execute: function (step, callback) {
+                execute: function (step, callback)
+                {
                     var userId = step.getParam('userId');
                     interactiveSession
                             .getDefault()
                             .clear(userId)
-                            ;
+                    ;
                     callback();
                 },
                 prepareStep: function (step)
@@ -49,7 +80,8 @@ if (resolver === null) {
                 }
             },
             projects: {
-                execute: function (step, callback) {
+                execute: function (step, callback) 
+                {
                     var userId = step.getParam('userId');
                     interactiveSession
                             .getDefault()
@@ -69,7 +101,7 @@ if (resolver === null) {
                 },
                 execute: function (step, callback)
                 {
-                    var entry = timerParser.filterCurrentEntry(step.getParam('entries').day_entries),
+                    var entry = timerTools.filterCurrentEntry(step.getParam('entries').day_entries),
                             userId = step.getParam('userId');
 
                     if (entry === null) {
@@ -98,6 +130,30 @@ if (resolver === null) {
             }
         },
         viewsProviders: {
+            
+            
+            remind : {
+                
+                getView : function (step)
+                {
+                    var results = step.getParam('results'),
+                        view = [];
+                    
+                    if (Object.size(results.notified) > 0) {
+                        view.push('Notified given users:');
+                        view.push('');
+                        _.each(results.notified, function (slackName) {
+                            view.push(slackName);
+                        });
+                    } else {
+                        view.push('No user notifications sent!');
+                        view.push('All users are running their timers!');
+                    }
+                    
+                    return  view.join('\n');
+                }
+            },
+            
             status: {
                 getView: function (step)
                 {
@@ -105,7 +161,7 @@ if (resolver === null) {
                     if (step === null) {
                         return errorString;
                     }
-                    var entry = timerParser.filterCurrentEntry(step.getParam('entries').day_entries);
+                    var entry = timerTools.filterCurrentEntry(step.getParam('entries').day_entries);
                     if (entry !== null) {
                         return  [
                             'You are currently working on ',
@@ -224,7 +280,7 @@ if (resolver === null) {
                     return;
                 } else {
                     logger.info('Successfully loaded tasks for user ' + userId, {});
-                    projects = timerParser.findMatchingClientsOrProjects(name, results.projects);
+                    projects = timerTools.findMatchingClientsOrProjects(name, results.projects);
 
                     if (!projects.length) {
                         var viewProvider = that.viewsProviders[action],
@@ -367,7 +423,7 @@ if (resolver === null) {
                 return;
             }
 
-            tasks = timerParser.getProjectTasks(projectId, projects);
+            tasks = timerTools.getProjectTasks(projectId, projects);
 
             step = interactiveSession
                     .getDefault()
@@ -413,7 +469,7 @@ if (resolver === null) {
 
             _.each(step.getOptions(), function (option, value) {
                 if (option.type === 'task') {
-                    view.push(value + '. ' + option.name + (timerParser.isRunningTask(option.id, option.project_id, dailyEntries) ? ' (Currently running)' : ''));
+                    view.push(value + '. ' + option.name + (timerTools.isRunningTask(option.id, option.project_id, dailyEntries) ? ' (Currently running)' : ''));
                 }
             });
 
@@ -464,7 +520,7 @@ if (resolver === null) {
                 return;
             }
 
-            dailyEntry = timerParser.getDailyEntry(taskId, projectId, dailyEntries);
+            dailyEntry = timerTools.getDailyEntry(taskId, projectId, dailyEntries);
 
             var resultsCallback = function (err, result) {
                 if (err) {
