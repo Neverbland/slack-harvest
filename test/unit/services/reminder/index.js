@@ -11,34 +11,42 @@ var expect          = require('chai').expect,
 
 dayEntriesMock = {
     some_user1 : [],
-    some_user2 : [{day_entry:
-                    {id: 311036476,
-                        notes: '',
-                        spent_at: '2015-03-16',
-                        hours: 1.6,
-                        user_id: 449849,
-                        project_id: 2,
-                        task_id: 1815946,
-                        created_at: '2015-03-16T15:00:02Z',
-                        updated_at: '2015-03-17T08:28:27Z',
-                        adjustment_record: false,
-                        timer_started_at: null,
-                        is_closed: false,
-                        is_billed: false}},
-        {day_entry:
-                    {id: 310859756,
-                        notes: '',
-                        spent_at: '2015-03-16',
-                        hours: 6.55,
-                        user_id: 449849,
-                        project_id: 2,
-                        task_id: 1815946,
-                        created_at: '2015-03-16T08:27:20Z',
-                        updated_at: '2015-03-16T15:00:02Z',
-                        adjustment_record: false,
-                        timer_started_at: null,
-                        is_closed: false,
-                        is_billed: false}}],
+    some_user2 : [
+        {
+            day_entry: {
+                id: 311036476,
+                notes: '',
+                spent_at: '2015-03-16',
+                hours: 1.6,
+                user_id: 449849,
+                project_id: 2,
+                task_id: 1815946,
+                created_at: '2015-03-16T15:00:02Z',
+                updated_at: '2015-03-17T08:28:27Z',
+                adjustment_record: false,
+                timer_started_at: null,
+                is_closed: false,
+                is_billed: false
+            }
+        },
+        {
+            day_entry: {
+                id: 310859756,
+                notes: '',
+                spent_at: '2015-03-16',
+                hours: 6.55,
+                user_id: 449849,
+                project_id: 2,
+                task_id: 1815946,
+                created_at: '2015-03-16T08:27:20Z',
+                updated_at: '2015-03-16T15:00:02Z',
+                adjustment_record: false,
+                timer_started_at: null,
+                is_closed: false,
+                is_billed: false
+            }
+        }
+    ],
     some_user3 : []
 };
 
