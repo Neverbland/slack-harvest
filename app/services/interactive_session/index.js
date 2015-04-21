@@ -152,7 +152,7 @@ if (resolver === null) {
                         'Choose which entry you want to update!',
                         ''
                     ];
-
+            
                     _.each(step.getOptions(), function (option, value) {
                         if (option.type === 'entry') {
                             view.push(value + '. ' + option.name);
@@ -183,7 +183,6 @@ if (resolver === null) {
                         } else {
                             logger.info('Successfully loaded tasks for user ' + params.userId, {});
                             dayEntries = timerTools.findMatchingEntries(params.name, results.day_entries);
-
                             if (!dayEntries.length) {
                                 callback(that.getView(null), null);
                                 return;
@@ -204,7 +203,7 @@ if (resolver === null) {
                                         name: entry.client + ' - ' + entry.project + ' - ' + entry.task,
                                         id: entry.task_id,
                                         project_id : entry.project_id,
-                                        type: 'project'
+                                        type: 'entry'
                                     };
                                 });
 
@@ -216,7 +215,7 @@ if (resolver === null) {
                                         .createStep(params.userId, options, action)
                             ;
 
-                            step.addParam('entries', dayEntries);
+                            step.addParam('entries', results);
 
                             callback(null, step);
                         }
@@ -617,6 +616,103 @@ if (resolver === null) {
     // Step 2 provider
     resolver.addStepProvider(stepProviderFactory({
         stepNumber: 1,
+        
+        
+        actionProviders : {
+            
+            update : {
+                getView : function (step)
+                {
+                    var taskName;
+                    if (step === null) {
+                        return errOutput;
+                    }
+                    
+                    taskName = step
+                                .getParam('selectedOption')
+                                .name
+                    ;
+                    
+                    return [
+                        'Cool, please provide a time to set for ',
+                        taskName
+                    ].join('\n');
+                },
+                
+                execute : function (params, previousStep, callback)
+                {
+                    var step = interactiveSession
+                                .getDefault()
+                                .createStep(params.userId, {}, previousStep.getAction())
+                    ;
+                    
+                    callback(null, step);
+                }
+            },
+            
+            start : {
+                getView : function (step)
+                {
+                    if (step === null) {
+                        return errOutput;
+                    }
+                    var view = [
+                        'Cool, love that project!',
+                        'What task are you on?',
+                        ''
+                    ],
+
+                    previousStep = step.getParam('previousStep'),
+                    dailyEntries = previousStep.getParam('entries').day_entries;
+
+                    _.each(step.getOptions(), function (option, value) {
+                        if (option.type === 'task') {
+                            view.push(value + '. ' + option.name + (timerTools.isRunningTask(option.id, option.project_id, dailyEntries) ? ' (Currently running)' : ''));
+                        }
+                    });
+
+                    view.push('');
+                    view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' if you picked the wrong project.');
+
+                    return view.join('\n');
+                },
+                
+                execute : function (params, previousStep, callback)
+                {
+                    var value = tools.validateGet(params, 'value'),
+                        option = previousStep.getOption(value),
+                        tasks = timerTools.getProjectTasks(option.id, previousStep.getParam('entries').projects),
+                        step = interactiveSession
+                                .getDefault()
+                                .createStep(params.userId, (function (tasks) {
+
+                                    var options = {};
+                                    options['no'] = {
+                                        name: 'Quit',
+                                        id: null,
+                                        type: 'system'
+                                    };
+
+                                    _.each(tasks, function (task, index) {
+
+                                        options['' + (index + 1) + ''] = {
+                                            name: task.name,
+                                            id: task.id,
+                                            project_id : option.id,
+                                            type: 'task'
+                                        };
+                                    });
+
+                                    return options;
+                                })(tasks), previousStep.getAction())
+                    ;
+                    
+                    callback(null, step);
+                }
+            }
+        },
+        
+        
         validate: function (params, step)
         {
             return this.tools.validate(this.stepNumber, step);
@@ -625,81 +721,41 @@ if (resolver === null) {
         execute: function (params, previousStep, callback) {
             var value,
                 option,
-                projectId,
                 action = previousStep.getAction(),
-                projects = previousStep.getParam('entries').projects,
-                userId = params.userId,
                 that = this,
-                tasks, 
-                step;
+                stepAction = this.actionProviders[action],
+                view
+            ;
             
             try {
                 value = tools.validateGet(params, 'value');
                 option = previousStep.getOption(value);
-                projectId = option.id;
             } catch (err) {
-                callback(null, that.createView(null), null);
-            }
-
-            if (this.tools.isRejectResponse(option, value)) {
-                this.tools.executeRejectResponse(userId, callback);
+                callback(null, this.createView(null), null);
                 return;
             }
 
-            tasks = timerTools.getProjectTasks(projectId, projects);
-
-            step = interactiveSession
-                    .getDefault()
-                    .createStep(userId, (function (tasks) {
-
-                        var options = {};
-                        options['no'] = {
-                            name: 'Quit',
-                            id: null,
-                            type: 'system'
-                        };
-
-                        _.each(tasks, function (task, index) {
-
-                            options['' + (index + 1) + ''] = {
-                                name: task.name,
-                                id: task.id,
-                                project_id : projectId,
-                                type: 'task'
-                            };
-                        });
-
-                        return options;
-                    })(tasks), action);
-
-            step.addParam('selectedOption', option);
-            callback(null, that.createView(step), step);
+            if (this.tools.isRejectResponse(option, value)) {
+                this.tools.executeRejectResponse(params.userId, callback);
+                return;
+            }
+            
+            stepAction.execute(params, previousStep, function (err, step) {
+                step.addParam('selectedOption', option);
+                if (err !== null) {
+                    callback(null, err, null);
+                    return;
+                } else {
+                    view = that.createView(step);
+                    callback(null, view, step);
+                }
+            });
         },
         
         createView: function (step)
         {
-            if (step === null) {
-                return errOutput;
-            }
-            var view = [
-                'Cool, love that project!',
-                'What task are you on?',
-                ''
-            ],
-                    
-            previousStep = step.getParam('previousStep'),
-            dailyEntries = previousStep.getParam('entries').day_entries;
-
-            _.each(step.getOptions(), function (option, value) {
-                if (option.type === 'task') {
-                    view.push(value + '. ' + option.name + (timerTools.isRunningTask(option.id, option.project_id, dailyEntries) ? ' (Currently running)' : ''));
-                }
-            });
-
-            view.push('');
-            view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' if you picked the wrong project.');
-
-            return view.join('\n');
+            var action = step.getAction();
+            return this.actionProviders[action].getView(step);
         }
     }));
 
