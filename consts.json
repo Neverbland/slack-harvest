@@ -8,6 +8,9 @@
         "DATE_FROM_TEXT" : "last monday",
         "DATE_TO_TEXT" : "+ 0 hours"
     },
+    "remind" : {
+        "CRON_TIME" : "00 00 12 * * 1-5"
+    },
     "userSession" : {
         "sessionTime" : 120000
     }

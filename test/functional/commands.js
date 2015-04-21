@@ -10,6 +10,7 @@ var app                 = require('./../../app.js'),
     sinon               = require('sinon'),
     sinonChai           = require('sinon-chai'),
     commandName         = require('./../config.json').api.controllers.timer.command,
+    slack               = require('./../../app/services/slack')('default'),
     harvest             = require('./../../app/services/harvest')('default', {
         subdomain   : "test",
         email       : "test@test.com",
@@ -143,6 +144,158 @@ describe('Functional: Non-dialogue commands', function () {
                 ].join('\n'));
                 done();
             });
+        });
+    });
+    
+    
+    describe ('Command: ' + commandName + ' remind', function () {
+        it ([
+            'Should call harvest API and grab all users current timelines. ',
+            'Send remind messages to users with empty timelines. ',
+            'Returns message that says which users received the notification.'
+        ].join('\n'), function (done) {
+            
+            var sendMessage = slack.sendMessage;
+            harvestModule.client.get = function (url, data, cb) {
+                cb(null, []);
+            }; 
+            
+            slack.sendMessage = function (text, config, callback) 
+            {
+                callback(null, true, '');
+            };
+    
+            
+            harvest.users = {
+                23456 : 'some_user'
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'remind'
+                }
+            }, function (err, res, body) {
+                slack.sendMessage = sendMessage;
+                var view = [
+                    'Notified given users:',
+                    '',
+                    'some_user'
+                ];
+                expect(body).to.be.equal(view.join('\n'));
+                done();
+            });
+        });
+        
+        it ([
+            'Should call harvest API and grab given user current timeline ',
+            'Send remind messages to this user with empty timeline. ',
+            'Returns message that says which user received the notification.'
+        ].join('\n'), function (done) {
+            
+            var sendMessage = slack.sendMessage;
+            harvestModule.client.get = function (url, data, cb) {
+                cb(null, []);
+            }; 
+            
+            slack.sendMessage = function (text, config, callback) 
+            {
+                callback(null, true, '');
+            };
+    
+            
+            harvest.users = {
+                23456 : 'some_user'
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'remind 23456'
+                }
+            }, function (err, res, body) {
+                slack.sendMessage = sendMessage;
+                var view = [
+                    'Notified given users:',
+                    '',
+                    'some_user'
+                ];
+                expect(body).to.be.equal(view.join('\n'));
+                done();
+            });
+        });
+        
+        
+        it ('Should return an error response if invalid user was provided.', function (done) {
+            
+            var sendMessage = slack.sendMessage;
+            harvestModule.client.get = function (url, data, cb) {
+                cb(null, []);
+            }; 
+            
+            slack.sendMessage = function (text, config, callback) 
+            {
+                callback(null, true, '');
+            };
+    
+            
+            harvest.users = {
+                23456 : 'some_user'
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'remind some_non_existing_user'
+                }
+            }, function (err, res, body) {
+                slack.sendMessage = sendMessage;
+                
+                expect(body).to.be.equal('Invalid user provided.');
+                
+                done();
+            });
+        });
+        
+        
+        it ([
+            'Should call harvest API and grab all users current timelines. ', 
+            'Shouldnt\'t send remind messages to users that have the timeline running. ',
+            'Returns message that says that no users received the notification.'
+        ].join('\n'), function (done) {
+            
+                var presetUsers = harvest.users;
+                
+                harvestModule.client.get = function (url, data, cb) {
+                    cb(null, sampleTimelineData.day_entries);
+                }; 
+
+                harvest.users = {
+                    '23456' : 'some_user'
+                };
+
+                request.post({
+                    url : 'http://localhost:3333/api/timer',
+                    form : {
+                        token : 'thisissomeauthtoken',
+                        user_name : 'some_user',
+                        text : 'remind'
+                    }
+                }, function (err, res, body) {
+                    harvest.users = presetUsers;
+                    var view = [
+                        'No user notifications sent!',
+                        'All users are running their timers!'
+                    ];
+                    expect(body).to.be.equal(view.join('\n'));
+                    done();
+                });
         });
     });
     

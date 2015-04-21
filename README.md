@@ -37,7 +37,7 @@ For the moment, harvest communication may be only set up using an account. To ha
 
 ###SLACK configuration
 
-The Slack part uses a simple **incoming WebHook** that need to be created within the Slack application itself (See [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)). The only mandatory parameter that need to be set is `endpoint` which is the webhook endpoint. The configuration below contains additional params which are overriding the default settings for the webhook. All [params available for the webhook](https://api.slack.com/incoming-webhooks) can be used except `channel`, which will always be overridden by **slack username** of the user that receives the notifications.
+The Slack part uses a simple **incoming WebHook** that needs to be created within the Slack application itself (See [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)). The only mandatory parameter that need to be set is `endpoint` which is the webhook endpoint. The configuration below contains additional params which are overriding the default settings for the webhook. All [params available for the webhook](https://api.slack.com/incoming-webhooks) can be used except `channel`, which will always be overridden by **slack username** of the user that receives the notifications.
 
 ```
 "slack" : {
@@ -68,6 +68,8 @@ For the moment the application is able to:
 
 -  send periodical report notifications on Slack management channel defined in `cron.report.channel` setting according to cron time provided in `cron.report.cronTime` section
 
+-  send reminder messages via Slack to people who have no timers running according to `cron.remind.cronTime` setting.
+
 ```
 "cron" : {
     "notify" : {
@@ -93,11 +95,13 @@ If any of the section for `cron` settings are not provided, the cron job will no
 
 The API provides given endpoints:
 
-- `http|https://your.domain.you/notify-all` Notifies all users present in the users config
+- `http|https://your.domain.you/notify-all` Notifies all users present in the users config providing information about their started tasks.
 
-- `http|https://your.domain.you/notify-user/user_id` Notifies user given by `user_id` which represents **either Harvest user ID or Slack username**
+- `http|https://your.domain.you/notify-user/user_id` Notifies user given by `user_id` which represents **either Harvest user ID or Slack username** about her/his started tasks.
 
-- `http|https://your.domain.you/notify-management` Notifies management channel provided in the `channel` property of the `POST` request
+- `http|https://your.domain.you/notify-management` Notifies management channel provided in the `channel` property of the `POST` request.
+
+- `http|https://your.domain.you/remind-all` Triggers notifications to users wo have no tasks started on Harvest.
 
 The `notify-all` and `notify-user` are **actions names**; this will be useful when creating authorization token.
 
@@ -143,6 +147,8 @@ The command syntax contains the configured slack command name (e.g. `/timer`) an
 
 - `start` aims to start a task. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
 
+- `remind` checks all users timelines and sends slack reminder message to all users who have empty day entries timelines. Accepts one additional parameter, which is the userId (**either slack name or harvest id**).
+
 ###Examples
 Command: 
 ```
@@ -178,6 +184,20 @@ Example output:
 Successfully stopped the timer for 
 NEVERBLAND - Internal - Admin
 ```
+
+
+Command:
+```
+/timer remind
+```
+Example output:
+```
+Notified given users:
+
+some_user1
+some_user2
+```
+
 
 
 Dialogue command 1:

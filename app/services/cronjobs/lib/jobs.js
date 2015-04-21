@@ -7,7 +7,9 @@ var notifier    =       require('./../../notifier'),
     tools       =       require('./../../tools.js'),
     logger      =       require('./../../logger.js')('default'),
     CronJob     =       require('cron').CronJob,
-    consts      =       require('./../../../../consts.json');
+    consts      =       require('./../../../../consts.json'),
+    reminder    =       require('./../../reminder/index.js')
+;
     
     
 /**
@@ -54,7 +56,8 @@ JobsHolder.prototype = {
                 cronTime = job.getCronTime(config),
                 handler = job.getJob(config),
                 description = job.getDescription(),
-                autoRun = job.shouldRunNow();
+                autoRun = job.shouldRunNow()
+            ;
                 
             logger.info('Setting up cron job for: "' + description + '" with cron time: ', cronTime, {});
             
@@ -263,6 +266,63 @@ var defaultJobs = {
         getDescription : function ()
         {
             return 'Automatic management channel notifications';
+        }
+    },
+    
+    
+    remind : {
+        
+        /**
+         * Returns the job function
+         * 
+         * @param   {Object}    config
+         * @returns {Function}
+         */
+        getJob : function (config) 
+        {
+            return function ()
+            {
+                reminder.remind(harvest.users, null, function (results) {
+                    _.each(results.notified, function (slackName) {
+                        logger.info('Successfully notified user ' + slackName + ' about empty time tracker.', {});
+                    });
+                });
+            };
+        },
+        
+        /**
+         * Formats the cron time according to given config
+         * 
+         * @param       {Object}        config
+         * @returns     {String}        The cron time format string
+         */
+        getCronTime : function (config)
+        {
+           return !!config.cronTime 
+                            ?   config.cronTime 
+                            :   consts.remind.CRON_TIME;   // by default every midday of working day; 
+        },
+        
+        /**
+         * Defines if given job should be ran independently from setting it up
+         * with cron
+         * 
+         * @returns {Boolean}
+         */
+        shouldRunNow : function ()
+        {
+            return false;
+        },
+        
+        
+        /**
+         * Returns description of the task
+         * 
+         * @returns {String}
+         */
+        getDescription : function ()
+        {
+            return 'User notifications about empty tracker.';
         }
     }
 };

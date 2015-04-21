@@ -4,6 +4,16 @@
 var _ = require('lodash');
 require('date-util');
 
+if (typeof Object.size === 'undefined') {
+    Object.size = function(obj) {
+        var size = 0, key;
+        for (key in obj) {
+            if (obj.hasOwnProperty(key)) size++;
+        }
+        return size;
+    };
+}
+
 module.exports = {
     
     /**
@@ -135,6 +145,36 @@ module.exports = {
         }
         
         return obj[param];
+    },
+
+
+    /**
+     * Validates if correct user has been sent
+     * 
+     * @param       {Object}    users       A map of harvest id -> slack name of all
+     *                                      configured users
+     * @param       {String}    userId      Either harvest id or slack name
+     * @returns     {Object}                A hashmap of harvestId -> slackName
+     * @throws      {Error}                 If invalid user provided
+     */
+    validateGetUser : function (users, userId)
+    {
+        var userMap = {},
+            found = false
+        ;
+        
+        _.each(users, function (slackName, harvestId) {
+            if ((String(harvestId) === String(userId)) || (String(slackName) === String(userId))) {
+                userMap[harvestId] = slackName;
+                found = true;
+            }
+        });
+
+        if (!found) {
+            throw new Error('Invalid user provided.');
+        } else {
+            return userMap;
+        }
     }
     
 };

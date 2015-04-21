@@ -36,7 +36,7 @@ function validateCreateDate (dateString)
  * @param   {Function}      next        The next callback to apply
  * @returns {undefined}
  */
-function notifyManagementController(req, res, next)
+function notifyManagementController (req, res, next)
 {
     var from = req.body.from || null,
         to = req.body.to || null,

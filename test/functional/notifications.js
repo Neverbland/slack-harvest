@@ -39,7 +39,7 @@ describe('Functional: Notifications', function () {
             var userId = 2345;
                 
             harvestMock.setUsers({
-                '2345' : 'some_test_user'
+                '23456' : 'some_test_user'
             });
             
 

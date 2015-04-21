@@ -120,6 +120,38 @@ var expect   = require('chai').expect,
     ];
 
 
+describe ('Prototypes and object modifications', function () {
+    
+    describe('Object.size', function () {
+    
+        it ('Should add a method that would result with similar output to Array.prototype.length property but on hash table-ish objects.', function () {
+            var input = [
+                {
+                    given : {},
+                    expected : 0
+                },
+                {
+                    given : {
+                        property1: "value 1",
+                        property2: "value 2",
+                        'property 3': "value 3"
+                    },
+                    expected : 3
+                }
+            ];
+
+            _.each(input, function (givenObject) {
+                var given = givenObject.given,
+                    expected = givenObject.expected
+                ;
+
+                expect(Object.size(given)).to.be.equal(expected);
+            });
+        });
+    });
+});
+
+
 describe('tools', function () {
     describe('tools.formatTime', function () {
         it ('Should return time in HH:MM format for given float number of hours.', function () {
@@ -243,6 +275,59 @@ describe('tools', function () {
             expect(function () {
                 tools.validateGet(given, 'param', errorMessage);
             }).to.throw(Error, errorMessage)
+        });
+    });
+    
+    describe('tools.validateGetUser', function () {
+        var users = {
+            12345 : 'some_user1',
+            23456 : 'some_user2',
+            34567 : 'some_user3'
+        };
+        
+        var given = [
+            {
+                given : 'some_user1',
+                expected : {
+                    12345 : 'some_user1'
+                }
+            },
+            {
+                given : 'some_user2',
+                expected : {
+                    23456 : 'some_user2'
+                }
+            },
+            {
+                given : 'some_user3',
+                expected : {
+                    34567 : 'some_user3'
+                }
+            },
+            {
+                given : 12345,
+                expected : {
+                    12345 : 'some_user1'
+                }
+            },
+            {
+                given : 23456,
+                expected : {
+                    23456 : 'some_user2'
+                }
+            },
+            {
+                given : 34567,
+                expected : {
+                    34567 : 'some_user3'
+                }
+            }
+        ];
+        
+        it('Should return proper harvest id -> slack name pair object for given user id.', function () {
+            _.each(given, function (givenObject) {
+                expect(tools.validateGetUser(users, givenObject.given)).to.be.deep.equal(givenObject.expected);
+            });
         });
     });
 });
