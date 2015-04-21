@@ -8,44 +8,43 @@ var     interactiveSession  = require('./lib/user_session.js'),
         _                   = require('lodash'),
         timerTools          = require('./../timer'),
         harvest             = require('./../harvest')('default'),
-        stepTools           = require('./lib/step_tools.js'),
+        StepTools           = require('./lib/step_tools.js'),
         errOutput           = 'Wrong input provided, try following the instructions...',
         logger              = require('./../../services/logger.js')('default'),
         commandName         = require('./../../../config/index.js').api.controllers.timer.command,
-        reminder            = require('./../reminder/index.js')
-;
-
-if (resolver === null) {
-    resolver = new resolverConstructor(interactiveSession.getDefault());
-
-
-    /**
-     * Applies step prototype to given step provider 
-     * and returns it back
-     * 
-     * @param   {Object}    stepProvider
-     * @returns {Object}
-     */
-    var stepFactory = function (stepProvider)
-        {
-            stepProvider.tools = new stepTools(stepProvider);
-            return stepProvider;
-        },
-        availableActions = [
+        reminder            = require('./../reminder/index.js'),
+        availableActions    = [
             'start',
             'stop',
             'status',
             'projects',
-            'remind'
+            'remind',
+            'update'
         ];
-    ;
-    
-    
+;
+
+
+/**
+ * Applies step prototype to given step provider 
+ * and returns it back
+ * 
+ * @param   {Object}    stepProvider
+ * @returns {Object}
+ */
+function stepProviderFactory (stepProvider)
+{
+    stepProvider.tools = new StepTools(stepProvider);
+    return stepProvider;
+}
+
+
+if (resolver === null) {
+    resolver = new resolverConstructor(interactiveSession.getDefault());
     timerTools.setAvailableActions(availableActions);
     
 
     // Step 1 provider
-    resolver.addStepProvider(stepFactory({
+    resolver.addStepProvider(stepProviderFactory({
         stepActionProviders: {
             
             start : {
@@ -124,6 +123,100 @@ if (resolver === null) {
                             ;
 
                             step.addParam('entries', results);
+
+                            callback(null, step);
+                        }
+                    });
+                },
+                
+                
+                postExecute : function (step, callback) 
+                {
+                    callback();
+                },
+                
+                prepareStep: function (step)
+                {
+                    return step;
+                }
+            },
+            
+            update : {
+
+                getView: function (step)
+                {
+                    if (step === null) {
+                        return 'No entries found!';
+                    }
+                    var view = [
+                        'Choose which entry you want to update!',
+                        ''
+                    ];
+
+                    _.each(step.getOptions(), function (option, value) {
+                        if (option.type === 'entry') {
+                            view.push(value + '. ' + option.name);
+                        }
+                    });
+
+                    view.push('');
+                    view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup');
+
+                    return view.join('\n');
+                },
+                
+                execute : function (params, callback)
+                {
+                    var that = this,
+                        action = tools.validateGet(params, 'action')
+                    ;
+                    harvest.getTasks(params.userId, function (err, results) {
+                
+                        var dayEntries,
+                            step,
+                            options
+                        ;
+
+                        if (err !== null) {
+                            callback(err, null);
+                            return;
+                        } else {
+                            logger.info('Successfully loaded tasks for user ' + params.userId, {});
+                            dayEntries = timerTools.findMatchingEntries(params.name, results.day_entries);
+
+                            if (!dayEntries.length) {
+                                callback(that.getView(null), null);
+                                return;
+                            }
+
+                            options = (function (entries) {
+
+                                var options = {};
+                                options['no'] = {
+                                    name: 'Quit',
+                                    id: null,
+                                    type: 'system'
+                                };
+
+                                _.each(entries, function (entry, index) {
+
+                                    options['' + (index + 1) + ''] = {
+                                        name: entry.client + ' - ' + entry.project + ' - ' + entry.task,
+                                        id: entry.task_id,
+                                        project_id : entry.project_id,
+                                        type: 'project'
+                                    };
+                                });
+
+                                return options;
+                            })(dayEntries);
+
+                            step = interactiveSession
+                                        .getDefault()
+                                        .createStep(params.userId, options, action)
+                            ;
+
+                            step.addParam('entries', dayEntries);
 
                             callback(null, step);
                         }
@@ -522,7 +615,7 @@ if (resolver === null) {
 
 
     // Step 2 provider
-    resolver.addStepProvider(stepFactory({
+    resolver.addStepProvider(stepProviderFactory({
         stepNumber: 1,
         validate: function (params, step)
         {
@@ -613,7 +706,7 @@ if (resolver === null) {
 
 
     // Step 3 provider
-    resolver.addStepProvider(stepFactory({
+    resolver.addStepProvider(stepProviderFactory({
         stepNumber: 2,
         validate: function (params, step)
         {
