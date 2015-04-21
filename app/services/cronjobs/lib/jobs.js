@@ -56,7 +56,8 @@ JobsHolder.prototype = {
                 cronTime = job.getCronTime(config),
                 handler = job.getJob(config),
                 description = job.getDescription(),
-                autoRun = job.shouldRunNow();
+                autoRun = job.shouldRunNow()
+            ;
                 
             logger.info('Setting up cron job for: "' + description + '" with cron time: ', cronTime, {});
             

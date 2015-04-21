@@ -277,4 +277,57 @@ describe('tools', function () {
             }).to.throw(Error, errorMessage)
         });
     });
+    
+    describe('tools.validateGetUser', function () {
+        var users = {
+            12345 : 'some_user1',
+            23456 : 'some_user2',
+            34567 : 'some_user3'
+        };
+        
+        var given = [
+            {
+                given : 'some_user1',
+                expected : {
+                    12345 : 'some_user1'
+                }
+            },
+            {
+                given : 'some_user2',
+                expected : {
+                    23456 : 'some_user2'
+                }
+            },
+            {
+                given : 'some_user3',
+                expected : {
+                    34567 : 'some_user3'
+                }
+            },
+            {
+                given : 12345,
+                expected : {
+                    12345 : 'some_user1'
+                }
+            },
+            {
+                given : 23456,
+                expected : {
+                    23456 : 'some_user2'
+                }
+            },
+            {
+                given : 34567,
+                expected : {
+                    34567 : 'some_user3'
+                }
+            }
+        ];
+        
+        it('Should return proper harvest id -> slack name pair object for given user id.', function () {
+            _.each(given, function (givenObject) {
+                expect(tools.validateGetUser(users, givenObject.given)).to.be.deep.equal(givenObject.expected);
+            });
+        });
+    });
 });

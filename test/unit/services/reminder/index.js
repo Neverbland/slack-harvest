@@ -56,10 +56,10 @@ describe('reminder', function () {
     describe('remind', function () {
         
         it('Should send reminder messages to all people whose harvest day entries reports are empty.', function (done) {
-            var users = {
-                    '1234' : 'some_user1',
-                    '2345' : 'some_user2',
-                    '3456' : 'some_user3'
+        var users = {
+            '12345' : 'some_user1',
+            '23456' : 'some_user2',
+            '34567' : 'some_user3'
                 }, 
                 counter = 0,
                 sendMessage = slack.sendMessage
@@ -99,14 +99,14 @@ describe('reminder', function () {
                 
                 
                 expect(results.successes).to.be.deep.equal({
-                    '1234' : 'some_user1',
-                    '2345' : 'some_user2',
-                    '3456' : 'some_user3'
+                    '12345' : 'some_user1',
+                    '23456' : 'some_user2',
+                    '34567' : 'some_user3'
                 });
                 
                 expect(results.notified).to.be.deep.equal({
-                    '1234' : 'some_user1',
-                    '3456' : 'some_user3'
+                    '12345' : 'some_user1',
+                    '34567' : 'some_user3'
                 });
                 
                 expect(results.errors).to.be.deep.equal({});

@@ -5,7 +5,8 @@ var harvest                 =   require('./../../../services/harvest')('default'
     notifier                =   require('./../../../services/notifier'),
     _                       =   require('lodash'),
     logger                  =   require('./../../../services/logger.js')('default'),
-    reminder                =   require('./../../../services/reminder/index')
+    reminder                =   require('./../../../services/reminder/index'),
+    tools                   =   require('./../../../services/tools.js')
 ;
 
 
@@ -33,9 +34,20 @@ function doNotify (harvestResponse, userId)
  * @param   {Function}      next        The next callback to apply
  * @returns {undefined}
  */
-function remindAllController (req, res, next)
+function remindUserController (req, res, next)
 {
-    reminder.remind(harvest.users, function () {
+    var users;
+    try {
+        users = tools.validateGetUser(harvest.users, req.params.user);
+    } catch (err) {
+        res.success = false;
+        res.errors = [
+            err.message
+        ];
+        next();
+        return;
+    }
+    reminder.remind(users, function () {
         res.success = true;
         next();
     });
@@ -43,5 +55,5 @@ function remindAllController (req, res, next)
 
 module.exports = function (app, config)
 {
-    app.use('/api/remind-all', remindAllController);
+    app.use('/api/remind-user/:user', remindUserController);
 };

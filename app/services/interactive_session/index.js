@@ -145,16 +145,39 @@ if (resolver === null) {
             remind : {
                 execute : function (params, callback)
                 {
+                    var userId = params.name,
+                        users,
+                        error = null
+                    ;
+                    if (!!userId) {
+                        try {
+                            users = tools.validateGetUser(harvest.users, userId);
+                        } catch (err) {
+                            users = null;
+                            error = err;
+                        }
+                    } else {
+                        users = harvest.users;
+                    }
                     var step = interactiveSession
                                 .getDefault()
                                 .createStep(params.userId, {}, params.action)
+                                .addParam('users', users)
+                                .addParam('error', error)
                     ;
                     callback(null, step);
                 },
                 
                 postExecute : function (step, callback) 
                 {
-                    reminder.remind(harvest.users, null, function (results) {
+                    var users = step.getParam('users'),
+                        error = step.getParam('error')
+                    ;
+                    if (error !== null) {
+                        callback();
+                        return;
+                    }
+                    reminder.remind(users, null, function (results) {
                         step.addParam('results', results);
                         
                         var userId = step.getParam('userId');
@@ -175,7 +198,12 @@ if (resolver === null) {
                 getView : function (step)
                 {
                     var results = step.getParam('results'),
-                        view = [];
+                        error = step.getParam('error'),
+                        view = []
+                    ;
+                    if (error) {
+                        return error.message;
+                    }
                     
                     if (Object.size(results.notified) > 0) {
                         view.push('Notified given users:');
