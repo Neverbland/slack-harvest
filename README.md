@@ -147,6 +147,8 @@ The command syntax contains the configured slack command name (e.g. `/timer`) an
 
 - `start` aims to start a task. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
 
+- `remind` checks all users timelines and sends slack reminder message to all users who have empty day entries timelines. Accepts one additional parameter, which is the userId (**either slack name or harvest id**).
+
 ###Examples
 Command: 
 ```
@@ -182,6 +184,20 @@ Example output:
 Successfully stopped the timer for 
 NEVERBLAND - Internal - Admin
 ```
+
+
+Command:
+```
+/timer remind
+```
+Example output:
+```
+Notified given users:
+
+some_user1
+some_user2
+```
+
 
 
 Dialogue command 1:
