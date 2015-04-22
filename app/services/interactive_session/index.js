@@ -637,7 +637,8 @@ if (resolver === null) {
                     
                     return [
                         'Cool, please provide a time to set for ',
-                        taskName
+                        taskName,
+                        'Just type ' + commandName + ' followed by a valid time format (HH:mm) or write \'' + commandName + ' no\' to quit the timer setup'
                     ].join('\n');
                 },
                 
@@ -742,9 +743,9 @@ if (resolver === null) {
                 return;
             }
             
-            stepAction.execute(params, previousStep, function (err, step) {
-                if (err !== null) {
-                    callback(null, err, null);
+            stepAction.execute(params, previousStep, function (returnMessage, step) {
+                if (returnMessage !== null) {
+                    callback(null, returnMessage, null);
                     return;
                 } else {
                     step.addParam('selectedOption', option);
@@ -756,6 +757,9 @@ if (resolver === null) {
         
         createView: function (step)
         {
+            if (step === null) {
+                return errOutput;
+            }
             var action = step.getAction();
             return this.actionProviders[action].getView(step);
         }
@@ -774,13 +778,76 @@ if (resolver === null) {
                 
                 getView : function (step)
                 {
+                    var taskName = step
+                                .getParam('previousStep')
+                                .getParam('selectedOption')
+                                .name
+                    ;
+                    if (step === null) {
+                        return errOutput;
+                    }
                     
+                    return [
+                        'Successfully updated the time for ',
+                        taskName,
+                        'to ' + step.getParam('timeRaw')
+                    ].join('\n');
                 },
                 
                 execute : function (params, previousStep, callback)
                 {
-                    var value = params.value;
+                    var value = params.value,
+                        time,
+                        that = this,
+                        id = previousStep
+                                .getParam('selectedOption')
+                                .id,
+                        step = interactiveSession
+                            .getDefault()
+                            .createStep(params.userId, {}, previousStep.getAction())
+                    ;
                     
+                    if (value === 'no') {
+                        interactiveSession.getDefault().clear(params.userId);
+                        callback(
+                            'Cool, try again later!',
+                            null
+                        );
+                    }
+                    
+                    try {
+                        time = timeParser
+                                .getDefault()
+                                .parse(value)
+                        ;
+                        
+                    } catch (err) {
+                        callback([
+                            err.message,
+                            'Try again, the valid format is HH:mm'
+                        ].join('\n'), null);
+                        return;
+                    }
+                    
+                    harvest.update(params.userId, id, {
+                        hours : time
+                    }, function (err, results) {
+
+                        interactiveSession
+                            .getDefault()
+                            .clear(params.userId)
+                        ;
+                        if (err !== null) {
+                            callback(err, null);
+                            return;
+                        } else {
+                            step
+                                .addParam('timeRaw', value)
+                                .addParam('timeParsed', time)
+                            ;
+                            callback(that.getView(step), null);
+                        }
+                    });
                 }
             },
             
@@ -883,9 +950,9 @@ if (resolver === null) {
                 return;
             }
 
-            stepAction.execute(params, previousStep, function (err, step) {
-                if (err !== null) {
-                    callback(null, err.toString(), null);
+            stepAction.execute(params, previousStep, function (returnMessage, step) {
+                if (returnMessage !== null) {
+                    callback(null, returnMessage.toString(), null);
                     return;
                 } else {
                     step.addParam('selectedOption', option);
