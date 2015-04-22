@@ -145,9 +145,11 @@ The command syntax contains the configured slack command name (e.g. `/timer`) an
 
 - `stop` stops the work for the task that is currently running for given user. This is a single step task that doesn't follow a dialogue with the server.
 
+- `remind` checks all users timelines and sends slack reminder message to all users who have empty day entries timelines. Accepts one additional parameter, which is the userId (**either slack name or harvest id**).
+
 - `start` aims to start a task. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
 
-- `remind` checks all users timelines and sends slack reminder message to all users who have empty day entries timelines. Accepts one additional parameter, which is the userId (**either slack name or harvest id**).
+- `update` allows user to update her/his number of hours for given day entry. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
 
 ###Examples
 Command: 
