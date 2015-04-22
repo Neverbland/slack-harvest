@@ -672,7 +672,7 @@ describe('Functional: Non-dialogue commands', function () {
                 expect(url).to.be.equal(expectedUrl);
                 cb(null, sampleTimelineData);
             };
-            
+
             request.post({
                 url : 'http://localhost:3333/api/timer',
                 form : {
