@@ -44,29 +44,37 @@ function SlackNotifier (slack, harvest)
 
 function formatResponse (dayEntries, projects, clients)
 {
-    var response = [
-        "*Your time tracked today*:"
-    ];
-
-
-    var clientsById = tools.byId(clients || {}, 'client');
-    var projectsById = tools.byId(projects || {}, 'project');
+    var 
+        response = [
+            "*Your time tracked today*:"
+        ],
+        clientsById = tools.byId(clients || {}, 'client'),
+        projectsById = tools.byId(projects || {}, 'project'),
+        totalTime = 0
+    ;
    
     _.each(dayEntries, function (resourceObject) {
         
-        var resource = resourceObject.day_entry;
-        var project = projectsById[resource.project_id] || null;
-        var client = (project && !!clientsById[project.client_id]) ? clientsById[project.client_id] : null;
-        var responsePart = [
-            (client ? client.name : "Unknown client"),
-            (project ? project.name : resource.project_id),
-            tools.formatTime(tools.getHours(resource))
-        ].join(' - ');
+        var resource = resourceObject.day_entry,
+            project = projectsById[resource.project_id] || null,
+            client = (project && !!clientsById[project.client_id]) ? clientsById[project.client_id] : null,
+            time = tools.getHours(resource),
+            responsePart = [
+                (client ? client.name : "Unknown client"),
+                (project ? project.name : resource.project_id),
+                tools.formatTime(time)
+            ].join(' - ')
+        ;
+        
+        totalTime += time;
         
         response.push(responsePart);
     });
     
     response.push('\n');
+    response.push('Total: ' + tools.formatTime(totalTime));
+    response.push('\n');
+    
     response.push('If anything is missing, add it here <' + SlackNotifier.prototype.LINK + '>' )
     
     return response.join("\n");
