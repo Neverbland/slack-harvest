@@ -986,6 +986,228 @@ describe('Functional: Non-dialogue commands', function () {
     });
     
     
+    describe ('Command: ' + commandName + ' note', function () {
+        
+        it('Should call the api and provide info, that no project/client is matching given input string.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'note nonexistingproject'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal('No entries found!');
+                done();
+            });
+        });
+        
+        
+        it('Should call the api and return step 1 dialogue message. After sending \'no\' response, should quit the dialogue.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'note test'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal([
+                    'Choose which entry you want to add the note to!',
+                    '',
+                    '1. Test Client - Test Project - Test Task (03:36)',
+                    '',
+                    'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the note edition'
+                ].join('\n'));
+                
+                request.post({
+                    url : 'http://localhost:3333/api/timer',
+                    form : {
+                        token : 'thisissomeauthtoken',
+                        user_name : 'some_user',
+                        text : 'no'
+                    }
+                }, function (err, res, body) {
+                    expect(body).to.be.equal('Cool, try again later!');
+                    done();
+                });
+            });
+        });
+        
+        
+        
+        it('Should call the api and return step 1 dialogue message. After sending entry number response, should show the third step message.', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'note test'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal([
+                    'Choose which entry you want to add the note to!',
+                    '',
+                    '1. Test Client - Test Project - Test Task (03:36)',
+                    '',
+                    'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the note edition'
+                ].join('\n'));
+                
+                request.post({
+                    url : 'http://localhost:3333/api/timer',
+                    form : {
+                        token : 'thisissomeauthtoken',
+                        user_name : 'some_user',
+                        text : '1'
+                    }
+                }, function (err, res, body) {
+                    expect(body).to.be.equal([
+                        'Cool, please provide the note to set for ',
+                        'Test Client - Test Project - Test Task (03:36)',
+                        'Just type ' + commandName + ' followed by the note string or write \'' + commandName + ' no\' to quit the timer setup'
+                    ].join('\n'));
+                    
+                    
+                    request.post({
+                        url : 'http://localhost:3333/api/timer',
+                        form : {
+                            token : 'thisissomeauthtoken',
+                            user_name : 'some_user',
+                            text : 'no'
+                        }
+                    }, function (err, res, body) {
+                        expect(body).to.be.equal('Cool, try again later!');
+                        done();
+                    });
+                    
+                });
+            });
+        });
+        
+        it('Should call the api and return step 3 dialogue message. After sending entry number response, should show the third step message. Then update the entry note', function (done) {
+            var userId = 23456,
+                expectedUrl = '/daily?of_user=' + userId,
+                spyCallback = sinon.spy()
+            ;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                spyCallback(sampleTimelineData);
+                expect(url).to.be.equal(expectedUrl);
+                cb(null, sampleTimelineData);
+            };
+            
+            request.post({
+                url : 'http://localhost:3333/api/timer',
+                form : {
+                    token : 'thisissomeauthtoken',
+                    user_name : 'some_user',
+                    text : 'note test'
+                }
+            }, function (err, res, body) {
+                expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
+                expect(body).to.be.equal([
+                    'Choose which entry you want to add the note to!',
+                    '',
+                    '1. Test Client - Test Project - Test Task (03:36)',
+                    '',
+                    'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the note edition'
+                ].join('\n'));
+                
+                request.post({
+                    url : 'http://localhost:3333/api/timer',
+                    form : {
+                        token : 'thisissomeauthtoken',
+                        user_name : 'some_user',
+                        text : '1'
+                    }
+                }, function (err, res, body) {
+                    expect(body).to.be.equal([
+                        'Cool, please provide the note to set for ',
+                        'Test Client - Test Project - Test Task (03:36)',
+                        'Just type ' + commandName + ' followed by the note string or write \'' + commandName + ' no\' to quit the timer setup'
+                    ].join('\n'));
+                    
+                    
+                    harvestModule.client.post = function (url, data, cb) {
+                        
+                        cb(null, {
+                            timer_started_at: '2015-04-14T07:28:26Z',
+                            project_id: '7585993',
+                            project: 'Test Project',
+                            user_id: 23456,
+                            spent_at: '2015-04-14',
+                            task_id: '1815943',
+                            task: 'Design',
+                            client: 'Test Client',
+                            id: 320497175,
+                            notes: '',
+                            created_at: '2015-04-14T07:28:20Z',
+                            updated_at: '2015-04-14T07:28:26Z',
+                            hours_without_timer: 0.2,
+                            hours: 6.25
+                        });
+                    };
+                    
+                    
+                    request.post({
+                        url : 'http://localhost:3333/api/timer',
+                        form : {
+                            token : 'thisissomeauthtoken',
+                            user_name : 'some_user',
+                            text : 'This is some example note'
+                        }
+                    }, function (err, res, body) {
+                        expect(body).to.be.equal([
+                            'Successfully updated the note for ',
+                            'Test Client - Test Project - Test Task (03:36)',
+                            '',
+                            '> This is some example note'
+                        ].join('\n'));
+                        done();
+                    });
+                    
+                });
+            });
+        });
+    });
+    
+    
     after(function (done) {
         server.close(done);
     });
