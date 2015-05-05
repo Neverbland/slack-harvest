@@ -329,6 +329,30 @@ _Harvest.prototype = {
     
     
     /**
+     * Updates given entry id for given user with given values
+     * 
+     * @param       {Number}    userId
+     * @param       {Number}    dayEntryId
+     * @param       {Object}    values
+     * @param       {Function}  callback
+     * @returns     {undefined}
+     */
+    update : function (userId, dayEntryId, values, callback)
+    {
+        var timeTrack = this.load('TimeTracking');
+        values.of_user = userId;
+        values.id = dayEntryId;
+        timeTrack.update(values, function (err, results) {
+
+            if (err !== null) {
+                logger.log('Not able to update task day entry for user ' + userId + ' and id ' + dayEntryId, err, {});
+            } 
+            callback(err, results);
+        });
+    },
+    
+    
+    /**
      * Creates the day entry
      * 
      * @param   {Number}    userId
