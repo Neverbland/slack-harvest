@@ -28,10 +28,10 @@ The application is written 100% in `Node.JS` and at this point consists of three
 For the moment, harvest communication may be only set up using an account. To have a complete list of projects in all user notifications, an account with access to prefferably all available projects, users and clients should be used. Mandatory parameters in the configuration object are `subdomain`, `email` and `password`.
 
 ```
-"harvest" : {
-    "subdomain" : "example_harvest_domain",
-    "email" : "XXXXX@neverbland.com",
-    "password" : "XXXXXXXXXXXXXXX"
+"harvest": {
+    "subdomain": "example_harvest_domain",
+    "email": "XXXXX@neverbland.com",
+    "password": "XXXXXXXXXXXXXXX"
 }
 ```
 
@@ -40,10 +40,10 @@ For the moment, harvest communication may be only set up using an account. To ha
 The Slack part uses a simple **incoming WebHook** that needs to be created within the Slack application itself (See [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)). The only mandatory parameter that need to be set is `endpoint` which is the webhook endpoint. The configuration below contains additional params which are overriding the default settings for the webhook. All [params available for the webhook](https://api.slack.com/incoming-webhooks) can be used except `channel`, which will always be overridden by **slack username** of the user that receives the notifications.
 
 ```
-"slack" : {
-    "username" : "Harvest",
+"slack": {
+    "username": "Harvest",
     "icon_url": "https://avatars0.githubusercontent.com/u/43635?v=3&s=200",
-    "endpoint" : "XXXXXXXXXXXXXX"
+    "endpoint": "XXXXXXXXXXXXXX"
 }
 ```
 
@@ -53,7 +53,7 @@ The users section contains the mapping of all available users **Harvest ID -> Sl
 
 ```
 "users": {
-    "123456" : "slack_name"
+    "123456": "slack_name"
 }
 ```
 
@@ -71,19 +71,19 @@ For the moment the application is able to:
 -  send reminder messages via Slack to people who have no timers running according to `cron.remind.cronTime` setting.
 
 ```
-"cron" : {
-    "notify" : {
-        "hour" : "16",
-        "munutes" : "30",
-        "cronTime" : "00 30 16 * * 1-5" // Optional, instead of hour/minutes
+"cron": {
+    "notify": {
+        "hour": "16",
+        "munutes": "30",
+        "cronTime": "00 30 16 * * 1-5" // Optional, instead of hour/minutes
     },
-    "preload" : {
-        "cronTime" : "00 00 7-20 * * 1-5"
+    "preload": {
+        "cronTime": "00 00 7-20 * * 1-5"
     },
-    "report" : {
-        "reportTitle" : "Weekly activity report",
-        "channel" : "#channel_name",
-        "cronTime" : "00 00 20 * * 5"
+    "report": {
+        "reportTitle": "Weekly activity report",
+        "channel": "#channel_name",
+        "cronTime": "00 00 20 * * 5"
     }
 }
 ```
@@ -150,18 +150,18 @@ The command syntax contains the configured slack command name (e.g. `/timer`) an
 - `remind` checks all users timelines and sends slack reminder message to all users who have empty day entries timelines. Accepts one additional parameter, which is the userId (**either slack name or harvest id**).
 
 ###Examples
-Command: 
+Command:
 ```
 /timer status
 ```
 Example output:
 ```
-You are currently working on 
+You are currently working on
 NEVERBLAND - Internal - Admin
 ```
 
 
-Command: 
+Command:
 ```
 /timer projects
 ```
@@ -181,7 +181,7 @@ Command:
 ```
 Example output:
 ```
-Successfully stopped the timer for 
+Successfully stopped the timer for
 NEVERBLAND - Internal - Admin
 ```
 
