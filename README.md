@@ -245,3 +245,38 @@ Example dialogue output:
 Successfully created and started an entry for
 NEVERBLAND - Project 2 - Backend
 ```
+
+
+Dialogue command 1:
+```
+/timer update neverb
+```
+Example dialogue output:
+```
+Choose which entry you want to update!
+
+1. NEVERBLAND - Project 1 - Task 1 (02:25)
+2. NEVERBLAND - Project 2 - Task 3 (01:30)
+
+Just type the number to choose it or write 'no' to quit the timer setup
+```
+Dialogue command 2:
+```
+/timer 2
+```
+Example dialogue output:
+```
+Cool, please provide a time to set for
+NEVERBLAND - Project 2 - Task 3 (01:30)
+Just type /timer followed by a valid time format (HH:mm or number of seconds) or write /timer no to quit the timer setup
+```
+Dialogue command 3:
+```
+/timer 02:30
+```
+Example dialogue output:
+```
+Successfully updated the time for
+NEVERBLAND - Project 2 - Task 3 (01:30)
+to 02:30
+```
