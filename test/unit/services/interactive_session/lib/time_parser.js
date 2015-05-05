@@ -65,4 +65,31 @@ describe('time_parser', function () {
         });
     });
     
+    describe('Parser.parse', function () {
+        it('Should be able to parse the default time format: X number of seconds', function () {
+            
+            var times = [
+                {given : '1800', expected : 0.5},
+                {given : '3600', expected : 1.0},
+                {given : '5400', expected : 1.5},
+                {given : '8100', expected : 2.25}
+            ];
+            
+            _.each(times, function (timeObject) {
+                var given = timeObject.given,
+                    expected = timeObject.expected
+                ;
+                
+                expect(timeParser.getDefault().parse(given)).to.be.equal(expected);
+            });
+        });
+        
+        it ('Should throw TranslatorNotFoundError instance if given time string cannot be parsed', function () {
+            var invalidTime = 'this is an invalid time string';
+            expect(function () {
+                timeParser.getDefault().parse(invalidTime);
+            }).to.throw(timeParser.error);
+        });
+    });
+    
 });

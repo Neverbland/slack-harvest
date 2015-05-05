@@ -638,7 +638,7 @@ if (resolver === null) {
                     return [
                         'Cool, please provide a time to set for ',
                         taskName,
-                        'Just type ' + commandName + ' followed by a valid time format (HH:mm) or write \'' + commandName + ' no\' to quit the timer setup'
+                        'Just type ' + commandName + ' followed by a valid time format (HH:mm or number of seconds) or write \'' + commandName + ' no\' to quit the timer setup'
                     ].join('\n');
                 },
                 
@@ -824,7 +824,7 @@ if (resolver === null) {
                     } catch (err) {
                         callback([
                             err.message,
-                            'Try again, the valid format is HH:mm'
+                            'Try again, the valid format is HH:mm or number of seconds'
                         ].join('\n'), null);
                         return;
                     }

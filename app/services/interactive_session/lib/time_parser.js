@@ -9,13 +9,24 @@ var instance = null,
 
 defaultTranslators = [
     {
-        // HH:mm format
+        /**
+         * Retuns bool info if this translator can translate the given time
+         * 
+         * @param       {String}        time
+         * @returns     {Boolean}   
+         */
         canTranslate : function (time)
         {
             var regexp = /^([01]?\d|2[0-3])(:[0-5]\d){1,2}$/;
             return regexp.test(time);
         },
         
+        /**
+         * Translates the input time string to number of hours
+         * 
+         * @param       {String}        time
+         * @returns     {Number}        Float value for the number of hours
+         */
         translate : function (time)
         {
             var split = time.split(':'),
@@ -26,6 +37,44 @@ defaultTranslators = [
             ;
             
             return hoursInt + (minsInt / 60); // Number of hours + part of hour
+        }
+    },
+    {
+        /**
+         * Retuns bool info if this translator can translate the given time
+         * 
+         * @param       {String}        time
+         * @returns     {Boolean}   
+         */
+        canTranslate : function (time)
+        {
+            var n = ~~Number(time);
+            return String(n) === time && n >= 0;
+        },
+        
+        /**
+         * Translates the input time string to number of hours
+         * 
+         * @param       {String}        time
+         * @returns     {Number}        Float value for the number of hours
+         */
+        translate : function (time)
+        {
+
+            var 
+                secs = Number(time),
+                hours = Math.floor(secs / (60 * 60)),
+                divisorForMinutes = secs % (60 * 60),
+                mins = Math.floor(divisorForMinutes / 60),
+                divisorForSeconds = divisorForMinutes % 60,
+                seconds = Math.ceil(divisorForSeconds),
+                
+                hoursInt = parseInt(hours),
+                minsInt = parseInt(mins),
+                secondsInt = parseInt(seconds)
+            ;
+            
+            return hoursInt + (minsInt / 60) + (secondsInt / (60 * 60)); // Number of hours + part of hour
         }
     }
 ];
