@@ -239,8 +239,7 @@ describe('api.controllers.timer', function () {
                         projectId : 3058542
                     }
                 ]
-            },
-            
+            }
         ];
        
         it('Should find best matches for given array of projects and name', function () {
@@ -255,5 +254,76 @@ describe('api.controllers.timer', function () {
         });
     });
     
+    
+    describe('timer.findMatchingEntries', function () {
+        var entries = [
+                        {
+                            project: 'Test Project1',
+                            client: 'Test Client1',
+                            task: 'Test Task1'
+                        },
+                        {
+                            project: 'Test Project2',
+                            client: 'Test Client2',
+                            task: 'Test Task2'
+                        }
+                    ];
+        
+        
+        var projectDataSamples = [
+            {
+                name : 'Project1',
+                expected : [
+                    {
+                            project: 'Test Project1',
+                            client: 'Test Client1',
+                            task: 'Test Task1'
+                    }
+                    
+                ]
+            },
+            {
+                name : 'Project2',
+                expected : [
+                    {
+                            project: 'Test Project2',
+                            client: 'Test Client2',
+                            task: 'Test Task2'
+                    }
+                    
+                ]
+            },
+            {
+                name : 'Test',
+                expected : [
+                    {
+                            project: 'Test Project1',
+                            client: 'Test Client1',
+                            task: 'Test Task1'
+                        },
+                        {
+                            project: 'Test Project2',
+                            client: 'Test Client2',
+                            task: 'Test Task2'
+                        }
+                ]
+            },
+            {
+                name : 'Nonmatching',
+                expected : []
+            }
+        ];
+       
+        it('Should find matches for given array of day entries', function () {
+            _.each(projectDataSamples, function (sample) {
+                var expected = sample.expected,
+                    name = sample.name,
+                    matching = timer.findMatchingEntries(name, entries);
+                    
+                expect(matching).to.be.a('array');
+                expect(matching).to.deep.equal(expected);
+            });
+        });
+    });
 });
     

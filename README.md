@@ -13,11 +13,11 @@ $ cd /path/to/project
 $ npm install
 ```
 
-Next thing to do is preparing the **config file**. The file must be located in the repository root and named `config.json` A template file is stored in `config.dist.json`. The fiel is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
+Next thing to do is preparing the **config file**. The file must be located in the repository root and named `config.json` A template file is stored in `config.dist.json`. The file is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
 
 ## Architecture
 
-The application is written 100% in `Node.JS` and at this point consists of thre blocks:
+The application is written 100% in `Node.JS` and at this point consists of three blocks:
 - the **cron-like time schedule** that sends notification messages to slack users,
 - a simple **HTTP API** to trigger notifications (single user and all users notifications, management report),
 - a **Slack Command API endpoint** that manages Harvest timer setup.
@@ -62,7 +62,7 @@ The users section contains the mapping of all available users **Harvest ID -> Sl
 
 For the moment the application is able to:
 
-- notify defined users at configured time every work day (monday - friday). The time is defined in the `cron.notify` section of the config file and uses **the same timezont that the machine the app runs on uses**. For the configuration below, the app will automatically send notifications every working day at `16:30`. If a `cron.notify.cronTime` value is provided in the config, **this value will be used instead of the hour and minutes settings**
+- notify defined users at the configured time every work day (monday - friday). The time is defined in the `cron.notify` section of the config file and uses **the same timezone as the machine the app is running on**. For the configuration below, the app will automatically send notifications every working day at `16:30`. If a `cron.notify.cronTime` value is provided in the config, **this value will be used instead of the hour and minutes settings**
 
 -  refresh (preload) the information about timesheet related entries (clients and projects) according to cron time provided in `cron.preload.cronTime` section
 
@@ -145,9 +145,11 @@ The command syntax contains the configured slack command name (e.g. `/timer`) an
 
 - `stop` stops the work for the task that is currently running for given user. This is a single step task that doesn't follow a dialogue with the server.
 
+- `remind` checks all users timelines and sends slack reminder message to all users who have empty day entries timelines. Accepts one additional parameter, which is the userId (**either slack name or harvest id**).
+
 - `start` aims to start a task. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
 
-- `remind` checks all users timelines and sends slack reminder message to all users who have empty day entries timelines. Accepts one additional parameter, which is the userId (**either slack name or harvest id**).
+- `update` allows user to update her/his number of hours for given day entry. As an additional param, a project/client name can be provided. This will trigger a dialogue with the server that can be stopped at any point.
 
 ###Examples
 Command: 
@@ -242,4 +244,39 @@ Example dialogue output:
 ```
 Successfully created and started an entry for
 NEVERBLAND - Project 2 - Backend
+```
+
+
+Dialogue command 1:
+```
+/timer update neverb
+```
+Example dialogue output:
+```
+Choose which entry you want to update!
+
+1. NEVERBLAND - Project 1 - Task 1 (02:25)
+2. NEVERBLAND - Project 2 - Task 3 (01:30)
+
+Just type the number to choose it or write 'no' to quit the timer setup
+```
+Dialogue command 2:
+```
+/timer 2
+```
+Example dialogue output:
+```
+Cool, please provide a time to set for
+NEVERBLAND - Project 2 - Task 3 (01:30)
+Just type /timer followed by a valid time format (HH:mm or number of seconds) or write /timer no to quit the timer setup
+```
+Dialogue command 3:
+```
+/timer 02:30
+```
+Example dialogue output:
+```
+Successfully updated the time for
+NEVERBLAND - Project 2 - Task 3 (01:30)
+to 02:30
 ```
