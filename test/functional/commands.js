@@ -811,7 +811,7 @@ describe('Functional: Non-dialogue commands', function () {
                 expect(body).to.be.equal([
                     'Choose which entry you want to update!',
                     '',
-                    '1. Test Client - Test Project - Test Task',
+                    '1. Test Client - Test Project - Test Task (03:36)',
                     '',
                     'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup'
                 ].join('\n'));
@@ -856,7 +856,7 @@ describe('Functional: Non-dialogue commands', function () {
                 expect(body).to.be.equal([
                     'Choose which entry you want to update!',
                     '',
-                    '1. Test Client - Test Project - Test Task',
+                    '1. Test Client - Test Project - Test Task (03:36)',
                     '',
                     'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup'
                 ].join('\n'));
@@ -871,8 +871,8 @@ describe('Functional: Non-dialogue commands', function () {
                 }, function (err, res, body) {
                     expect(body).to.be.equal([
                         'Cool, please provide a time to set for ',
-                        'Test Client - Test Project - Test Task',
-                        'Just type ' + commandName + ' followed by a valid time format (HH:mm) or write \'' + commandName + ' no\' to quit the timer setup'
+                        'Test Client - Test Project - Test Task (03:36)',
+                        'Just type ' + commandName + ' followed by a valid time format (HH:mm or number of seconds) or write \'' + commandName + ' no\' to quit the timer setup'
                     ].join('\n'));
                     
                     
@@ -916,7 +916,7 @@ describe('Functional: Non-dialogue commands', function () {
                 expect(body).to.be.equal([
                     'Choose which entry you want to update!',
                     '',
-                    '1. Test Client - Test Project - Test Task',
+                    '1. Test Client - Test Project - Test Task (03:36)',
                     '',
                     'Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup'
                 ].join('\n'));
@@ -931,8 +931,8 @@ describe('Functional: Non-dialogue commands', function () {
                 }, function (err, res, body) {
                     expect(body).to.be.equal([
                         'Cool, please provide a time to set for ',
-                        'Test Client - Test Project - Test Task',
-                        'Just type ' + commandName + ' followed by a valid time format (HH:mm) or write \'' + commandName + ' no\' to quit the timer setup'
+                        'Test Client - Test Project - Test Task (03:36)',
+                        'Just type ' + commandName + ' followed by a valid time format (HH:mm or number of seconds) or write \'' + commandName + ' no\' to quit the timer setup'
                     ].join('\n'));
                     
                     
@@ -967,7 +967,7 @@ describe('Functional: Non-dialogue commands', function () {
                     }, function (err, res, body) {
                         expect(body).to.be.equal([
                             'Successfully updated the time for ',
-                            'Test Client - Test Project - Test Task',
+                            'Test Client - Test Project - Test Task (03:36)',
                             'to 06:15'
                         ].join('\n'));
                         done();

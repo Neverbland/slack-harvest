@@ -4,7 +4,7 @@
 var     interactiveSession  = require('./lib/user_session.js'),
         resolverConstructor = require('./lib/resolver.js'),
         resolver            = null,
-        tools               = require('./../tools'),
+        tools               = require('./../tools.js'),
         _                   = require('lodash'),
         timerTools          = require('./../timer'),
         harvest             = require('./../harvest')('default'),
@@ -201,7 +201,7 @@ if (resolver === null) {
                                 _.each(entries, function (entry, index) {
 
                                     options['' + (index + 1) + ''] = {
-                                        name: entry.client + ' - ' + entry.project + ' - ' + entry.task,
+                                        name: entry.client + ' - ' + entry.project + ' - ' + entry.task + ' (' + tools.formatTime(tools.getHours(entry)) + ')',
                                         task_id: entry.task_id,
                                         id : entry.id,
                                         project_id : entry.project_id,
