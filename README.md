@@ -13,11 +13,11 @@ $ cd /path/to/project
 $ npm install
 ```
 
-Next thing to do is preparing the **config file**. The file must be located in the repository root and named `config.json` A template file is stored in `config.dist.json`. The fiel is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
+Next thing to do is preparing the **config file**. The file must be located in the repository root and named `config.json` A template file is stored in `config.dist.json`. The file is divided into sections containing particular configuration options for the application middlewares. To get the Slack <-> Harvest part communicate, the most important thing is to set up the credentials for both services properly.
 
 ## Architecture
 
-The application is written 100% in `Node.JS` and at this point consists of thre blocks:
+The application is written 100% in `Node.JS` and at this point consists of three blocks:
 - the **cron-like time schedule** that sends notification messages to slack users,
 - a simple **HTTP API** to trigger notifications (single user and all users notifications, management report),
 - a **Slack Command API endpoint** that manages Harvest timer setup.
@@ -62,7 +62,7 @@ The users section contains the mapping of all available users **Harvest ID -> Sl
 
 For the moment the application is able to:
 
-- notify defined users at configured time every work day (monday - friday). The time is defined in the `cron.notify` section of the config file and uses **the same timezont that the machine the app runs on uses**. For the configuration below, the app will automatically send notifications every working day at `16:30`. If a `cron.notify.cronTime` value is provided in the config, **this value will be used instead of the hour and minutes settings**
+- notify defined users at the configured time every work day (monday - friday). The time is defined in the `cron.notify` section of the config file and uses **the same timezone as the machine the app is running on**. For the configuration below, the app will automatically send notifications every working day at `16:30`. If a `cron.notify.cronTime` value is provided in the config, **this value will be used instead of the hour and minutes settings**
 
 -  refresh (preload) the information about timesheet related entries (clients and projects) according to cron time provided in `cron.preload.cronTime` section
 
