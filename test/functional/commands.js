@@ -112,7 +112,11 @@ describe('Functional: Non-dialogue commands', function () {
                 }
             }, function (err, res, body) {
                 expect(spyCallback).to.have.been.calledWith(timelineData);
-                expect(body).to.be.equal('Currently you have no running tasks.');
+                expect(body).to.be.equal([
+                    'Currently you have no running tasks.',
+                    '',
+                    'Total: 00:00'
+                ].join('\n'));
                 done();
             });
         });
@@ -140,7 +144,9 @@ describe('Functional: Non-dialogue commands', function () {
                 expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
                 expect(body).to.be.equal([
                     'You are currently working on ',
-                    'Test Client - Test Project - Test Task'
+                    'Test Client - Test Project - Test Task (03:36)',
+                    '',
+                    'Total: 03:36'
                 ].join('\n'));
                 done();
             });

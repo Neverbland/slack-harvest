@@ -372,19 +372,36 @@ if (resolver === null) {
                 
                 getView: function (step)
                 {
-                    var errorString = 'Currently you have no running tasks.';
+                    var view = [],
+                        errorString = 'Currently you have no running tasks.',
+                        entry,
+                        entries,
+                        time,
+                        totalTime = 0
+                    ;
                     if (step === null) {
-                        return errorString;
+                        view.push(errorString);
                     }
-                    var entry = timerTools.filterCurrentEntry(step.getParam('entries'));
+                    entries = step.getParam('entries');
+                    entry = timerTools.filterCurrentEntry(entries);
                     if (entry !== null) {
-                        return  [
-                            'You are currently working on ',
-                            entry.client + ' - ' + entry.project + ' - ' + entry.task
-                        ].join('\n');
+                        view.push('You are currently working on ');
+                        time = tools.getHours(entry),
+                        view.push(entry.client + ' - ' + entry.project + ' - ' + entry.task + ' (' + tools.formatTime(time) + ')');
+                        
                     } else {
-                        return errorString;
+                        view.push(errorString);
                     }
+                    
+                    _.each(entries, function (entry) {
+                        var time = tools.getHours(entry);
+                        totalTime += time;
+                    });
+                    
+                    view.push('');
+                    view.push('Total: ' + tools.formatTime(totalTime));
+                    
+                    return view.join('\n');
                 }
             },
             projects: {
