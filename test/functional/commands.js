@@ -126,6 +126,7 @@ describe('Functional: Non-dialogue commands', function () {
             var userId = 23456,
                 expectedUrl = '/daily?of_user=' + userId,
                 spyCallback = sinon.spy()
+            ;
             
             harvestModule.client.get = function (url, data, cb) {
                 spyCallback(sampleTimelineData);
