@@ -813,6 +813,7 @@ if (resolver === null) {
                             'Cool, try again later!',
                             null
                         );
+                        return;
                     }
                     
                     try {
@@ -846,6 +847,7 @@ if (resolver === null) {
                                 .addParam('timeParsed', time)
                             ;
                             callback(that.getView(step), null);
+                            return;
                         }
                     });
                 }
