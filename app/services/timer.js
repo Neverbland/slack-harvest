@@ -46,6 +46,18 @@ timer = {
         this.validActions = actions;
         return this;
     },
+    
+    /**
+     * Adds the action
+     * 
+     * @param   {String}    action
+     * @returns {timer}
+     */
+    addAvailableAction : function (action)
+    {
+        this.validActions.push(action);
+        return this;
+    },
 
 
     validateAction : function (action) 

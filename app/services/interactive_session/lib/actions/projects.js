@@ -1,0 +1,104 @@
+var 
+    projectsProvider,
+    interactiveSession  = require('./../user_session.js'),
+    _                   = require('lodash'),
+    harvest             = require('./../../../harvest')('default'),
+    errOutput           = 'Wrong input provided, try following the instructions...'
+;
+
+
+projectsProvider = {
+    
+    ACTION_NAME : 'projects',
+    
+    /**
+     * Provides the name for action
+     * 
+     * @returns     {String}
+     */
+    getActionName : function ()
+    {
+        return this.ACTION_NAME;
+    },
+    
+    
+    /**
+     * Returns step provider for step one
+     * 
+     * @returns {Function}
+     */
+    getStepOne : function ()
+    {
+        return {
+            getView: function (step)
+            {
+                var errorString = 'Currently you have no available projects.';
+                if (step === null) {
+                    return errorString;
+                }
+
+                var view = [
+                    'Available projects',
+                    ''
+                ];
+
+                _.each(step.getParam('projects'), function (project, index) {
+                    view.push((index + 1) + '. ' + project.client + ' - ' + project.name);
+                });
+
+                return view.join('\n');
+            },
+
+            execute : function (params, callback)
+            {
+                var that = this;
+                harvest.getTasks(params.userId, function (err, results) {
+                    var step;
+                    if (err !== null) {
+                        callback(err, null);
+                    } else if (!results.projects || !results.projects.length) {
+                        callback(that.getView(null), null);
+                    } else {
+                        step = interactiveSession
+                                    .getDefault()
+                                    .createStep(params.userId, {}, params.action)
+                        ;
+                        step.addParam('projects', results.projects);
+                        callback(null, step);
+                    }
+                });
+            },
+
+            postExecute: function (step, callback) 
+            {
+                var userId = step.getParam('userId');
+                interactiveSession
+                        .getDefault()
+                        .clear(userId)
+                ;
+                callback();
+            },
+
+            prepareStep: function (step)
+            {
+                return null;
+            }
+        };
+    },
+    
+    
+    getStepTwo : function ()
+    {
+        return null;
+    },
+    
+    
+    getStepThree : function ()
+    {
+        return null;
+    }
+    
+};
+
+
+module.exports = projectsProvider; 
