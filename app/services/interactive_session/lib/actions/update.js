@@ -207,6 +207,7 @@ updateProvider = {
                         'Cool, try again later!',
                         null
                     );
+                    return;
                 }
 
                 try {

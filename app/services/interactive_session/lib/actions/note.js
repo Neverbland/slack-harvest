@@ -213,6 +213,7 @@ noteProvider = {
                         'Cool, try again later!',
                         null
                     );
+                    return;
                 }
 
                 harvest.update(params.userId, id, {
@@ -229,6 +230,7 @@ noteProvider = {
                     } else {
                         step.addParam('note', note);
                         callback(that.getView(step), null);
+                        return;
                     }
                 });
             }
