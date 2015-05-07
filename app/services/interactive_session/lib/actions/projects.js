@@ -1,104 +1,71 @@
+/*jshint node: true*/
+'use strict';
+
 var 
     projectsProvider,
     interactiveSession  = require('./../user_session.js'),
     _                   = require('lodash'),
     harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...'
+    errOutput           = 'Wrong input provided, try following the instructions...',
+    StepProvider        = require('./../step_provider.js')
 ;
 
-
-projectsProvider = {
-    
-    ACTION_NAME : 'projects',
-    
-    /**
-     * Provides the name for action
-     * 
-     * @returns     {String}
-     */
-    getActionName : function ()
+projectsProvider = new StepProvider('projects');
+projectsProvider.addStep(1, {
+    getView: function (step)
     {
-        return this.ACTION_NAME;
+        var errorString = 'Currently you have no available projects.';
+        if (step === null) {
+            return errorString;
+        }
+
+        var view = [
+            'Available projects',
+            ''
+        ];
+
+        _.each(step.getParam('projects'), function (project, index) {
+            view.push((index + 1) + '. ' + project.client + ' - ' + project.name);
+        });
+
+        return view.join('\n');
     },
-    
-    
-    /**
-     * Returns step provider for step one
-     * 
-     * @returns {Function}
-     */
-    getStepOne : function ()
+
+    execute : function (params, callback)
     {
-        return {
-            getView: function (step)
-            {
-                var errorString = 'Currently you have no available projects.';
-                if (step === null) {
-                    return errorString;
-                }
-
-                var view = [
-                    'Available projects',
-                    ''
-                ];
-
-                _.each(step.getParam('projects'), function (project, index) {
-                    view.push((index + 1) + '. ' + project.client + ' - ' + project.name);
-                });
-
-                return view.join('\n');
-            },
-
-            execute : function (params, callback)
-            {
-                var that = this;
-                harvest.getTasks(params.userId, function (err, results) {
-                    var step;
-                    if (err !== null) {
-                        callback(err, null);
-                    } else if (!results.projects || !results.projects.length) {
-                        callback(that.getView(null), null);
-                    } else {
-                        step = interactiveSession
-                                    .getDefault()
-                                    .createStep(params.userId, {}, params.action)
-                        ;
-                        step.addParam('projects', results.projects);
-                        callback(null, step);
-                    }
-                });
-            },
-
-            postExecute: function (step, callback) 
-            {
-                var userId = step.getParam('userId');
-                interactiveSession
-                        .getDefault()
-                        .clear(userId)
+        var that = this;
+        harvest.getTasks(params.userId, function (err, results) {
+            var step;
+            if (err !== null) {
+                callback(err, null);
+            } else if (!results.projects || !results.projects.length) {
+                callback(that.getView(null), null);
+            } else {
+                step = interactiveSession
+                            .getDefault()
+                            .createStep(params.userId, {}, params.action)
                 ;
-                callback();
-            },
-
-            prepareStep: function (step)
-            {
-                return null;
+                step.addParam('projects', results.projects);
+                callback(null, step);
             }
-        };
+        });
     },
-    
-    
-    getStepTwo : function ()
+
+    postExecute: function (step, callback) 
     {
-        return null;
+        var userId = step.getParam('userId');
+        interactiveSession
+                .getDefault()
+                .clear(userId)
+        ;
+        callback();
     },
-    
-    
-    getStepThree : function ()
+
+    prepareStep: function (step)
     {
         return null;
     }
-    
-};
+});
 
 
 module.exports = projectsProvider; 

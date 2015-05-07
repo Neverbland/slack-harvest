@@ -243,16 +243,11 @@ walker.on('file', function (root, stat, next) {
 
     timerTools.addAvailableAction(action);
     _.each(resolver.stepProviders, function (stepProvider) {
-        var actionProvider;
-        if (stepProvider.getStepNumber() === 1) {
-            actionProvider = provider.getStepOne();
-        } else if (stepProvider.getStepNumber() === 2) {
-            actionProvider = provider.getStepTwo();
-        } else {
-            actionProvider = provider.getStepThree();
-        }
-
-
+        var actionProvider,
+            stepNumber = stepProvider.getStepNumber(),
+            actionProvider = provider.getStep(stepNumber)
+        ;
+        
         stepProvider.stepActionProviders[action] = actionProvider;
 
     });

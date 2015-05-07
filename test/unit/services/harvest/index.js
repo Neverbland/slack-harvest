@@ -39,6 +39,32 @@ describe('harvest', function () {
         });
     });
     
+    describe('harvest.getProjectTimeTrack', function () {
+        it('Should send a request to Harvest API with valid project data', function () {
+            
+            var projectId = 123456,
+                dateForm = {
+                    date : new Date(0),
+                    string : '19700101'
+                },
+                dateTo = {
+                    date : new Date(0),
+                    string : '19700101'
+                },
+                expectedUrl = '/projects/' + projectId + '/entries?from=' + dateForm.string + '&to=' + dateTo.string,
+                cb = function (err, result) {};
+                
+            
+            harvestModule.client.get = function (url, data, cb) {
+                expect(url).to.be.equal(expectedUrl);
+                expect(cb).to.be.equal(cb);
+            };  
+            
+            
+            harvest.getProjectTimeTrack(projectId, dateForm.date, dateTo.date, cb);
+        });
+    });
+    
     
     describe('harvest.getProjects', function () {
         it('Should send a request to Harvest API for given projects url if projects not present and load not foeced.', function () {

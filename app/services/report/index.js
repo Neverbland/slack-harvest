@@ -68,38 +68,96 @@ function getIdsFromCombined (entries, mainKey, indexKey)
 }
 
 
+/**
+ * Sorts the day entries by user id
+ * 
+ * @param       {Array}     dayEntries
+ * @returns     {Array}     An array of objects containing the dayEntries,
+ *                          slackName and harvestId
+ */
+function byUserSlackName (dayEntries, harvest)
+{
+    var results = [],
+        byUser = {}
+    ;
+    _.each(dayEntries, function (entryObject) {
+        var entry = entryObject.day_entry,
+            userId = entry.user_id
+        ;
+        
+        byUser[userId] = byUser[userId] || [];
+        byUser[userId].push(entryObject);
+    });
+    
+    _.each(byUser, function (entryObjects, harvestId) {
+        var slackName = harvest.users[harvestId];
+        if (slackName) {
+            results.push({
+                harvestId : harvestId,
+                dayEntries : entryObjects,
+                slackName : slackName,
+                error : false
+            });
+        }
+    });
+    
+    
+    return results;
+}
+
+
+
 function ReportPrototype () 
 {
     this.notify = function (slackContext) 
     {
-        var users = slackContext.users || this.harvest.users;
-   
-        var promises = [];
-        var that = this;
-        _.each(users, function (slackName, harvestId) {
+        var users = slackContext.users || this.harvest.users,
+            projectId = slackContext.projectId,
+            promises = [],
+            that = this
+        ;
+        
+        if (!projectId) {
+            _.each(users, function (slackName, harvestId) {
+                var def = Q.defer();
+                that.harvest.getUserTimeTrack(harvestId, slackContext.fromDate, slackContext.toDate, function (err, dayEntries) {
+                    if (err !== null) {
+                        logger.error("Failed fetching user timeline from Harvest API for user " + harvestId, err, {});
+                        def.resolve({
+                            dayEntries : dayEntries,
+                            slackName : slackName,
+                            harvestId : harvestId,
+                            error : err
+                        });
+                    } else {
+                        def.resolve({
+                            dayEntries : dayEntries,
+                            slackName : slackName,
+                            harvestId : harvestId,
+                            error : false
+                        });
+                    }
+                });
+                promises.push(def.promise);
+            });
+        } else {
             var def = Q.defer();
-            that.harvest.getUserTimeTrack(harvestId, slackContext.fromDate, slackContext.toDate, function (err, dayEntries) {
+            that.harvest.getProjectTimeTrack(projectId, slackContext.fromDate, slackContext.toDate, function (err, dayEntries) {
                 if (err !== null) {
-                    logger.error("Failed fetching user timeline from Harvest API for user " + harvestId, err, {});
+                    logger.error("Failed fetching user timeline from Harvest API for project " + projectId, err, {});
                     def.resolve({
                         dayEntries : dayEntries,
-                        slackName : slackName,
-                        harvestId : harvestId,
                         error : err
                     });
                 } else {
-                    def.resolve({
-                        dayEntries : dayEntries,
-                        slackName : slackName,
-                        harvestId : harvestId,
-                        error : false
-                    });
+                    def.resolve(byUserSlackName(dayEntries, that.harvest));
                 }
             });
             promises.push(def.promise);
-        });
-
+        }
+   
         Q.all(promises).then(function (dayEntries) {
+            dayEntries = !projectId ? dayEntries : dayEntries[0];
             var projectsIds = getIdsFromCombined(dayEntries, 'day_entry', 'project_id');
             that.harvest.getProjectsByIds(projectsIds, function (err, projects) {
                 if (err === null) {

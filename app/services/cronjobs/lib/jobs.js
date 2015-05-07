@@ -8,7 +8,8 @@ var notifier    =       require('./../../notifier'),
     logger      =       require('./../../logger.js')('default'),
     CronJob     =       require('cron').CronJob,
     consts      =       require('./../../../../consts.json'),
-    reminder    =       require('./../../reminder/index.js')
+    reminder    =       require('./../../reminder/index.js'),
+    util        =       require('util')
 ;
     
     
@@ -56,13 +57,13 @@ JobsHolder.prototype = {
                 cronTime = job.getCronTime(config),
                 handler = job.getJob(config),
                 description = job.getDescription(),
-                autoRun = job.shouldRunNow()
+                autoRun = job.shouldRunNow(config)
             ;
                 
             logger.info('Setting up cron job for: "' + description + '" with cron time: ', cronTime, {});
             
-            var job = new CronJob(cronTime, handler);
-            job.start();
+            var cronJob = new CronJob(cronTime, handler);
+            cronJob.start();
             if (autoRun) {
                 logger.info('Immediately executing cron job for: "' + description + '".', {});
                 handler();
@@ -132,7 +133,7 @@ var defaultJobs = {
          * 
          * @returns {Boolean}
          */
-        shouldRunNow : function ()
+        shouldRunNow : function (config)
         {
             return false;
         },
@@ -176,9 +177,7 @@ var defaultJobs = {
         getCronTime : function (config)
         {
         
-            return !!config.cronTime 
-                            ?   config.cronTime 
-                            :   consts.preload.CRON_TIME;
+            return !!config.cronTime ? config.cronTime : consts.preload.CRON_TIME;
         },
         
         /**
@@ -187,7 +186,7 @@ var defaultJobs = {
          * 
          * @returns {Boolean}
          */
-        shouldRunNow : function ()
+        shouldRunNow : function (config)
         {
             return true;
         },
@@ -227,7 +226,8 @@ var defaultJobs = {
                     reportTitle : reportTitle,
                     channel : config.channel,
                     fromDate : dateFromObject,
-                    toDate : dateToObject
+                    toDate : dateToObject,
+                    projectId : config.projectId ? config.projectId : null
                 });
             };
         },
@@ -241,9 +241,7 @@ var defaultJobs = {
         getCronTime : function (config)
         {
         
-            return !!config.cronTime 
-                            ?   config.cronTime 
-                            :   consts.report.CRON_TIME;   // by default every hour, every week day, from 7am to 8pm; 
+            return !!config.cronTime ? config.cronTime : consts.report.CRON_TIME;   // by default every hour, every week day, from 7am to 8pm; 
         },
         
         /**
@@ -252,9 +250,9 @@ var defaultJobs = {
          * 
          * @returns {Boolean}
          */
-        shouldRunNow : function ()
+        shouldRunNow : function (config)
         {
-            return false;
+            return Boolean(config.run) ? true : false;
         },
         
         
@@ -298,9 +296,7 @@ var defaultJobs = {
          */
         getCronTime : function (config)
         {
-           return !!config.cronTime 
-                            ?   config.cronTime 
-                            :   consts.remind.CRON_TIME;   // by default every midday of working day; 
+           return !!config.cronTime ? config.cronTime : consts.remind.CRON_TIME;   // by default every midday of working day; 
         },
         
         /**
@@ -309,7 +305,7 @@ var defaultJobs = {
          * 
          * @returns {Boolean}
          */
-        shouldRunNow : function ()
+        shouldRunNow : function (config)
         {
             return false;
         },
@@ -335,7 +331,12 @@ module.exports = function (config, additionalJobs)
     _.each(config, function (configValues, jobName) {
         var job = jobs[jobName];
         if (!!job) {
-            jobsHolder.addJob(job, configValues);
+            if (!util.isArray(configValues)) {
+                configValues = [configValues];
+            }
+            _.each(configValues, function (configValue) {
+                jobsHolder.addJob(job, configValue);
+            });
         }
     });
     

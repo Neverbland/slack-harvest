@@ -33,7 +33,7 @@ module.exports = function (app, config)
             res.statusCode = httpCodes.NOT_FOUND;
         }
 
-        if (!!res.success === false) {
+        if (Boolean(res.success) === false) {
             httpCode = (res.statusCode === httpCodes.NOT_FOUND) ? res.statusCode : httpCodes.BAD_REQUEST; // Unauthorized
         } else {
             httpCode = httpCodes.OK;

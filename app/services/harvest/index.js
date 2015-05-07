@@ -67,21 +67,42 @@ _Harvest.prototype = {
     /**
      * Provides harvest entries for given user
      * 
-     * @param   {Number}        user_id
+     * @param   {Number}        userId
      * @param   {Date}          fromDate
      * @param   {Date}          toDate
      * @param   {Function}      callback    The callback that takes
      *                                      the error and returned data
      */
-    getUserTimeTrack : function (user_id, fromDate, toDate, callback) 
+    getUserTimeTrack : function (userId, fromDate, toDate, callback) 
     {
         var reports = this.load('Reports');
         reports.timeEntriesByUser({
-            user_id : user_id,
+            user_id : userId,
             from : formatDate(fromDate),
             to : formatDate(toDate)
         }, callback);
     },
+    
+    
+    /**
+     * Provides harvest entries for given user
+     * 
+     * @param   {Number}        projectId
+     * @param   {Date}          fromDate
+     * @param   {Date}          toDate
+     * @param   {Function}      callback    The callback that takes
+     *                                      the error and returned data
+     */
+    getProjectTimeTrack : function (projectId, fromDate, toDate, callback) 
+    {
+        var reports = this.load('Reports');
+        reports.timeEntriesByProject({
+            project_id : projectId,
+            from : formatDate(fromDate),
+            to : formatDate(toDate)
+        }, callback);
+    },
+    
     
     load : function (component) 
     {   
@@ -106,7 +127,8 @@ _Harvest.prototype = {
     /**
      * Passes loaded projects to callback
      * 
-     * @param       {Function}      callback
+     * @param       {Function}      callback    Gets error as first and the list
+     *                                          of projects as second param
      * @param       {Boolean}       force
      * @return      {Object}
      */
@@ -426,4 +448,4 @@ module.exports = function (key, config)
         instances[key] = new _Harvest(config);
         return instances[key];
     }
-}
+};

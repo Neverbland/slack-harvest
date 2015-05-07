@@ -110,8 +110,9 @@ var SlackNotifierPrototype = function ()
      */
     this.prepareText = function (userName, dayEntries)
     {
-        var that = this;
-        var projectsIds = tools.getIds(dayEntries, 'day_entry', 'project_id');
+        var that = this,
+            projectsIds = tools.getIds(dayEntries, 'day_entry', 'project_id')
+        ;
         this.harvest.getProjectsByIds(projectsIds, function (err, projects) {
             if (err === null) {
                 var clientsIds = tools.getIds(projects, 'project', 'client_id');

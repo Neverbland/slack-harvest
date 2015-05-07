@@ -14,7 +14,7 @@ var _ = require('lodash');
 var Notifier = function () 
 {
     this.notifiers = {};
-}
+};
 
 
 Notifier.prototype = {
