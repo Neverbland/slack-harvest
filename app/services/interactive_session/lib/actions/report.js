@@ -11,7 +11,8 @@ var
     errOutput           = 'Wrong input provided, try following the instructions...',
     logger              = require('./../../../logger.js')('default'),
     commandName         = require('./../../../../../config/index.js').api.controllers.timer.command,
-    StepProvider        = require('./../step_provider.js')
+    StepProvider        = require('./../step_provider.js'),
+    dateParser          = require('./../date_parser.js')
 ;
 
 
@@ -24,16 +25,18 @@ var
  */
 function mergeWithClients (projects, clients)
 {
+    var results = [];
     _.each(projects, function (project) {
-        var clientId = Number(project['client_id']);
+        var clientId = Number(project['project']['client_id']);
         _.each(clients, function (client) {
-            if (Number(client['id']) === clientId) {
-                project['client'] = client.name;
+            if (Number(client['client']['id']) === clientId) {
+                project['project']['client'] = client['client']['name'];
+                results.push(project['project']);
             }
         });
     });
     
-    return projects;
+    return results;
 }
 
 
@@ -41,11 +44,12 @@ reportProvider = new StepProvider('report');
 reportProvider.addStep(1, {
     getView: function (step)
     {
+
         if (step === null) {
             return 'No projects matching given string found!';
         }
         var view = [
-            'Choose the awesome project you are working on today!',
+            'Choose the project for the report',
             ''
         ];
 
@@ -67,7 +71,8 @@ reportProvider.addStep(1, {
         var that = this,
             action = tools.validateGet(params, 'action'),
             clientsIds,
-            step
+            step,
+            options
         ;
         harvest.getProjects(function (err, projects) {
 
@@ -88,7 +93,6 @@ reportProvider.addStep(1, {
                     } else {
                         projects = mergeWithClients(projects, clients);
                         projects = timerTools.findMatchingClientsOrProjects(params.name, projects);
-                        
                         options = (function (entries) {
 
                             var options = {};
@@ -121,7 +125,7 @@ reportProvider.addStep(1, {
                     }
                 });
             }
-        });
+        }, true);
     },
 
 
@@ -136,5 +140,165 @@ reportProvider.addStep(1, {
     }
 });
 
+
+reportProvider.addStep(2, {
+    getView : function (step)
+    {
+        var taskName;
+        if (step === null) {
+            return errOutput;
+        }
+
+        taskName = step
+                    .getParam('selectedOption')
+                    .name
+        ;
+
+        return [
+            'Cool, please provide a start date ',
+            taskName,
+            'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
+        ].join('\n');
+    },
+
+    execute : function (params, previousStep, callback)
+    {
+        var step = interactiveSession
+                    .getDefault()
+                    .createStep(params.userId, {}, previousStep.getAction())
+        ;
+
+        callback(null, step);
+    }
+});
+
+
+reportProvider.addStep(3, {
+    getView : function (step)
+    {
+        var taskName;
+        if (step === null) {
+            return errOutput;
+        }
+
+        taskName = step
+                .getParam('previousStep')
+                    .getParam('selectedOption')
+                    .name
+        ;
+
+        return [
+            'Cool, please provide the end date ',
+            taskName,
+            'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
+        ].join('\n');
+    },
+
+    execute : function (params, previousStep, callback)
+    {
+        
+        var value = params.value,
+            date,
+            step = interactiveSession
+                .getDefault()
+                .createStep(params.userId, {}, previousStep.getAction())
+        ;
+        
+        if (value === 'no') {
+            interactiveSession
+                    .getDefault()
+                    .clear(params.userId)
+            ;
+            callback(
+                'Cool, try again later!',
+                null
+            );
+            return;
+        }
+        
+        try {
+            date = dateParser
+                    .getDefault()
+                    .parse(value)
+            ;
+
+        } catch (err) {
+            callback([
+                err.message
+            ].join('\n'), null);
+            return;
+        }
+        
+        step.addParam('startDate', date);
+        callback(null, step);
+    }
+});
+
+
+reportProvider.addStep(4, {
+    getView : function (step)
+    {
+        var taskName;
+        if (step === null) {
+            return errOutput;
+        }
+
+        taskName = step
+                    .getParam('selectedOption')
+                    .name
+        ;
+
+        return [
+            'Cool, please provide the end date ',
+            taskName,
+            'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
+        ].join('\n');
+    },
+
+    execute : function (params, previousStep, callback)
+    {
+        console.log('chuj');
+        var value = params.value,
+            date,
+            that = this,
+            id = previousStep
+                    .getParam('previousStep')
+                    .getParam('selectedOption')
+                    .id,
+            prevDate = previousStep.getParam('startDate'),
+            step = interactiveSession
+                .getDefault()
+                .createStep(params.userId, {}, previousStep.getAction())
+        ;
+
+        if (value === 'no') {
+            interactiveSession
+                    .getDefault()
+                    .clear(params.userId)
+            ;
+            callback(
+                'Cool, try again later!',
+                null
+            );
+            return;
+        }
+
+        try {
+            date = dateParser
+                    .getDefault()
+                    .parse(value, prevDate)
+            ;
+
+        } catch (err) {
+            callback([
+                err.message
+            ].join('\n'), null);
+            return;
+        }
+        
+        step.addParam('endDate', date);
+        callback(null, step);
+    }
+});
 
 module.exports = reportProvider;

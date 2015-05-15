@@ -174,7 +174,7 @@ if (resolver === null) {
 
 
 
-    // Step 3 provider
+    // Step 3,4,5,... provider
     resolver.addStepProvider(stepProviderFactory({
         stepNumber: 2,
         
@@ -186,7 +186,11 @@ if (resolver === null) {
         
         validate: function (params, step)
         {
-            return this.tools.validate(this.stepNumber, step);
+            if (step === null) {
+                return false;
+            }
+
+            return (step.getParam('stepNumber') >= this.stepNumber);
         },
         
         execute: function (params, previousStep, callback) {

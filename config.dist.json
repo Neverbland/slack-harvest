@@ -37,10 +37,12 @@
         "preload" : {
             "cronTime" : "00 00 7-20 * * 1-5"
         },
-        "report" : {
-            "reportTitle" : "Weekly activity report",
-            "channel" : "#channel_name"
-        },
+        "report" : [
+            {
+                "reportTitle" : "Weekly activity report",
+                "channel" : "#channel_name"
+            }
+        ],
         "remind" : {
             "cronTime" : "00 00 12 * * 1-5"
         }
