@@ -184,13 +184,13 @@ if (resolver === null) {
         
         stepActionProviders : {},
         
-        validate: function (params, step)
+        validate: function (params, previousStep)
         {
-            if (step === null) {
+            if (previousStep === null) {
                 return false;
             }
-
-            return (step.getParam('stepNumber') >= this.stepNumber);
+            
+            return (previousStep.getParam('stepNumber') >= this.stepNumber);
         },
         
         execute: function (params, previousStep, callback) {

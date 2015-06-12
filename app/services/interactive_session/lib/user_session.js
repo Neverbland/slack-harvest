@@ -51,6 +51,24 @@ UserSessionStep.prototype = (function () {
             return validateOption(this.options, key);
         },
         
+        /**
+         * Checks weather or not a parameter for given key
+         * has been stored in the step
+         * 
+         * @param   {String}    key
+         * @returns {Boolean}
+         */
+        hasParam : function (key)
+        {
+            try {
+                validateOption(this.params, key);
+            } catch (err) {
+                return false;
+            }
+            
+            return true;
+        },
+        
         
         /**
          * Returns all available options

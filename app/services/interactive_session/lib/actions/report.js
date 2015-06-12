@@ -144,13 +144,14 @@ reportProvider.addStep(1, {
 reportProvider.addStep(2, {
     getView : function (step)
     {
-        var taskName;
+        var taskName,
+            selectedOption = step.getParam('selectedOption')
+        ;
         if (step === null) {
             return errOutput;
         }
 
-        taskName = step
-                    .getParam('selectedOption')
+        taskName = selectedOption
                     .name
         ;
 
@@ -174,129 +175,155 @@ reportProvider.addStep(2, {
 
 
 reportProvider.addStep(3, {
+    
+    subSteps : {
+        1 : {
+            getView : function (step)
+            {
+                var taskName,
+                    previousStep = step.getParam('previousStep')
+                ;
+                if (step === null) {
+                    return errOutput;
+                }
+
+                taskName = previousStep
+                            .getParam('selectedOption')
+                            .name
+                ;
+
+                return [
+                    'Cool, please provide the end date ',
+                    taskName,
+                    'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
+                ].join('\n');
+            },
+
+            execute : function (params, previousStep, callback)
+            {
+
+                var value = params.value,
+                    date,
+                    step = interactiveSession
+                        .getDefault()
+                        .createStep(params.userId, {}, previousStep.getAction())
+                ;
+
+                if (value === 'no') {
+                    interactiveSession
+                            .getDefault()
+                            .clear(params.userId)
+                    ;
+                    callback(
+                        'Cool, try again later!',
+                        null
+                    );
+                    return;
+                }
+
+                try {
+                    date = dateParser
+                            .getDefault()
+                            .parse(value)
+                    ;
+
+                } catch (err) {
+                    callback([
+                        err.message
+                    ].join('\n'), null);
+                    return;
+                }
+
+                step.addParam('startDate', date);
+                step.addParam('subStep', 1);
+                callback(null, step);
+            }
+        },
+        2 : {
+            getView : function (step)
+            {
+                var taskName;
+                if (step === null) {
+                    return errOutput;
+                }
+
+                taskName = step
+                            .getParam('previousStep')
+                            .getParam('previousStep')
+                            .getParam('selectedOption')
+                            .name
+                ;
+
+                return [
+                    'Cool, please provide the end date ',
+                    taskName,
+                    'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
+                ].join('\n');
+            },
+
+            execute : function (params, previousStep, callback)
+            {
+                var value = params.value,
+                    date,
+                    that = this,
+                    id = previousStep
+                            .getParam('previousStep')
+                            .getParam('selectedOption')
+                            .id,
+                    prevDate = previousStep.getParam('startDate'),
+                    step = interactiveSession
+                        .getDefault()
+                        .createStep(params.userId, {}, previousStep.getAction())
+                ;
+
+                if (value === 'no') {
+                    interactiveSession
+                            .getDefault()
+                            .clear(params.userId)
+                    ;
+                    callback(
+                        'Cool, try again later!',
+                        null
+                    );
+                    return;
+                }
+
+                try {
+                    date = dateParser
+                            .getDefault()
+                            .parse(value, prevDate)
+                    ;
+
+                } catch (err) {
+                    callback([
+                        err.message
+                    ].join('\n'), null);
+                    return;
+                }
+
+                step.addParam('endDate', date);
+                step.addParam('subStep', 2);
+                callback(null, step);
+            }
+        }
+    },
+    
     getView : function (step)
     {
-        var taskName;
-        if (step === null) {
-            return errOutput;
-        }
-
-        taskName = step
-                .getParam('previousStep')
-                    .getParam('selectedOption')
-                    .name
-        ;
-
-        return [
-            'Cool, please provide the end date ',
-            taskName,
-            'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
-        ].join('\n');
+        var index = step.getParam('subStep');
+        
+        return this.subSteps['' + index + ''].getView(step);
     },
 
     execute : function (params, previousStep, callback)
     {
-        
-        var value = params.value,
-            date,
-            step = interactiveSession
-                .getDefault()
-                .createStep(params.userId, {}, previousStep.getAction())
-        ;
-        
-        if (value === 'no') {
-            interactiveSession
-                    .getDefault()
-                    .clear(params.userId)
-            ;
-            callback(
-                'Cool, try again later!',
-                null
-            );
-            return;
+        var index;
+        if (!previousStep.hasParam('subStep')) {
+            return this.subSteps['1'].execute(params, previousStep, callback);
+        } else {
+            index = previousStep.getParam('subStep');
+            return this.subSteps['' + (index + 1) + ''].execute(params, previousStep, callback);
         }
-        
-        try {
-            date = dateParser
-                    .getDefault()
-                    .parse(value)
-            ;
-
-        } catch (err) {
-            callback([
-                err.message
-            ].join('\n'), null);
-            return;
-        }
-        
-        step.addParam('startDate', date);
-        callback(null, step);
-    }
-});
-
-
-reportProvider.addStep(4, {
-    getView : function (step)
-    {
-        var taskName;
-        if (step === null) {
-            return errOutput;
-        }
-
-        taskName = step
-                    .getParam('selectedOption')
-                    .name
-        ;
-
-        return [
-            'Cool, please provide the end date ',
-            taskName,
-            'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
-        ].join('\n');
-    },
-
-    execute : function (params, previousStep, callback)
-    {
-        var value = params.value,
-            date,
-            that = this,
-            id = previousStep
-                    .getParam('previousStep')
-                    .getParam('selectedOption')
-                    .id,
-            prevDate = previousStep.getParam('startDate'),
-            step = interactiveSession
-                .getDefault()
-                .createStep(params.userId, {}, previousStep.getAction())
-        ;
-
-        if (value === 'no') {
-            interactiveSession
-                    .getDefault()
-                    .clear(params.userId)
-            ;
-            callback(
-                'Cool, try again later!',
-                null
-            );
-            return;
-        }
-
-        try {
-            date = dateParser
-                    .getDefault()
-                    .parse(value, prevDate)
-            ;
-
-        } catch (err) {
-            callback([
-                err.message
-            ].join('\n'), null);
-            return;
-        }
-        
-        step.addParam('endDate', date);
-        callback(null, step);
     }
 });
 

@@ -117,7 +117,11 @@ describe('user_session', function () {
             expect(step1.getAction()).to.equal(action);  
             
             expect(step2.getParam('stepNumber')).to.equal(2);            
-            expect(step2.getParam('previousStep')).to.equal(step1);            
+            expect(step2.getParam('previousStep')).to.equal(step1); 
+            
+            expect(step2.hasParam('previousStep')).to.equal(true); 
+            expect(step2.hasParam('blahBlahBlah')).to.equal(false); 
+            
             expect(step2.getParam('userId')).to.equal(userId);
             expect(step2.getOption('some')).to.equal('option');  
             expect(step2.getOptions()).to.equal(options);  
