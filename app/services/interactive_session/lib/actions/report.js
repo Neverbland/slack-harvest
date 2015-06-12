@@ -257,7 +257,6 @@ reportProvider.addStep(4, {
 
     execute : function (params, previousStep, callback)
     {
-        console.log('chuj');
         var value = params.value,
             date,
             that = this,
