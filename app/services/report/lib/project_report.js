@@ -136,7 +136,7 @@ report = {
                                 clientsById : tools.byId(clients, 'client'),
                                 projectsById : tools.byId(projects, 'project'),
                             };
-                            view = viewBuilder.prepareString(viewData);
+                            view = viewBuilder.prepareString(viewData, projectId);
             
                             callback(null, view);
                         }

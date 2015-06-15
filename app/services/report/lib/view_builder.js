@@ -39,7 +39,7 @@ function formatSummary (summary)
  * @param       {Object}        clientsById
  * @param       {Object}        projectsById
  * 
- * @returns     {String}
+ * @returns     {Object}
  */
 function projectsSummary(dayEntries, clientsById, projectsById)
 {
@@ -61,7 +61,7 @@ function projectsSummary(dayEntries, clientsById, projectsById)
         }
     });
     
-    return formatSummary(summary);
+    return summary;
     
 }
 
@@ -78,12 +78,15 @@ function projectsSummary(dayEntries, clientsById, projectsById)
  */
 function userReport (userEntriesObject, clientsById, projectsById)
 {
-    var resultsRow = {
-        title : userEntriesObject.slackName,
-        text : projectsSummary(userEntriesObject.dayEntries, clientsById, projectsById),
-        mrkdwn_in : ["text", "title"],
-        color: "FFA200"
-    };
+    var summary = projectsSummary(userEntriesObject.dayEntries, clientsById, projectsById),
+        resultsRow = {
+            title : userEntriesObject.slackName,
+            text : formatSummary(summary),
+            mrkdwn_in : ["text", "title"],
+            color: "FFA200",
+            summary: summary
+        }
+    ;
     
     return resultsRow;
 }
@@ -123,23 +126,31 @@ module.exports = {
      * Formats the string view
      * 
      * @param   {Object}    data
+     * @param   {String}    projectId
      * @returns {String}
      */
-    prepareString : function (data)
+    prepareString : function (data, projectId)
     {
         var view = this.prepareView(data),
-            result = [],
-            that = this
+            results = [],
+            that = this,
+            totalTime = 0
         ;
         
         _.each(view, function (viewObject) {
-            result.push([
+            var timeSpent = viewObject.summary[projectId].time;
+            totalTime += timeSpent;
+
+            results.push([
                 that.prepareTitle(viewObject),
                 viewObject.text
             ].join('\n'));
         });
         
-        return result.join('\n');
+        results.push('\n');
+        results.push('Total on project: ' + tools.formatTime(totalTime));
+        
+        return results.join('\n');
         
     },
     
