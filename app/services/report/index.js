@@ -72,8 +72,9 @@ function getIdsFromCombined (entries, mainKey, indexKey)
  * Sorts the day entries by user id
  * 
  * @param       {Array}     dayEntries
- * @returns     {Array}     An array of objects containing the dayEntries,
- *                          slackName and harvestId
+ * @param       {Object}    harvest     The harvest object
+ * @returns     {Array}                 An array of objects containing the dayEntries,
+ *                                      slackName and harvestId
  */
 function byUserSlackName (dayEntries, harvest)
 {

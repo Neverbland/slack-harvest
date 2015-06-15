@@ -2,7 +2,8 @@
 'use strict';
 
 var _       =   require('lodash'),
-    tools   =   require('./../../tools.js');
+    tools   =   require('./../../tools.js')
+;
 
 
 
@@ -109,7 +110,7 @@ module.exports = {
             dayEntries      =   data.dayEntries,
             results         =   []
         ;
-    
+
         _.each(dayEntries, function (dayEntriesObject) {
             results.push(userReport(dayEntriesObject, clientsById, projectsById));
         });

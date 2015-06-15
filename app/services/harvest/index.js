@@ -75,11 +75,13 @@ _Harvest.prototype = {
      */
     getUserTimeTrack : function (userId, fromDate, toDate, callback) 
     {
+        fromDate = (typeof fromDate === 'string') ? fromDate : formatDate(fromDate);
+        toDate = (typeof toDate === 'string') ? toDate : formatDate(toDate);
         var reports = this.load('Reports');
         reports.timeEntriesByUser({
             user_id : userId,
-            from : formatDate(fromDate),
-            to : formatDate(toDate)
+            from : fromDate,
+            to : toDate
         }, callback);
     },
     

@@ -12,7 +12,8 @@ var
     logger              = require('./../../../logger.js')('default'),
     commandName         = require('./../../../../../config/index.js').api.controllers.timer.command,
     StepProvider        = require('./../step_provider.js'),
-    dateParser          = require('./../date_parser.js')
+    dateParser          = require('./../date_parser.js'),
+    projectReport       = require('./../../../report/lib/project_report.js')
 ;
 
 
@@ -242,35 +243,19 @@ reportProvider.addStep(3, {
         2 : {
             getView : function (step)
             {
-                var taskName;
-                if (step === null) {
-                    return errOutput;
-                }
-
-                taskName = step
-                            .getParam('previousStep')
-                            .getParam('previousStep')
-                            .getParam('selectedOption')
-                            .name
-                ;
-
-                return [
-                    'Cool, please provide the end date ',
-                    taskName,
-                    'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
-                ].join('\n');
+                return step.getParam('view');
             },
 
             execute : function (params, previousStep, callback)
             {
                 var value = params.value,
-                    date,
+                    dateTo,
                     that = this,
                     id = previousStep
                             .getParam('previousStep')
                             .getParam('selectedOption')
                             .id,
-                    prevDate = previousStep.getParam('startDate'),
+                    dateFrom = previousStep.getParam('startDate'),
                     step = interactiveSession
                         .getDefault()
                         .createStep(params.userId, {}, previousStep.getAction())
@@ -289,9 +274,9 @@ reportProvider.addStep(3, {
                 }
 
                 try {
-                    date = dateParser
+                    dateTo = dateParser
                             .getDefault()
-                            .parse(value, prevDate)
+                            .parse(value, dateFrom)
                     ;
 
                 } catch (err) {
@@ -300,10 +285,20 @@ reportProvider.addStep(3, {
                     ].join('\n'), null);
                     return;
                 }
-
-                step.addParam('endDate', date);
-                step.addParam('subStep', 2);
-                callback(null, step);
+                
+                projectReport.getReport(id, dateFrom, dateTo, function (err, view) {
+                    interactiveSession
+                            .getDefault()
+                            .clear(params.userId)
+                    ;
+                    
+                    if (err) {
+                        callback(err, null);
+                    } else {
+                        step.addParam('view', view);
+                        callback(null, step);
+                    }
+                });
             }
         }
     },
@@ -311,19 +306,13 @@ reportProvider.addStep(3, {
     getView : function (step)
     {
         var index = step.getParam('subStep');
-        
         return this.subSteps['' + index + ''].getView(step);
     },
 
     execute : function (params, previousStep, callback)
     {
-        var index;
-        if (!previousStep.hasParam('subStep')) {
-            return this.subSteps['1'].execute(params, previousStep, callback);
-        } else {
-            index = previousStep.getParam('subStep');
-            return this.subSteps['' + (index + 1) + ''].execute(params, previousStep, callback);
-        }
+        var index = !previousStep.hasParam('subStep') ? '1' : String(previousStep.getParam('subStep') + 1);
+        this.subSteps[index].execute(params, previousStep, callback);
     }
 });
 
