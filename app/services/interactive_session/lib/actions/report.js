@@ -296,7 +296,7 @@ reportProvider.addStep(3, {
                         callback(err, null);
                     } else {
                         step.addParam('view', view);
-                        callback(null, step);
+                        callback(that.getView(step), null);
                     }
                 });
             }

@@ -130,14 +130,15 @@ report = {
                             logger.error('Failed fetching clients for given clients ids', clientsIds, {});
                             callback(err, null);
                         } else{
+
                             viewData = {
                                 dayEntries : dayEntries,
-                                projectsById : projects,
-                                clientsById : clients
+                                clientsById : tools.byId(clients, 'client'),
+                                projectsById : tools.byId(projects, 'project'),
                             };
-                            view = viewBuilder.prepareView(viewData);
-                            console.log(view);
-                            callback(null, view.join('\n'));
+                            view = viewBuilder.prepareString(viewData);
+            
+                            callback(null, view);
                         }
                     });
                 } else {

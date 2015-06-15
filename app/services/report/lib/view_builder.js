@@ -118,6 +118,32 @@ module.exports = {
         return results;
     },
     
+    
+    /**
+     * Formats the string view
+     * 
+     * @param   {Object}    data
+     * @returns {String}
+     */
+    prepareString : function (data)
+    {
+        var view = this.prepareView(data),
+            result = [],
+            that = this
+        ;
+        
+        _.each(view, function (viewObject) {
+            result.push([
+                that.prepareTitle(viewObject),
+                viewObject.text
+            ].join('\n'));
+        });
+        
+        return result.join('\n');
+        
+    },
+    
+    
     /**
      * Returns the title of the report
      * 
