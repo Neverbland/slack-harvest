@@ -87,7 +87,7 @@ statusProvider.addStep(1, {
         if (entry !== null) {
             view.push('You are currently working on ');
             time = tools.getHours(entry),
-            view.push(entry.client + ' - ' + entry.project + ' - ' + entry.task + ' (' + tools.formatTime(time) + ')');
+            view.push(entry.client + ' - ' + entry.project + ' - ' + entry.task + ' - ' + entry.notes  + ' (' + tools.formatTime(time) + ')');
 
         } else {
             view.push(errorString);

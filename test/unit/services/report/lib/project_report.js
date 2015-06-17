@@ -2,23 +2,31 @@
 
 var report              = require('./../../../../../app/services/report/lib/project_report.js'),
     expect              = require('chai').expect,
+    harvest             = require('./../../../../../app/services/harvest')('default', {
+        subdomain       : "test",
+        email           : "test@test.com",
+        password        : "password"
+    }),
+    harvestModule       = harvest.harvest,
     dayEntriesMock      = [
         {
-            timer_started_at: '2015-04-14T07:28:26Z',
-            project_id: '7585993',
-            user_id: 23456,
-            spent_at: '2015-04-14',
-            task_id: '1815946',
-            id: 320497172,
-            notes: '',
-            created_at: '2015-04-14T07:28:20Z',
-            updated_at: '2015-04-14T07:28:26Z',
-            hours_without_timer: 0.2,
-            hours: 3.61
+            day_entry : {
+                timer_started_at: '2015-04-14T07:28:26Z',
+                project_id: '7585993',
+                user_id: 2,
+                spent_at: '2015-04-14',
+                task_id: '1815946',
+                id: 320497172,
+                notes: '',
+                created_at: '2015-04-14T07:28:20Z',
+                updated_at: '2015-04-14T07:28:26Z',
+                hours_without_timer: 0.2,
+                hours: 3.61
+            }
         }
     ],
-    projectsMock        = [
-        {
+    projectsMock        = {
+        7585993 : {
             name: 'Test Project',
             code: '',
             id: 7585993,
@@ -32,7 +40,7 @@ var report              = require('./../../../../../app/services/report/lib/proj
             client_currency: 'British Pound - GBP',
             client_currency_symbol: '£'
         },
-        {
+        7585994 : {
             name: 'Test Project 2',
             code: '',
             id: 7585994,
@@ -46,15 +54,15 @@ var report              = require('./../../../../../app/services/report/lib/proj
             client_currency: 'British Pound - GBP',
             client_currency_symbol: '£'
         }
-    ],
-    clientsMock = [
-        {
+    },
+    clientsMock = {
+        3 : {
             client : {
                 id : 3,
                 name : 'Test client'
             }
         }
-    ]
+    }
 ;
 
 
@@ -67,9 +75,27 @@ describe('project_report', function () {
             
             var dateFrom = '20150401',
                 dateTo = '20150405',
-                projectId = 1
+                projectId = 1,
+                users = {
+                    2 : 'some_user1',
+                },      
+                userId = 2,
+                clientId = 3,
+                expectedUrlBeginningUsers = '/people/' + userId + '/entries',
+                expectedUrlBeginningClient = '/clients/' + clientId
             ;
             
+            harvest.users = users;
+            
+            harvestModule.client.get = function (url, data, cb) {
+                if (url.substr(0, expectedUrlBeginningUsers.length) === expectedUrlBeginningUsers) {
+                    cb(null, dayEntriesMock);
+                    return;
+                } else if (url.substr(0, expectedUrlBeginningClient.length) === expectedUrlBeginningClient) {
+                    cb(null, clientsMock[3]);
+                    return;
+                }
+            };  
             
             
             report.getReport(projectId, dateFrom, dateTo, function (err, view) {

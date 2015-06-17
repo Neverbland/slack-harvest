@@ -30,7 +30,7 @@ var app                 = require('./../../app.js'),
                                         task: 'Test Task',
                                         client: 'Test Client',
                                         id: 320497172,
-                                        notes: '',
+                                        notes: 'Test Note',
                                         created_at: '2015-04-14T07:28:20Z',
                                         updated_at: '2015-04-14T07:28:26Z',
                                         hours_without_timer: 0.2,
@@ -145,7 +145,7 @@ describe('Functional: Non-dialogue commands', function () {
                 expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
                 expect(body).to.be.equal([
                     'You are currently working on ',
-                    'Test Client - Test Project - Test Task (03:36)',
+                    'Test Client - Test Project - Test Task - Test Note (03:36)',
                     '',
                     'Total: 03:36'
                 ].join('\n'));
