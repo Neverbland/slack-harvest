@@ -18,11 +18,18 @@ function formatSummary (summary)
     var records = [];
     var totalTime = 0;
     _.each(summary, function (project) {
-        var responsePart = [
+        var responsePart,
+            responsePartArray = [
             project.clientName,
-            project.projectName,
-            tools.formatTime(project.time)
-        ].join(' - ');
+            project.projectName
+        ];
+        if (project.note.length) {
+            responsePartArray.push(project.note);
+        }
+        
+        responsePartArray.push(tools.formatTime(project.time));
+        responsePart = responsePartArray.join(' - ');
+        
         totalTime += project.time;
         records.push(responsePart);
     });
@@ -48,16 +55,19 @@ function projectsSummary(dayEntries, clientsById, projectsById)
         var dayEntry = dayEntryObject.day_entry,
             projectId = dayEntry.project_id,
             project = projectsById[projectId] || null,
-            client = (project && clientsById[project.client_id]) ? clientsById[project.client_id] : null;
+            client = (project && clientsById[project.client_id]) ? clientsById[project.client_id] : null,
+            key = '' + projectId + dayEntry.note
+        ;
             
-        if (!summary[projectId]) {
-            summary[projectId] = {
+        if (!summary[key]) {
+            summary[key] = {
                 projectName : project ? project.name : dayEntry.project_id,
                 clientName : client ? client.name : "Unknown client",
-                time : tools.getHours(dayEntry)
+                time : tools.getHours(dayEntry),
+                note : dayEntries.notes
             };
         } else {
-            summary[projectId].time = summary[projectId].time + tools.getHours(dayEntry);
+            summary[key].time = summary[key].time + tools.getHours(dayEntry);
         }
     });
     

@@ -77,6 +77,7 @@ statusProvider.addStep(1, {
             entry,
             entries,
             time,
+            viewArray,
             totalTime = 0
         ;
         if (step === null) {
@@ -86,8 +87,17 @@ statusProvider.addStep(1, {
         entry = timerTools.filterCurrentEntry(entries);
         if (entry !== null) {
             view.push('You are currently working on ');
-            time = tools.getHours(entry),
-            view.push(entry.client + ' - ' + entry.project + ' - ' + entry.task + ' - ' + entry.notes  + ' (' + tools.formatTime(time) + ')');
+            time = tools.getHours(entry);
+            viewArray = [
+                entry.client,
+                entry.project,
+                entry.task
+            ];
+            
+            if (entry.notes.length) {
+                viewArray.push(entry.notes);
+            }
+            view.push(viewArray.join(' - ') + ' (' + tools.formatTime(time) + ')');
 
         } else {
             view.push(errorString);
