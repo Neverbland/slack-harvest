@@ -5,17 +5,23 @@ var _       = require('lodash'),
     request = require('request');
 
 
-function _Slack (config)
+/**
+ * Constructs the _Slack object
+ * 
+ * @param {Object} config
+ * @constructs
+ */
+function Slack (config)
 {
     this.endpoint = config.endpoint;
     this.config = config; 
     if (!config.username) {
-        this.config.username = _Slack.prototype.USER_AGENT;
+        this.config.username = Slack.prototype.USER_AGENT;
     }
 }
 
 
-_Slack.prototype = {
+Slack.prototype = {
     USER_AGENT : "Neverbland Slack - Harvest Integration Middleman",
     
     
@@ -80,7 +86,7 @@ _Slack.prototype = {
         
     } 
 };
-_Slack.prototype.constructor = _Slack;
+Slack.prototype.constructor = Slack;
 
 
 /**
@@ -95,14 +101,14 @@ var instances = {};
  * 
  * @param   {String}    key
  * @param   {Object}    config
- * @returns {_Slack}
+ * @returns {Slack}
  */
 module.exports = function (key, config)
 {
     if (!!instances[key]) {
         return instances[key];
     } else {
-        instances[key] = new _Slack(config);
+        instances[key] = new Slack(config);
         return instances[key];
     }
-}
+};

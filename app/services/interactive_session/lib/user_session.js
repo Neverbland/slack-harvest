@@ -249,8 +249,8 @@ UserSession.prototype = (function () {
         {
 
             var steps = this.users[userId] || [],
-                step = step || steps.length,
-                index = step - 1,
+                currentStepNumber = step || steps.length,
+                index = currentStepNumber - 1,
                 value;
         
             if (!steps.length) {
@@ -260,7 +260,7 @@ UserSession.prototype = (function () {
             value = steps[index];
             
             if (typeof value === 'undefined') {
-                throw new Error('Step ' + step + ' does not exist!');
+                throw new Error('Step ' + currentStepNumber + ' does not exist!');
             }
             
             return value;

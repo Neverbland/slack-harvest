@@ -84,7 +84,7 @@ function SlackReminderPrototype ()
             }
         });
     };
-};
+}
 
 SlackReminderPrototype.prototype = new events.EventEmitter();
 

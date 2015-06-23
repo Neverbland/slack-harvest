@@ -30,7 +30,7 @@ statusProvider.addStep(1, {
                 callback(err, null);
                 return;
             } else if (!results.day_entries) {
-                var step = interactiveSession
+                step = interactiveSession
                             .getDefault()
                             .createStep(params.userId, {}, params.action)
                 ;

@@ -205,7 +205,7 @@ function ReportPrototype ()
     
     // Send the message when all content populated and the text is prepared
     this.on('responseReady', this.responseReadyHandler);
-};
+}
 
 
 ReportPrototype.prototype = new events.EventEmitter();
@@ -214,4 +214,4 @@ Report.prototype = new ReportPrototype();
 
 module.exports = function (slack, harvest, builder) {
     return new Report(slack, harvest, (builder || viewBuilder));
-}
+};

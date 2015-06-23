@@ -115,11 +115,14 @@ module.exports = {
      */
     dateFromString : function (timeString)
     {
-        var date = new Date().strtotime(timeString);
+        var date = new Date().strtotime(timeString),
+            intValue
+        ;
         if (date instanceof Date) {
             return date;
         }
-        if (parseInt(date) !== NaN) {
+        intValue = parseInt(date);
+        if (!isNaN(intValue)) {
             return new Date(date);
         } else {
             return date;

@@ -85,10 +85,13 @@ if (resolver === null) {
          */
         createView: function (step)
         {
+            var provider,
+                action
+            ;
             if (step === null) {
                 return errOutput;
             }
-            var action;
+
             try {
                 action = step.getAction();
             } catch (err) {
@@ -96,7 +99,7 @@ if (resolver === null) {
             }
 
             try {
-                var provider = tools.validateGet(this.stepActionProviders, action);
+                provider = tools.validateGet(this.stepActionProviders, action);
             } catch (err) {
                 return errOutput;
             }
@@ -247,8 +250,7 @@ walker.on('file', function (root, stat, next) {
 
     timerTools.addAvailableAction(action);
     _.each(resolver.stepProviders, function (stepProvider) {
-        var actionProvider,
-            stepNumber = stepProvider.getStepNumber(),
+        var stepNumber = stepProvider.getStepNumber(),
             actionProvider = provider.getStep(stepNumber)
         ;
         

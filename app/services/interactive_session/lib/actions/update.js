@@ -43,11 +43,12 @@ updateProvider.addStep(1, {
 
                 options = (function (entries) {
 
-                    var options = {};
-                    options['no'] = {
-                        name: 'Quit',
-                        id: null,
-                        type: 'system'
+                    var options = {
+                        no : {
+                            name: 'Quit',
+                            id: null,
+                            type: 'system'
+                        }
                     };
 
                     _.each(entries, function (entry, index) {

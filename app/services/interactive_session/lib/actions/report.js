@@ -28,11 +28,11 @@ function mergeWithClients (projects, clients)
 {
     var results = [];
     _.each(projects, function (project) {
-        var clientId = Number(project['project']['client_id']);
+        var clientId = Number(project.project.client_id);
         _.each(clients, function (client) {
-            if (Number(client['client']['id']) === clientId) {
-                project['project']['client'] = client['client']['name'];
-                results.push(project['project']);
+            if (Number(client.client.id) === clientId) {
+                project.project.client = client.client.name;
+                results.push(project.project);
             }
         });
     });
@@ -96,12 +96,14 @@ reportProvider.addStep(1, {
                         projects = timerTools.findMatchingClientsOrProjects(params.name, projects);
                         options = (function (entries) {
 
-                            var options = {};
-                            options['no'] = {
-                                name: 'Quit',
-                                id: null,
-                                type: 'system'
+                            var options = {
+                                no : {
+                                    name: 'Quit',
+                                    id: null,
+                                    type: 'system'
+                                }
                             };
+                            
 
                             _.each(entries, function (entry, index) {
 

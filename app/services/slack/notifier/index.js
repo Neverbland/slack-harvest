@@ -75,7 +75,7 @@ function formatResponse (dayEntries, projects, clients)
     response.push('Total: ' + tools.formatTime(totalTime));
     response.push('\n');
     
-    response.push('If anything is missing, add it here <' + SlackNotifier.prototype.LINK + '>' )
+    response.push('If anything is missing, add it here <' + SlackNotifier.prototype.LINK + '>' );
     
     return response.join("\n");
 }
@@ -105,6 +105,7 @@ var SlackNotifierPrototype = function ()
      * prepares the text and triggers propper event when ready
      * 
      * @param       {String}        userName
+     * @param       {Object}        dayEntries
      * @param       {Array}         An array of day entries
      * @returns     {undefined}
      */

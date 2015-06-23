@@ -25,7 +25,7 @@ function formatDate (date)
     return yyyy + (mm[1] ? mm : "0" + mm[0]) + (dd[1] ? dd : "0" + dd[0]); // padding
 }
 
-function _Harvest (config)
+function Harvest (config)
 {
     this.harvest = new harvest({
         subdomain : config.subdomain,
@@ -61,7 +61,7 @@ function byId (resources, mainKey)
 }
 
 
-_Harvest.prototype = {
+Harvest.prototype = {
     USER_AGENT : "Neverbland Slack - Harvest Integration Middleman",
     
     /**
@@ -432,7 +432,7 @@ _Harvest.prototype = {
         this.users = users;
     }
 };
-_Harvest.prototype.constructor = _Harvest;
+Harvest.prototype.constructor = Harvest;
 
 /**
  * Creates a new instance if such instance does not exist. If exists, returns
@@ -440,14 +440,14 @@ _Harvest.prototype.constructor = _Harvest;
  * 
  * @param   {String}    key
  * @param   {Object}    config
- * @returns {_Harvest}
+ * @returns {Harvest}
  */
 module.exports = function (key, config)
 {
     if (!!instances[key]) {
         return instances[key];
     } else {
-        instances[key] = new _Harvest(config);
+        instances[key] = new Harvest(config);
         return instances[key];
     }
 };

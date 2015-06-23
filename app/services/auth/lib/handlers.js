@@ -53,7 +53,7 @@ var handlers = {
     {
         this.token = token;
     }
-}
+};
 
 
 

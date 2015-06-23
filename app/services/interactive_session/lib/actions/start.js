@@ -65,12 +65,14 @@ startProvider.addStep(1, {
 
                 options = (function (entries) {
 
-                    var options = {};
-                    options['no'] = {
-                        name: 'Quit',
-                        id: null,
-                        type: 'system'
+                    var options = {
+                        no : {
+                            name: 'Quit',
+                            id: null,
+                            type: 'system'
+                        }
                     };
+                    
 
                     _.each(entries, function (entry, index) {
 
@@ -144,12 +146,14 @@ startProvider.addStep(2, {
                     .getDefault()
                     .createStep(params.userId, (function (tasks) {
 
-                        var options = {};
-                        options['no'] = {
-                            name: 'Quit',
-                            id: null,
-                            type: 'system'
+                        var options = {
+                            no : {
+                                name: 'Quit',
+                                id: null,
+                                type: 'system'
+                            }
                         };
+                        
 
                         _.each(tasks, function (task, index) {
 
@@ -217,7 +221,7 @@ startProvider.addStep(3, {
 
          dailyEntry = timerTools.getDailyEntry(option.id, projectId, dailyEntries);
 
-         var resultsCallback = function (err, result) {
+         resultsCallback = function (err, result) {
              if (err) {
                  step.addParam('error', err);
              }
