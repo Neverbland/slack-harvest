@@ -93,6 +93,7 @@ report = {
         _.each(users, function (slackName, harvestId) {
             var def = Q.defer();
             harvest.getUserTimeTrack(harvestId, fromDate, toDate, function (err, dayEntries) {
+                
                 if (err !== null) {
                     logger.error("Failed fetching user timeline from Harvest API for user " + harvestId, err, {});
                     def.resolve({
@@ -121,10 +122,11 @@ report = {
             ;
             
             dayEntries = filterByProjectId(dayEntries, projectId);
-
+            
             harvest.getProjectsByIds(projectsIds, function (err, projects) {
                 if (err === null) {
                     var clientsIds = tools.getIds(projects, 'project', 'client_id');
+                    
                     harvest.getClientsByIds(clientsIds, function (err, clients) {
                         if (err !== null) {
                             logger.error('Failed fetching clients for given clients ids', clientsIds, {});

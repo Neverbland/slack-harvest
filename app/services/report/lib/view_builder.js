@@ -20,10 +20,10 @@ function formatSummary (summary)
     _.each(summary, function (project) {
         var responsePart,
             responsePartArray = [
-            project.clientName,
-            project.projectName
-        ];
-        if (project.note.length) {
+                project.clientName,
+                project.projectName
+            ];
+        if (project.note && project.note.length) {
             responsePartArray.push(project.note);
         }
         
@@ -56,7 +56,7 @@ function projectsSummary(dayEntries, clientsById, projectsById)
             projectId = dayEntry.project_id,
             project = projectsById[projectId] || null,
             client = (project && clientsById[project.client_id]) ? clientsById[project.client_id] : null,
-            key = '' + projectId + dayEntry.note
+            key = '' + projectId + (dayEntry.note || '')
         ;
             
         if (!summary[key]) {
@@ -88,15 +88,18 @@ function projectsSummary(dayEntries, clientsById, projectsById)
  */
 function userReport (userEntriesObject, clientsById, projectsById)
 {
+    
     var summary = projectsSummary(userEntriesObject.dayEntries, clientsById, projectsById),
-        resultsRow = {
-            title : userEntriesObject.slackName,
-            text : formatSummary(summary),
-            mrkdwn_in : ["text", "title"],
-            color: "FFA200",
-            summary: summary
-        }
+        resultsRow
     ;
+
+    resultsRow = {
+        title : userEntriesObject.slackName,
+        text : formatSummary(summary),
+        mrkdwn_in : ["text", "title"],
+        color: "FFA200",
+        summary: summary
+    };
     
     return resultsRow;
 }
@@ -123,7 +126,7 @@ module.exports = {
             dayEntries      =   data.dayEntries,
             results         =   []
         ;
-
+        
         _.each(dayEntries, function (dayEntriesObject) {
             results.push(userReport(dayEntriesObject, clientsById, projectsById));
         });
@@ -146,7 +149,7 @@ module.exports = {
             that = this,
             totalTime = 0
         ;
-        
+
         _.each(view, function (viewObject) {
             var timeSpent = viewObject.summary[projectId].time;
             totalTime += timeSpent;

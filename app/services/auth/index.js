@@ -24,9 +24,11 @@ module.exports = function (app, config, errorCallback)
     // Assign action name to the request
     app.use(function (req, res, next) 
     {
-        var url = req.originalUrl;
-        var noSlash = url.substr(1);
-        var parts = noSlash.split('/');
+        var url = req.originalUrl,
+            noSlash = url.substr(1),
+            parts = noSlash.split('/')
+        ;
+        
         req.body.action = parts[1];
 
         next();

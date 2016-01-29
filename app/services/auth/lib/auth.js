@@ -81,27 +81,29 @@ Auth.prototype = {
      */
     hasAccess : function (req)
     {
-        var requestErrors = [];
-        var hasAccess = true;
+        var requestErrors = [],
+            hasAccess = true,
+            handler
+        ;
         for (var i = 0; i < this.handlers.length; i++) {
-            var handler = this.handlers[i];
+            handler = this.handlers[i];
             try {
                 handler.validate(req);
             } catch (err) {
                 hasAccess = false;
                 if (err.name === 'AuthError') {
-                    var errors = err.getErrors();
-                    requestErrors = mergeErrors(requestErrors, errors);
+                    requestErrors = mergeErrors(requestErrors, err.getErrors());
                 } else {
                     throw err;
                 }
             }
         }
         
-        return hasAccess ? hasAccess : (function (requestErrors) {
+        if (!hasAccess) {
             req.errors = requestErrors;
-            return false;
-        })(requestErrors);
+        }
+        
+        return hasAccess;
     },
     
     
