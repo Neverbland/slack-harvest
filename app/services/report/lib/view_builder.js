@@ -147,13 +147,11 @@ module.exports = {
     {
         var view = this.prepareView(data),
             results = [],
-            that = this,
-            totalTime = 0
+            that = this
         ;
 
         _.each(view, function (viewObject) {
             var timeSpent = viewObject.summary[projectId].time;
-            totalTime += timeSpent;
 
             results.push([
                 that.prepareTitle(viewObject),
@@ -161,8 +159,6 @@ module.exports = {
             ].join('\n'));
         });
         
-        results.push('\n');
-        results.push('Total on project: ' + tools.formatTime(totalTime));
         
         return results.join('\n');
         
