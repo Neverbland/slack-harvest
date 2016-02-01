@@ -15,8 +15,9 @@ var _       =   require('lodash'),
  */
 function formatSummary (summary)
 {
-    var records = [];
-    var totalTime = 0;
+    var records = [],
+        totalTime = 0
+    ;
     _.each(summary, function (project) {
         var responsePart,
             responsePartArray = [
@@ -56,7 +57,7 @@ function projectsSummary(dayEntries, clientsById, projectsById)
             projectId = dayEntry.project_id,
             project = projectsById[projectId] || null,
             client = (project && clientsById[project.client_id]) ? clientsById[project.client_id] : null,
-            key = '' + projectId + (dayEntry.note || '')
+            key = '' + projectId + (dayEntry.notes || '')
         ;
             
         if (!summary[key]) {
@@ -64,7 +65,7 @@ function projectsSummary(dayEntries, clientsById, projectsById)
                 projectName : project ? project.name : dayEntry.project_id,
                 clientName : client ? client.name : "Unknown client",
                 time : tools.getHours(dayEntry),
-                note : dayEntries.notes
+                note : dayEntry.notes
             };
         } else {
             summary[key].time = summary[key].time + tools.getHours(dayEntry);
