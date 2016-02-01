@@ -55,16 +55,22 @@ function formatResponse (dayEntries, projects, clients)
    
     _.each(dayEntries, function (resourceObject) {
         
-        var resource = resourceObject.day_entry,
-            project = projectsById[resource.project_id] || null,
+        var dayEntry = resourceObject.day_entry,
+            project = projectsById[dayEntry.project_id] || null,
             client = (project && !!clientsById[project.client_id]) ? clientsById[project.client_id] : null,
-            time = tools.getHours(resource),
-            responsePart = [
+            time = tools.getHours(dayEntry),
+            responsePartArray = [
                 (client ? client.name : "Unknown client"),
-                (project ? project.name : resource.project_id),
-                tools.formatTime(time)
-            ].join(' - ')
+                (project ? project.name : dayEntry.project_id)
+            ].join(' - '),
+            responsePart
         ;
+        if (!!dayEntry.notes && dayEntry.notes.length) {
+            responsePartArray.push(dayEntry.notes);
+        }
+        
+        responsePartArray.push(tools.formatTime(time));
+        responsePart = responsePartArray.join(' - ');
         
         totalTime += time;
         

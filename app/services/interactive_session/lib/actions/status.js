@@ -86,7 +86,7 @@ statusProvider.addStep(1, {
         entries = step.getParam('entries');
         entry = timerTools.filterCurrentEntry(entries);
         if (entry !== null) {
-            view.push('You are currently working on ');
+            view.push('You are currently working on: ');
             time = tools.getHours(entry);
             viewArray = [
                 entry.client,

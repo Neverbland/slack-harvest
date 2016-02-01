@@ -144,7 +144,7 @@ describe('Functional: Non-dialogue commands', function () {
             }, function (err, res, body) {
                 expect(spyCallback).to.have.been.calledWith(sampleTimelineData);
                 expect(body).to.be.equal([
-                    'You are currently working on ',
+                    'You are currently working on: ',
                     'Test Client - Test Project - Test Task - Test Note (03:36)',
                     '',
                     'Total: 03:36'
