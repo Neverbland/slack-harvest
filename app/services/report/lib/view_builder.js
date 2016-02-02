@@ -59,7 +59,7 @@ function projectsSummary(dayEntries, clientsById, projectsById)
             client = (project && clientsById[project.client_id]) ? clientsById[project.client_id] : null,
             key = '' + projectId + (dayEntry.notes || '')
         ;
-            
+        
         if (!summary[key]) {
             summary[key] = {
                 projectName : project ? project.name : dayEntry.project_id,

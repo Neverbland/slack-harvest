@@ -1,7 +1,7 @@
 /*jshint node: true*/
 'use strict';
 
-var notifier    =       require('./../../notifier'),
+var notifier    =       require('./../../notifier/index.js'),
     harvest     =       require('./../../harvest')('default'),
     _           =       require('lodash'),
     tools       =       require('./../../tools.js'),

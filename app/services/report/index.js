@@ -117,7 +117,7 @@ function ReportPrototype ()
             promises = [],
             that = this
         ;
-        
+
         if (!projectId) {
             _.each(users, function (slackName, harvestId) {
                 var def = Q.defer();
@@ -159,10 +159,13 @@ function ReportPrototype ()
    
         Q.all(promises).then(function (dayEntries) {
             dayEntries = !projectId ? dayEntries : dayEntries[0];
-            var projectsIds = getIdsFromCombined(dayEntries, 'day_entry', 'project_id');
+            var projectsIds = getIdsFromCombined(dayEntries, 'day_entry', 'project_id'),
+                clientsIds
+            ;
+
             that.harvest.getProjectsByIds(projectsIds, function (err, projects) {
                 if (err === null) {
-                    var clientsIds = tools.getIds(projects, 'project', 'client_id');
+                    clientsIds = tools.getIds(projects, 'project', 'client_id');
                     that.harvest.getClientsByIds(clientsIds, function (err, clients) {
                         if (err === null) {
                             that.emit('responseReady', {
