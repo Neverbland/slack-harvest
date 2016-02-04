@@ -7,38 +7,9 @@ var _               =   require('lodash'),
     harvest         =   require('./../../harvest')('default'),
     logger          =   require('./../../logger.js')('default'),
     viewBuilder     =   require('./view_builder.js'),
+    i18n            =   require('i18n'),
     report
 ;
-
-
-/**
- * Provides ids from combined collection of day entries
- * 
- * @param       {Array}     entries     An array of entry objects
- * 
- * @param       {String}    mainKey     The property under which the object is
- *                                      stored in single object resource. 
- *                                      Fot clients client, for day resource 
- *                                      - day_resource, etc.
- *                                      
- * @param       {String}    indexKey    The index of the id to be returned
- * 
- * @returns     {Array}                 An array of integer numbers
- */
-function getIdsFromCombined (entries, mainKey, indexKey)
-{
-    var ids = [];
-    _.each(entries, function (userObject) {
-        if (!userObject.error) {
-            _.each(userObject.dayEntries, function (entryObject) {
-                var entry = entryObject[mainKey];
-                ids.push(entry[indexKey]);
-            });
-        }
-    });
-    
-    return ids;
-}
 
 
 function filterByProjectId (dayEntries, projectId)
@@ -95,7 +66,7 @@ report = {
             harvest.getUserTimeTrack(harvestId, fromDate, toDate, function (err, dayEntries) {
                 
                 if (err !== null) {
-                    logger.error("Failed fetching user timeline from Harvest API for user " + harvestId, err, {});
+                    logger.error(i18n.__("Failed fetching user timeline from Harvest API for user %s", harvestId), err, {});
                     def.resolve({
                         dayEntries : dayEntries,
                         slackName : slackName,
@@ -129,7 +100,7 @@ report = {
                     
                     harvest.getClientsByIds(clientsIds, function (err, clients) {
                         if (err !== null) {
-                            logger.error('Failed fetching clients for given clients ids', clientsIds, {});
+                            logger.error(i18n.__('Failed fetching clients for given clients ids'), clientsIds, {});
                             callback(err, null);
                         } else{
 
@@ -144,7 +115,7 @@ report = {
                         }
                     });
                 } else {
-                    logger.error('Failed fetching projects for given projects ids', projectsIds, {});
+                    logger.error(i18n.__('Failed fetching projects for given projects ids'), projectsIds, {});
                 }
             });
         });        

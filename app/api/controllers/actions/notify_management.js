@@ -5,7 +5,8 @@ var notifier                =   require('./../../../services/notifier'),
     _                       =   require('lodash'),
     logger                  =   require('./../../../services/logger.js')('default'),
     consts                  =   require('./../../../../consts.json'),
-    tools                   =   require('./../../../services/tools.js')
+    tools                   =   require('./../../../services/tools.js'),
+    i18n                    =   require('i18n')
 ;
   
    
@@ -21,7 +22,7 @@ function validateCreateDate (dateString)
 {
     var date = new Date(dateString);
     if (date.toString() === 'Invalid Date') {
-        throw new TypeError('Provided date ' + dateString + ' is invalid!');
+        throw new TypeError(i18n.__('Provided date %s is invalid!', dateString));
     }
     
     return date;
@@ -73,14 +74,17 @@ function notifyManagementController (req, res, next)
     if (!channel) {
         res.success = false;
         res.errors = [
-            'A channel must be provided in \'channel\' post field.'
+            i18n.__('A channel must be provided in \'channel\' post field.')
         ];
         next();
         return;
     }
 
     res.success = true;
-    logger.info('Preparing management report from: ' + dateFromObject + ' to ' + dateToObject, {});
+    logger.info(i18n.__('Preparing management report from: {{dateStart}} to {{dateEnd}}', {
+        dateStart : dateFromObject,
+        dateEnd : dateToObject
+    }), {});
     notifier.notify('management', {
         reportTitle: reportTitle,
         channel: channel,

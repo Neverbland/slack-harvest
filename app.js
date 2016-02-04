@@ -21,9 +21,23 @@ var
     reportNotifier = require('./app/services/report')(slack, harvest),
     slackNotifier = require('./app/services/slack/notifier')(slack, harvest),
     slackReminder = require('./app/services/slack/notifier/remind')(slack, harvest),
+    i18n = require('i18n'),
     server
 ;
 
+i18n.configure({
+    locales : ['en'],
+    directory: __dirname + '/locales',
+    logDebugFn : function (msg) {
+        logger.info(msg, {});
+    },
+    logWarnFn: function (msg) {
+        logger.warn(msg, {});
+    },
+    logErrorFn: function (msg) {
+        logger.error(msg, {});
+    }
+});
 harvest.setUsers(config.users);
 slack.setUsers(config.users);
 

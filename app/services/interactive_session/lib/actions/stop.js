@@ -3,13 +3,13 @@
 
 var 
     stopProvider,
-    interactiveSession  = require('./../user_session.js'),
-    tools               = require('./../../../tools.js'),
-    timerTools          = require('./../../../timer'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    logger              = require('./../../../logger.js')('default'),
-    StepProvider        = require('./../step_provider.js')
+    interactiveSession  =   require('./../user_session.js'),
+    tools               =   require('./../../../tools.js'),
+    timerTools          =   require('./../../../timer'),
+    harvest             =   require('./../../../harvest')('default'),
+    i18n                =   require('i18n'),
+    logger              =   require('./../../../logger.js')('default'),
+    StepProvider        =   require('./../step_provider.js')
 ;
 
 stopProvider = new StepProvider('stop');
@@ -17,7 +17,7 @@ stopProvider.addStep(1, {
     getView: function (step)
     {
         if (step === null) {
-            return 'Currently you have no running tasks.';
+            return i18n.__('Currently you have no running tasks.');
         }
         var error = step.getParam('stopError'),
             entry = step.getParam('entry')
@@ -28,7 +28,7 @@ stopProvider.addStep(1, {
         }
 
         return [
-            'Successfully stopped the timer for',
+            i18n.__('Successfully stopped the timer for'),
             entry.client + ' - ' + entry.project + ' - ' + entry.task
         ].join('\n');
     },
@@ -50,7 +50,7 @@ stopProvider.addStep(1, {
                 return;
             } else {
                 dayEntries = results.day_entries || [];
-                logger.info('Successfully loaded tasks for user ' + params.userId, {});
+                logger.info(i18n.__('Successfully loaded tasks for user %s', params.userId), {});
 
                 if (!dayEntries.length) {
                     callback(that.getView(null), null);
@@ -81,7 +81,7 @@ stopProvider.addStep(1, {
                 userId = step.getParam('userId');
 
         if (entry === null) {
-            step.addParam('stopError', 'Currently you have no running tasks.');
+            step.addParam('stopError', i18n.__('Currently you have no running tasks.'));
             interactiveSession
                     .getDefault()
                     .clear(userId)
@@ -92,7 +92,7 @@ stopProvider.addStep(1, {
             step.addParam('entry', entry);
             harvest.toggle(userId, entry.id, function (err, result) {
                 if (err !== null) {
-                    step.addParam('stopError', 'An error occured, please try again later.');
+                    step.addParam('stopError', i18n.__('An error occured, please try again later.'));
                 }
                 interactiveSession
                         .getDefault()

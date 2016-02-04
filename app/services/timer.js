@@ -1,8 +1,9 @@
 /*jshint node: true*/
 'use strict';
 
-var _ = require('lodash'),
-        timer
+var 
+    _           =   require('lodash'),
+    timer
 ;
 
 

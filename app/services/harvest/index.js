@@ -7,6 +7,7 @@ var harvest     =   require('harvest'),
     logger      =   require('./../logger.js')('default'),
     humps       =   require('humps'),
     Q           =   require('q'),
+    i18n        =   require('i18n'),
     instances   =   {}
 ;
 
@@ -154,7 +155,7 @@ Harvest.prototype = {
             if (err === null) {
                 that.projects = _.assign(that.projects, byId(results, 'project'));
             } else {
-                logger.log('Not able to load all projects.', err, {});
+                logger.log(i18n.__('Not able to load all projects.'), err, {});
             }
             callback(err, results);
         });
@@ -190,7 +191,10 @@ Harvest.prototype = {
             } else {
                 that[methodName].call(that, id, function (err, resource) {
                     if (err !== null) {
-                        logger.log('Not able to load resource for method ' + methodName +  ', id: ' + id, err, {});
+                        logger.log(i18n.__('Not able to load resource for method {{methodName}}, id: {{id}}', {
+                            methodName : methodName,
+                            id : id
+                        }), err, {});
                         def.resolve(null);
                     } else {
                         that[cacheName][id] = resource;
@@ -301,7 +305,7 @@ Harvest.prototype = {
             if (err === null) {
                 that.clients = _.assign(that.clients, byId(results, 'client'));
             } else {
-                logger.log('Not able to load all clients.', err, {});
+                logger.log(i18n.__('Not able to load all clients.'), err, {});
             }
             callback(err, results);
         });
@@ -322,7 +326,7 @@ Harvest.prototype = {
             of_user : userId
         }, function (err, results) {
             if (err !== null) {
-                logger.log('Not able to load tasks for user ' + userId, err, {});
+                logger.log(i18n.__('Not able to load tasks for user %s', userId), err, {});
             } 
             callback(err, results);
         });
@@ -345,7 +349,10 @@ Harvest.prototype = {
         }, function (err, results) {
 
             if (err !== null) {
-                logger.log('Not able to toggle task day entry for user ' + userId + ' and id ' + dayEntryId, err, {});
+                logger.log(i18n.__('Not able to toggle task day entry for user {{userId}} and id {{dayEntryId}}', {
+                    userId : userId,
+                    dayEntryId : dayEntryId
+                }), err, {});
             } 
             callback(err, results);
         });
@@ -369,7 +376,10 @@ Harvest.prototype = {
         timeTrack.update(values, function (err, results) {
 
             if (err !== null) {
-                logger.log('Not able to update task day entry for user ' + userId + ' and id ' + dayEntryId, err, {});
+                logger.log(i18n.__('Not able to update task day entry for user {{userId}} and id {{dayEntryId}}', {
+                    userId : userId,
+                    dayEntryId : dayEntryId
+                }), err, {});
             } 
             callback(err, results);
         });
@@ -394,7 +404,10 @@ Harvest.prototype = {
             hours : ''
         }, function (err, results) {
             if (err !== null) {
-                logger.log('Not able to create an entry for user ' + userId + ' and taskId ' + taskId, err, {});
+                logger.log(i18n.__('Not able to create an entry for user {{userId}} and taskId {{taskId}}', {
+                    userId : userId,
+                    taskId : taskId
+                }), err, {});
             } 
             callback(err, results);
         });

@@ -9,7 +9,8 @@ var notifier    =       require('./../../notifier/index.js'),
     CronJob     =       require('cron').CronJob,
     consts      =       require('./../../../../consts.json'),
     reminder    =       require('./../../reminder/index.js'),
-    util        =       require('util')
+    util        =       require('util'),
+    i18n        =       require('i18n')
 ;
     
     
@@ -57,15 +58,16 @@ JobsHolder.prototype = {
                 cronTime = job.getCronTime(config),
                 handler = job.getJob(config),
                 description = job.getDescription(),
-                autoRun = job.shouldRunNow(config)
+                autoRun = job.shouldRunNow(config),
+                cronJob
             ;
                 
-            logger.info('Setting up cron job for: "' + description + '" with cron time: ', cronTime, {});
+            logger.info(i18n.__('Setting up cron job for: "%s" with cron time: ', description), cronTime, {});
             
-            var cronJob = new CronJob(cronTime, handler);
+            cronJob = new CronJob(cronTime, handler);
             cronJob.start();
             if (autoRun) {
-                logger.info('Immediately executing cron job for: "' + description + '".', {});
+                logger.info(i18n.__('Immediately executing cron job for: "%s".', description), {});
                 handler();
             }
         });
@@ -91,7 +93,7 @@ var defaultJobs = {
             return function ()
             {
                 _.each(harvest.fromUserMap(harvest.users), function (userId) {
-                    logger.info('Trying to send notifications to user: ' + userId, {});
+                    logger.info(i18n.__('Trying to send notifications to user: %s', userId), {});
                     harvest.getUserTimeTrack(userId, new Date(), new Date(), function (err, harvestResponse) {
                         if (err === null) {
                             notifier.notify('users', {
@@ -99,7 +101,7 @@ var defaultJobs = {
                                 harvestResponse : harvestResponse
                             });
                         } else {
-                            logger.error("Failed fetching user timeline from Harvest API for user " + userId, err, {});
+                            logger.error(i18n.__("Failed fetching user timeline from Harvest API for user %s", userId), err, {});
                         }
                     });
                 });
@@ -146,7 +148,7 @@ var defaultJobs = {
          */
         getDescription : function ()
         {
-            return 'Automatic notifications of harvest users on their Slack channels';
+            return i18n.__('Automatic notifications of harvest users on their Slack channels');
         }
     },
     
@@ -161,9 +163,9 @@ var defaultJobs = {
         {
             return function ()
             {
-                logger.info('Loading projects from Harvest API...', {});
+                logger.info(i18n.__('Loading projects from Harvest API...'), {});
                 harvest.doGetProjects();
-                logger.info('Loading clients from Harvest API...', {});
+                logger.info(i18n.__('Loading clients from Harvest API...'), {});
                 harvest.doGetClients();
             };
         },
@@ -199,7 +201,7 @@ var defaultJobs = {
          */
         getDescription : function ()
         {
-            return 'Automatic periodical fetching clients and projects from Harvest API';
+            return i18n.__('Automatic periodical fetching clients and projects from Harvest API');
         }
     },
     
@@ -221,7 +223,10 @@ var defaultJobs = {
                     dateToObject    = tools.dateFromString(dateTo),
                     reportTitle     = config.reportTitle || consts.report.DEFAULT_REPORT_TITLE;
                 
-                logger.info('Preparing management report from: ' + dateFromObject + ' to ' + dateToObject, {});
+                logger.info(i18n.__('Preparing management report from: {{dateFrom}} to {{dateTo}}', {
+                    dateFrom : dateFromObject,
+                    dateTo : dateToObject
+                }), {});
                 notifier.notify('management', {
                     reportTitle : reportTitle,
                     channel : config.channel,
@@ -263,7 +268,7 @@ var defaultJobs = {
          */
         getDescription : function ()
         {
-            return 'Automatic management channel notifications';
+            return i18n.__('Automatic management channel notifications');
         }
     },
     
@@ -282,7 +287,7 @@ var defaultJobs = {
             {
                 reminder.remind(harvest.users, null, function (results) {
                     _.each(results.notified, function (slackName) {
-                        logger.info('Successfully notified user ' + slackName + ' about empty time tracker.', {});
+                        logger.info(i18n.__('Successfully notified user %s about empty time tracker.', slackName), {});
                     });
                 });
             };
@@ -318,7 +323,7 @@ var defaultJobs = {
          */
         getDescription : function ()
         {
-            return 'User notifications about empty tracker.';
+            return i18n.__('User notifications about empty tracker.');
         }
     }
 };

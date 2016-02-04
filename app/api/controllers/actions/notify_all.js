@@ -4,7 +4,8 @@
 var harvest                 =   require('./../../../services/harvest')('default'),
     notifier                =   require('./../../../services/notifier'),
     _                       =   require('lodash'),
-    logger                  =   require('./../../../services/logger.js')('default')
+    logger                  =   require('./../../../services/logger.js')('default'),
+    i18n                    =   require('i18n')
 ;
 
 
@@ -45,7 +46,7 @@ function notifyAllController (req, res, next)
                anySuccess = true;
                doNotify(harvestResponse, userId);
            } else {
-               logger.error("Failed fetching user timeline from Harvest API for user " + userId, err, {});
+               logger.error(i18n.__("Failed fetching user timeline from Harvest API for user %s", userId) , err, {});
                errors.push(err);
            }
 

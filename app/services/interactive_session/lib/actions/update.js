@@ -3,16 +3,17 @@
 
 var 
     updateProvider,
-    interactiveSession  = require('./../user_session.js'),
-    tools               = require('./../../../tools.js'),
-    _                   = require('lodash'),
-    timerTools          = require('./../../../timer'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    logger              = require('./../../../logger.js')('default'),
-    commandName         = require('./../../../../../config/index.js').api.controllers.timer.command,
-    timeParser          = require('./../time_parser.js'),
-    StepProvider        = require('./../step_provider.js')
+    interactiveSession  =   require('./../user_session.js'),
+    tools               =   require('./../../../tools.js'),
+    _                   =   require('lodash'),
+    timerTools          =   require('./../../../timer'),
+    harvest             =   require('./../../../harvest')('default'),
+    i18n                =   require('i18n'),
+    logger              =   require('./../../../logger.js')('default'),
+    commandName         =   require('./../../../../../config/index.js').api.controllers.timer.command,
+    timeParser          =   require('./../time_parser.js'),
+    StepProvider        =   require('./../step_provider.js'),
+    errOutput           =   i18n.__('Wrong input provided, try following the instructions...')
 ;
 
 
@@ -34,7 +35,7 @@ updateProvider.addStep(1, {
                 callback(err, null);
                 return;
             } else {
-                logger.info('Successfully loaded tasks for user ' + params.userId, {});
+                logger.info(i18n.__('Successfully loaded tasks for user %s', params.userId), {});
                 dayEntries = timerTools.findMatchingEntries(params.name, results.day_entries);
                 if (!dayEntries.length) {
                     callback(that.getView(null), null);
@@ -80,10 +81,10 @@ updateProvider.addStep(1, {
     getView: function (step)
     {
         if (step === null) {
-            return 'No entries found!';
+            return i18n.__('No entries found!');
         }
         var view = [
-            'Choose which entry you want to update!',
+            i18n.__('Choose which entry you want to update!'),
             ''
         ];
 
@@ -94,7 +95,9 @@ updateProvider.addStep(1, {
         });
 
         view.push('');
-        view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup');
+        view.push(i18n.__('Just type {{{commandName}}} followed by a number to choose it or write \'{{{commandName}}} no\' to quit the timer setup', {
+            commandName : commandName
+        }));
 
         return view.join('\n');
     },
@@ -125,9 +128,11 @@ updateProvider.addStep(2, {
         ;
 
         return [
-            'Cool, please provide a time to set for ',
+            i18n.__('Cool, please provide a time to set for '),
             taskName,
-            'Just type ' + commandName + ' followed by a valid time format (HH:mm or number of seconds) or write \'' + commandName + ' no\' to quit the timer setup'
+            i18n.__('Just type {{{commandName}}} followed by a valid time format (HH:mm or number of seconds) or write \'{{{commandName}}} no\' to quit the timer setup', {
+                commandName : commandName
+            })
         ].join('\n');
     },
 
@@ -155,9 +160,9 @@ updateProvider.addStep(3, {
         }
 
         return [
-            'Successfully updated the time for ',
+            i18n.__('Successfully updated the time for '),
             taskName,
-            'to ' + step.getParam('timeRaw')
+            i18n.__('to %s', step.getParam('timeRaw'))
         ].join('\n');
     },
 
@@ -180,7 +185,7 @@ updateProvider.addStep(3, {
                     .clear(params.userId)
             ;
             callback(
-                'Cool, try again later!',
+                i18n.__('Cool, try again later!'),
                 null
             );
             return;
@@ -195,7 +200,7 @@ updateProvider.addStep(3, {
         } catch (err) {
             callback([
                 err.message,
-                'Try again, the valid format is HH:mm or number of seconds'
+                i18n.__('Try again, the valid format is HH:mm or number of seconds')
             ].join('\n'), null);
             return;
         }

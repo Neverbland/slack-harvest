@@ -3,15 +3,16 @@
 
 var 
     startProvider,
-    interactiveSession  = require('./../user_session.js'),
-    tools               = require('./../../../tools.js'),
-    _                   = require('lodash'),
-    timerTools          = require('./../../../timer'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    logger              = require('./../../../logger.js')('default'),
-    commandName         = require('./../../../../../config/index.js').api.controllers.timer.command,
-    StepProvider        = require('./../step_provider.js')
+    interactiveSession  =   require('./../user_session.js'),
+    tools               =   require('./../../../tools.js'),
+    _                   =   require('lodash'),
+    timerTools          =   require('./../../../timer'),
+    harvest             =   require('./../../../harvest')('default'),
+    logger              =   require('./../../../logger.js')('default'),
+    commandName         =   require('./../../../../../config/index.js').api.controllers.timer.command,
+    StepProvider        =   require('./../step_provider.js'),
+    i18n                =   require('i18n'),
+    errOutput           =   i18n.__('Wrong input provided, try following the instructions...')
 ;
 
 startProvider = new StepProvider('start');
@@ -19,10 +20,10 @@ startProvider.addStep(1, {
     getView: function (step)
     {
         if (step === null) {
-            return 'No projects matching given string found!';
+            return i18n.__('No projects matching given string found!');
         }
         var view = [
-            'Choose the awesome project you are working on today!',
+            i18n.__('Choose the awesome project you are working on today!'),
             ''
         ];
 
@@ -33,7 +34,9 @@ startProvider.addStep(1, {
         });
 
         view.push('');
-        view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the timer setup');
+        view.push(i18n.__('Just type {{{commandName}}} followed by a number to choose it or write \'{{{commandName}}} no\' to quit the timer setup', {
+            commandName : commandName
+        }));
 
 
         return view.join('\n');
@@ -55,7 +58,7 @@ startProvider.addStep(1, {
                 callback(err, null);
                 return;
             } else {
-                logger.info('Successfully loaded tasks for user ' + params.userId, {});
+                logger.info(i18n.__('Successfully loaded tasks for user %s', params.userId), {});
                 projects = timerTools.findMatchingClientsOrProjects(params.name, results.projects);
 
                 if (!projects.length) {
@@ -117,8 +120,8 @@ startProvider.addStep(2, {
             return errOutput;
         }
         var view = [
-            'Cool, love that project!',
-            'What task are you on?',
+            i18n.__('Cool, love that project!'),
+            i18n.__('What task are you on?'),
             ''
         ],
 
@@ -127,12 +130,14 @@ startProvider.addStep(2, {
 
         _.each(step.getOptions(), function (option, value) {
             if (option.type === 'task') {
-                view.push(value + '. ' + option.name + (timerTools.isRunningTask(option.id, option.project_id, dailyEntries) ? ' (Currently running)' : ''));
+                view.push(value + '. ' + option.name + (timerTools.isRunningTask(option.id, option.project_id, dailyEntries) ? i18n.__(' (Currently running)') : ''));
             }
         });
 
         view.push('');
-        view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' if you picked the wrong project.');
+        view.push(i18n.__('Just type {{{commandName}}} followed by a number to choose it or write \'{{{commandName}}} no\' if you picked the wrong project.', {
+            commandName : commandName
+        }));
 
         return view.join('\n');
     },
@@ -183,10 +188,10 @@ startProvider.addStep(3, {
          }
          entry = step.getParam('entry');
          if (step.getParam('error')) {
-             return 'An error occured, please try again later';
+             return i18n.__('An error occured, please try again later');
          } else {
              return [
-                 'Successfully created and started an entry for',
+                 i18n.__('Successfully created and started an entry for'),
                  '',
                  entry.client + ' - ' + entry.project + ' - ' + entry.task
              ].join('\n');

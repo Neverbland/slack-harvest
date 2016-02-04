@@ -3,15 +3,16 @@
 
 var 
     noteProvider,
-    interactiveSession  = require('./../user_session.js'),
-    tools               = require('./../../../tools.js'),
-    _                   = require('lodash'),
-    timerTools          = require('./../../../timer'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    logger              = require('./../../../logger.js')('default'),
-    commandName         = require('./../../../../../config/index.js').api.controllers.timer.command,
-    StepProvider        = require('./../step_provider.js')
+    interactiveSession  =   require('./../user_session.js'),
+    tools               =   require('./../../../tools.js'),
+    _                   =   require('lodash'),
+    timerTools          =   require('./../../../timer'),
+    harvest             =   require('./../../../harvest')('default'),
+    logger              =   require('./../../../logger.js')('default'),
+    commandName         =   require('./../../../../../config/index.js').api.controllers.timer.command,
+    StepProvider        =   require('./../step_provider.js'),
+    i18n                =   require('i18n'),
+    errOutput           =   i18n.__('Wrong input provided, try following the instructions...')
 ;
 
 noteProvider = new StepProvider('note');
@@ -19,10 +20,10 @@ noteProvider.addStep(1, {
     getView: function (step)
     {
         if (step === null) {
-            return 'No entries found!';
+            return i18n.__('No entries found!');
         }
         var view = [
-            'Choose which entry you want to add the note to!',
+            i18n.__('Choose which entry you want to add the note to!'),
             ''
         ];
 
@@ -33,7 +34,9 @@ noteProvider.addStep(1, {
         });
 
         view.push('');
-        view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the note edition');
+        view.push(i18n.__('Just type {{{commandName}}} followed by a number to choose it or write \'{{{commandName}}} no\' to quit the note edition', {
+            commandName : commandName
+        }));
 
         return view.join('\n');
     },
@@ -54,7 +57,7 @@ noteProvider.addStep(1, {
                 callback(err, null);
                 return;
             } else {
-                logger.info('Successfully loaded tasks for user ' + params.userId, {});
+                logger.info(i18n.__('Successfully loaded tasks for user %s', params.userId), {});
                 dayEntries = timerTools.findMatchingEntries(params.name, results.day_entries);
                 if (!dayEntries.length) {
                     callback(that.getView(null), null);
@@ -124,9 +127,11 @@ noteProvider.addStep(2, {
         ;
 
         return [
-            'Cool, please provide the note to set for ',
+            i18n.__('Cool, please provide the note to set for '),
             taskName,
-            'Just type ' + commandName + ' followed by the note string or write \'' + commandName + ' no\' to quit the timer setup'
+            i18n.__('Just type {{{commandName}}} followed by the note string or write \'{{{commandName}}} no\' to quit the timer setup', {
+                commandName : commandName
+            })
         ].join('\n');
     },
 
@@ -155,7 +160,7 @@ noteProvider.addStep(3, {
         }
 
         return [
-            'Successfully updated the note for ',
+            i18n.__('Successfully updated the note for '),
             taskName,
             '',
             '> ' + step.getParam('note')
@@ -176,7 +181,7 @@ noteProvider.addStep(3, {
 
         if (!note || !note.length) {
             callback([
-                'You need to provide the note!'
+                i18n.__('You need to provide the note!')
             ].join('\n'), null);
             return;
         }
@@ -187,7 +192,7 @@ noteProvider.addStep(3, {
                     .clear(params.userId)
             ;
             callback(
-                'Cool, try again later!',
+                i18n.__('Cool, try again later!'),
                 null
             );
             return;

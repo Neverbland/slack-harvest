@@ -4,7 +4,8 @@
 var harvest                 =   require('./../../../services/harvest')('default'),
     notifier                =   require('./../../../services/notifier'),
     _                       =   require('lodash'),
-    logger                  =   require('./../../../services/logger.js')('default')
+    logger                  =   require('./../../../services/logger.js')('default'),
+    i18n                    =   require('i18n')
 ;
 
 
@@ -54,7 +55,7 @@ function notifyUserController (req, res, next)
             if (err === null) {
                 doNotify(harvestResponse, userId);
             } else {
-                logger.error("Failed fetching user timeline from Harvest API for user " + userId, err, {});
+                logger.error(i18n.__("Failed fetching user timeline from Harvest API for user %s", userId), err, {});
                 res.success = false;
                 res.errors = [
                     err
@@ -65,7 +66,7 @@ function notifyUserController (req, res, next)
     } else {
         res.success = false;
         res.errors = [
-            'Invalid user id'
+            i18n.__('Invalid user id %s', userId)
         ];
         next();
     }

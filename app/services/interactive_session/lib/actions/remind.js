@@ -3,13 +3,13 @@
 
 var
     remindProvider,
-    interactiveSession  = require('./../user_session.js'),
-    tools               = require('./../../../tools.js'),
-    _                   = require('lodash'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    reminder            = require('./../../../reminder/index.js'),
-    StepProvider        = require('./../step_provider.js')
+    interactiveSession  =   require('./../user_session.js'),
+    tools               =   require('./../../../tools.js'),
+    _                   =   require('lodash'),
+    harvest             =   require('./../../../harvest')('default'),
+    reminder            =   require('./../../../reminder/index.js'),
+    StepProvider        =   require('./../step_provider.js'),
+    i18n                =   require('i18n')
 ;
 
 remindProvider = new StepProvider('remind');
@@ -77,14 +77,14 @@ remindProvider.addStep(1, {
         }
 
         if (Object.size(results.notified) > 0) {
-            view.push('Notified given users:');
+            view.push(i18n.__('Notified given users:'));
             view.push('');
             _.each(results.notified, function (slackName) {
                 view.push(slackName);
             });
         } else {
-            view.push('No user notifications sent!');
-            view.push('All users are running their timers!');
+            view.push(i18n.__('No user notifications sent!'));
+            view.push(i18n.__('All users are running their timers!'));
         }
 
         return  view.join('\n');

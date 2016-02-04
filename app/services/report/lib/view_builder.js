@@ -2,7 +2,8 @@
 'use strict';
 
 var _       =   require('lodash'),
-    tools   =   require('./../../tools.js')
+    tools   =   require('./../../tools.js'),
+    i18n    =   require('i18n')
 ;
 
 
@@ -35,7 +36,7 @@ function formatSummary (summary)
         records.push(responsePart);
     });
 
-    records.push('Total: ' + tools.formatTime(totalTime));
+    records.push(i18n.__('Total: %s', tools.formatTime(totalTime)));
     
     return records.join('\n');
 }
@@ -63,7 +64,7 @@ function projectsSummary(dayEntries, clientsById, projectsById)
         if (!summary[key]) {
             summary[key] = {
                 projectName : project ? project.name : dayEntry.project_id,
-                clientName : client ? client.name : "Unknown client",
+                clientName : client ? client.name : i18n.__("Unknown client"),
                 time : tools.getHours(dayEntry),
                 note : dayEntry.notes
             };
@@ -129,7 +130,10 @@ module.exports = {
         ;
         
         _.each(dayEntries, function (dayEntriesObject) {
-            results.push(userReport(dayEntriesObject, clientsById, projectsById));
+            var userReportOutput = userReport(dayEntriesObject, clientsById, projectsById);
+            if (userReportOutput !== null) {
+                results.push(userReportOutput);
+            }
         });
         
         return results;

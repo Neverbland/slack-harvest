@@ -4,7 +4,9 @@
 var _           =   require('lodash'),
     events      =   require("events"),
     logger      =   require('./../../logger.js')('default'),
-    tools       =   require('./../../tools.js');
+    tools       =   require('./../../tools.js'),
+    i18n        =   require('i18n')
+;
 
 
 /**
@@ -46,7 +48,7 @@ function formatResponse (dayEntries, projects, clients)
 {
     var 
         response = [
-            "*Your time tracked today*:"
+            i18n.__("*Your time tracked today*:")
         ],
         clientsById = tools.byId(clients || {}, 'client'),
         projectsById = tools.byId(projects || {}, 'project'),
@@ -60,7 +62,7 @@ function formatResponse (dayEntries, projects, clients)
             client = (project && !!clientsById[project.client_id]) ? clientsById[project.client_id] : null,
             time = tools.getHours(dayEntry),
             responsePartArray = [
-                (client ? client.name : "Unknown client"),
+                (client ? client.name : i18n.__("Unknown client")),
                 (project ? project.name : dayEntry.project_id)
             ].join(' - '),
             responsePart
@@ -78,10 +80,10 @@ function formatResponse (dayEntries, projects, clients)
     });
     
     response.push('\n');
-    response.push('Total: ' + tools.formatTime(totalTime));
+    response.push(i18n.__('Total: %s', tools.formatTime(totalTime)));
     response.push('\n');
     
-    response.push('If anything is missing, add it here <' + SlackNotifier.prototype.LINK + '>' );
+    response.push(i18n.__('If anything is missing, add it here <%s>', SlackNotifier.prototype.LINK));
     
     return response.join("\n");
 }
@@ -130,11 +132,11 @@ var SlackNotifierPrototype = function ()
                             text : formatResponse(dayEntries, projects, clients)
                         });
                     } else{
-                        logger.error('Failed fetching clients for given clients ids', clientsIds, {});
+                        logger.error(i18n.__('Failed fetching clients for given clients ids'), clientsIds, {});
                     }
                 });
             } else {
-                logger.error('Failed fetching projects for given projects ids', projectsIds, {});
+                logger.error(i18n.__('Failed fetching projects for given projects ids'), projectsIds, {});
             }
         });
     };
@@ -147,9 +149,9 @@ var SlackNotifierPrototype = function ()
             channel : '@' + data.userName
         }, function (err, httpResponse, body) {
             if (err === null) {
-                logger.info('Successfully sent a reminder message to user ' + data.userName, {});
+                logger.info(i18n.__('Successfully sent a reminder message to user %s', data.userName), {});
             } else {
-                logger.info('Reminder for user ' + data.userName + ' not sent. Error: ', err, {});
+                logger.info(i18n.__('Reminder for user %s not sent.', data.userName), err, {});
             }
         });
     };

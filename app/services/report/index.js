@@ -6,19 +6,10 @@ var Q           =   require('q'),
     logger      =   require('./../logger.js')('default'),
     _           =   require('lodash'),
     tools       =   require('./../tools.js'),
-    viewBuilder =   require('./lib/view_builder.js');
-        
-
-
-function validate (config, field)
-{
-    if (!!config.field) {
-        throw new Error('The field ' + field + ' is not present in the config!');
-    }
-    
-    return config[field];
-}
-
+    viewBuilder =   require('./lib/view_builder.js'),
+    i18n        =   require('i18n')
+;
+  
 
 /**
  * Reports provides a way to generate a full report of activity for users and send
@@ -123,7 +114,7 @@ function ReportPrototype ()
                 var def = Q.defer();
                 that.harvest.getUserTimeTrack(harvestId, slackContext.fromDate, slackContext.toDate, function (err, dayEntries) {
                     if (err !== null) {
-                        logger.error("Failed fetching user timeline from Harvest API for user " + harvestId, err, {});
+                        logger.error(i18n.__("Failed fetching user timeline from Harvest API for user %s", harvestId), err, {});
                         def.resolve({
                             dayEntries : dayEntries,
                             slackName : slackName,
@@ -145,7 +136,7 @@ function ReportPrototype ()
             var def = Q.defer();
             that.harvest.getProjectTimeTrack(projectId, slackContext.fromDate, slackContext.toDate, function (err, dayEntries) {
                 if (err !== null) {
-                    logger.error("Failed fetching user timeline from Harvest API for project " + projectId, err, {});
+                    logger.error(i18n.__("Failed fetching user timeline from Harvest API for project %s", projectId), err, {});
                     def.resolve({
                         dayEntries : dayEntries,
                         error : err
@@ -177,11 +168,11 @@ function ReportPrototype ()
                                 title : slackContext.reportTitle
                             });
                         } else{
-                            logger.error('Failed fetching clients for given clients ids', clientsIds, {});
+                            logger.error(i18n.__('Failed fetching clients for given clients ids'), clientsIds, {});
                         }
                     });
                 } else {
-                    logger.error('Failed fetching projects for given projects ids', projectsIds, {});
+                    logger.error(i18n.__('Failed fetching projects for given projects ids'), projectsIds, {});
                 }
             });
         });
@@ -198,9 +189,9 @@ function ReportPrototype ()
             attachments : attachments
         }, function (err, httpResponse, body) {
             if (err === null) {
-                logger.info('Successfully sent a report message to channel ' + data.channel, {});
+                logger.info(i18n.__('Successfully sent a report message to channel %s', data.channel), {});
             } else {
-                logger.info('Report for channel ' + data.channel + ' not sent. Error: ', err, {});
+                logger.info(i18n.__('Report for channel %s not sent.', data.channel), err, {});
             }
         });
     };

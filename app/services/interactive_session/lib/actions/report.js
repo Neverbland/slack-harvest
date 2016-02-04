@@ -3,17 +3,17 @@
 
 var 
     reportProvider,
-    interactiveSession  = require('./../user_session.js'),
-    tools               = require('./../../../tools.js'),
-    _                   = require('lodash'),
-    timerTools          = require('./../../../timer'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    logger              = require('./../../../logger.js')('default'),
-    commandName         = require('./../../../../../config/index.js').api.controllers.timer.command,
-    StepProvider        = require('./../step_provider.js'),
-    dateParser          = require('./../date_parser.js'),
-    projectReport       = require('./../../../report/lib/project_report.js')
+    interactiveSession  =   require('./../user_session.js'),
+    tools               =   require('./../../../tools.js'),
+    _                   =   require('lodash'),
+    timerTools          =   require('./../../../timer'),
+    harvest             =   require('./../../../harvest')('default'),
+    i18n                =   require('i18n'),
+    commandName         =   require('./../../../../../config/index.js').api.controllers.timer.command,
+    StepProvider        =   require('./../step_provider.js'),
+    dateParser          =   require('./../date_parser.js'),
+    projectReport       =   require('./../../../report/lib/project_report.js'),
+    errOutput           =   i18n.__('Wrong input provided, try following the instructions...')
 ;
 
 
@@ -45,12 +45,12 @@ reportProvider = new StepProvider('report');
 reportProvider.addStep(1, {
     getView: function (step)
     {
-
+        var view;
         if (step === null) {
-            return 'No projects matching given string found!';
+            return i18n.__('No projects matching given string found!');
         }
-        var view = [
-            'Choose the project for the report',
+        view = [
+            i18n.__('Choose the project for the report'),
             ''
         ];
 
@@ -61,7 +61,9 @@ reportProvider.addStep(1, {
         });
 
         view.push('');
-        view.push('Just type ' + commandName + ' followed by a number to choose it or write \'' + commandName + ' no\' to quit the report setup');
+        view.push(i18n.__('Just type {{{commandName}}} followed by a number to choose it or write \'{{{commandName}}} no\' to quit the report setup', {
+            commandName: commandName
+        }));
 
 
         return view.join('\n');
@@ -159,9 +161,11 @@ reportProvider.addStep(2, {
         ;
 
         return [
-            'Cool, please provide a start date ',
+            i18n.__('Cool, please provide a start date '),
             taskName,
-            'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
+            i18n.__('Just type {{{commandName}}} followed by a valid time format (dd-mm-yyyy) or write \'{{{commandName}}} no\' to quit the timer setup', {
+                commandName : commandName
+            })
         ].join('\n');
     },
 
@@ -196,9 +200,11 @@ reportProvider.addStep(3, {
                 ;
 
                 return [
-                    'Cool, please provide the end date ',
+                    i18n.__('Cool, please provide the end date '),
                     taskName,
-                    'Just type ' + commandName + ' followed by a valid time format (dd-mm-yyyy) or write \'' + commandName + ' no\' to quit the timer setup'
+                    i18n.__('Just type {{{commandName}}} followed by a valid time format (dd-mm-yyyy) or write \'{{{commandName}}} no\' to quit the timer setup', {
+                        commandName : commandName
+                    })
                 ].join('\n');
             },
 
@@ -218,7 +224,7 @@ reportProvider.addStep(3, {
                             .clear(params.userId)
                     ;
                     callback(
-                        'Cool, try again later!',
+                        i18n.__('Cool, try again later!'),
                         null
                     );
                     return;
@@ -269,7 +275,7 @@ reportProvider.addStep(3, {
                             .clear(params.userId)
                     ;
                     callback(
-                        'Cool, try again later!',
+                        i18n.__('Cool, try again later!'),
                         null
                     );
                     return;

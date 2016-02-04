@@ -3,24 +3,24 @@
 
 var 
     projectsProvider,
-    interactiveSession  = require('./../user_session.js'),
-    _                   = require('lodash'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    StepProvider        = require('./../step_provider.js')
+    interactiveSession  =   require('./../user_session.js'),
+    _                   =   require('lodash'),
+    harvest             =   require('./../../../harvest')('default'),
+    StepProvider        =   require('./../step_provider.js'),
+    i18n                =   require('i18n')
 ;
 
 projectsProvider = new StepProvider('projects');
 projectsProvider.addStep(1, {
     getView: function (step)
     {
-        var errorString = 'Currently you have no available projects.';
+        var errorString = i18n.__('Currently you have no available projects.');
         if (step === null) {
             return errorString;
         }
 
         var view = [
-            'Available projects',
+            i18n.__('Available projects'),
             ''
         ];
 

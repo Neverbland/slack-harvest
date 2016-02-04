@@ -1,8 +1,10 @@
 /*jshint node: true*/
 'use strict';
 
-var interactiveSession = require('./user_session.js'),
-    stepTools = function () {};
+var interactiveSession  =    require('./user_session.js'),
+    stepTools           =   function () {},
+    i18n                =   require('i18n')
+;
     
 stepTools.prototype = {
 
@@ -31,7 +33,7 @@ stepTools.prototype = {
         interactiveSession.getDefault().clear(userId);
         callback(
             null, 
-            'Cool, try again later!',
+            i18n.__('Cool, try again later!'),
             null
         );
     },

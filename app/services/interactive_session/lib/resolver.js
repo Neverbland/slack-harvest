@@ -1,9 +1,10 @@
 /*jshint node: true*/
 'use strict';
 
-var _               = require('lodash'),
-    userSession     = require('./user_session.js'),
-    logger          = require('./../../../services/logger.js')('default')
+var _               =   require('lodash'),
+    userSession     =   require('./user_session.js'),
+    logger          =   require('./../../../services/logger.js')('default'),
+    i18n            =   require('i18n')
 ;
 
 function Resolver (userSession, sessionTime)
@@ -97,9 +98,9 @@ Resolver.prototype = {
                     .getDefault()
                     .clear(userId)
             ;
-            logger.info('Cleared user session for userId ' + userId, {});
+            logger.info(i18n.__('Cleared user session for userId %s', userId), {});
         }, this.sessionTime);
-        logger.info('Added user session for userId ' + userId, {});
+        logger.info(i18n.__('Added user session for userId %s', userId), {});
     },
     
     

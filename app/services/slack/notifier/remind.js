@@ -4,7 +4,8 @@
 var _           =   require('lodash'),
     events      =   require("events"),
     logger      =   require('./../../logger.js')('default'),
-    tools       =   require('./../../tools.js');
+    i18n        =   require('i18n')
+;
 
 
 /**
@@ -70,17 +71,17 @@ function SlackReminderPrototype ()
     this.prepareText = function (userName)
     {
         var view = [
-                'You have no tasks running on *Harvest*!',
-                'Click here <' + SlackReminder.prototype.LINK + '> to add them or use the timer command on Slack'
+                i18n.__('You have no tasks running on *Harvest*!'),
+                i18n.__('Click here <%s> to add them or use the timer command on Slack', SlackReminder.prototype.LINK)
             ].join('\n')
         ;
         this.slack.sendMessage(view, {
             channel : '@' + userName
         }, function (err, httpResponse, body) {
             if (err === null) {
-                logger.info('Successfully sent a reminder message to user ' + userName, {});
+                logger.info(i18n.__('Successfully sent a reminder message to user %s', userName), {});
             } else {
-                logger.info('Reminder for user ' + userName + ' not sent. Error: ', err, {});
+                logger.info(i18n.__('Reminder for user %s not sent.', userName), err, {});
             }
         });
     };

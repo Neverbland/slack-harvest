@@ -3,14 +3,14 @@
 
 var 
     statusProvider,
-    interactiveSession  = require('./../user_session.js'),
-    tools               = require('./../../../tools.js'),
-    _                   = require('lodash'),
-    timerTools          = require('./../../../timer'),
-    harvest             = require('./../../../harvest')('default'),
-    errOutput           = 'Wrong input provided, try following the instructions...',
-    logger              = require('./../../../logger.js')('default'),
-    StepProvider        = require('./../step_provider.js')
+    interactiveSession  =   require('./../user_session.js'),
+    tools               =   require('./../../../tools.js'),
+    _                   =   require('lodash'),
+    timerTools          =   require('./../../../timer'),
+    harvest             =   require('./../../../harvest')('default'),
+    i18n                =   require('i18n'),
+    logger              =   require('./../../../logger.js')('default'),
+    StepProvider        =   require('./../step_provider.js')
 ;
 
 statusProvider = new StepProvider('status');
@@ -37,7 +37,7 @@ statusProvider.addStep(1, {
                 callback(null, step);
             } else {
                 dayEntries = results.day_entries;
-                logger.info('Successfully loaded tasks for user ' + params.userId, {});
+                logger.info(i18n.__('Successfully loaded tasks for user %s', params.userId), {});
 
                 if (!dayEntries.length) {
                     callback(that.getView(null), null);
@@ -73,7 +73,7 @@ statusProvider.addStep(1, {
     getView: function (step)
     {
         var view = [],
-            errorString = 'Currently you have no running tasks.',
+            errorString = i18n.__('Currently you have no running tasks.'),
             entry,
             entries,
             time,
@@ -86,7 +86,7 @@ statusProvider.addStep(1, {
         entries = step.getParam('entries');
         entry = timerTools.filterCurrentEntry(entries);
         if (entry !== null) {
-            view.push('You are currently working on: ');
+            view.push(i18n.__('You are currently working on: '));
             time = tools.getHours(entry);
             viewArray = [
                 entry.client,
@@ -109,7 +109,7 @@ statusProvider.addStep(1, {
         });
 
         view.push('');
-        view.push('Total: ' + tools.formatTime(totalTime));
+        view.push(i18n.__('Total: %s', tools.formatTime(totalTime)));
 
         return view.join('\n');
     }

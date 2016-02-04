@@ -3,7 +3,9 @@
 
 var httpCodes       =   require('./codes.js'),
     controllers     =   require('./controllers'),
-    logger          =   require('./../services/logger.js')('default');
+    logger          =   require('./../services/logger.js')('default'),
+    i18n            =   require('i18n')
+;
 
 /**
  * API module
@@ -30,7 +32,7 @@ module.exports = function (app, config)
     require('./../services/auth')(app, config.auth, function (err, res) 
     {
         var errorMsgs = err.getErrors();
-        logger.warn('API request blocked. Errors: ', errorMsgs, {});
+        logger.warn(i18n.__('API request blocked. Errors: '), errorMsgs, {});
         res.writeHead(httpCodes.UNAUTHORIZED); // Unauthorized
         res.write(JSON.stringify({
             success : false,

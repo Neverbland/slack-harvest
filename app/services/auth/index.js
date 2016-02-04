@@ -1,9 +1,11 @@
 /*jshint node: true*/
 'use strict';
 
-var authErrorFactory = require('./lib/error.js'),
-    auth = require('./lib/auth.js'),
-    applyHandlers = require('./lib/handlers.js');
+var authErrorFactory        =   require('./lib/error.js'),
+    auth                    =   require('./lib/auth.js'),
+    applyHandlers           =   require('./lib/handlers.js'),
+    i18n                    =   require('i18n')
+;
 
 /**
  * Auth module handles authentication. Takes the app and the auth config as params
@@ -40,7 +42,7 @@ module.exports = function (app, config, errorCallback)
             next();
         } else {
             errorCallback(
-                authErrorFactory.create("Access denied!", auth.getErrors(req)),
+                authErrorFactory.create(i18n.__("Access denied!"), auth.getErrors(req)),
                 res
             );
         }

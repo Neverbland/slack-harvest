@@ -8,7 +8,9 @@ var httpCodes               =   require('./../../codes.js'),
     tools                   =   require('./../../../services/tools.js'),
     timerCommandParser      =   require('./../../../services/timer.js'),
     consts                  =   require('../../../../consts.json'),
-    commandSessionResolver  =   require('./../../../services/interactive_session');
+    commandSessionResolver  =   require('./../../../services/interactive_session'),
+    i18n                    =   require('i18n')
+;
 
 
 function getHarvestUserId (users, userId)
@@ -38,7 +40,7 @@ function manageTimerController(req, res, next)
         config,
         userName = (function () {
             try {
-                return tools.validateGet(req.body, 'user_name', "Invalid username provided!");
+                return tools.validateGet(req.body, 'user_name', i18n.__("Invalid username provided!"));
             } catch (err) {
                 res.success = false;
                 res.errors = [

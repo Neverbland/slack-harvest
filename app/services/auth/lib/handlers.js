@@ -1,9 +1,12 @@
 /*jshint node: true*/
 'use strict';
 
-var crypto              = require('crypto'),
-    authErrorFactory    = require('./error.js'),
-    _                   = require('lodash');
+var 
+    crypto              =   require('crypto'),
+    authErrorFactory    =   require('./error.js'),
+    _                   =   require('lodash'),
+    i18n                =   require('i18n')
+;
 
 /**
  * Generates/recreates hash for given secret, seed and action
@@ -67,14 +70,15 @@ handlers.secret.prototype = {
      */
     validate : function (req)
     {
-        var requestToken = req.body.token;
-        var action = req.body.action;
-        var seed = req.body.seed;
-        var hash = generateHash(this.secret, seed, action);
+        var requestToken = req.body.token,
+            action = req.body.action,
+            seed = req.body.seed,
+            hash = generateHash(this.secret, seed, action)
+        ;
         
         if (hash !== requestToken) {
-            throw new authErrorFactory.create("Invalid token", [
-                "Provided token is invalid"
+            throw new authErrorFactory.create(i18n.__("Invalid token"), [
+                i18n.__("Provided token is invalid")
             ]);
         }
     }
@@ -95,8 +99,8 @@ handlers.token.prototype = {
         var requestToken = req.body.token;
         
         if (this.token !== requestToken) {
-            throw new authErrorFactory.create("Invalid token", [
-                "Provided token is invalid"
+            throw new authErrorFactory.create(i18n.__("Invalid token"), [
+                i18n.__("Provided token is invalid")
             ]);
         }
     }

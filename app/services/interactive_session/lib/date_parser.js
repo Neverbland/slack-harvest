@@ -1,8 +1,10 @@
 /*jshint node: true*/
 'use strict';
 
-var instance = null,
-    _ = require('lodash')
+var 
+    instance        =   null,
+    _               =   require('lodash'),
+    i18n            =   require('i18n')
 ;
 
 
@@ -46,13 +48,13 @@ function Parser ()
             result
         ;
         if (!reg.test(date)) {
-            throw new DateError('Invalid date format, try [dd-mm-YYYY].');
+            throw new DateError(i18n.__('Invalid date format, try [dd-mm-YYYY].'));
         }
         
         result = format(date);
         
         if (prevDate && (prevDate > result)) {
-            throw new DateError('The end date must be later than the start date.');
+            throw new DateError(i18n.__('The end date must be later than the start date.'));
         }
         
         return result;

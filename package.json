@@ -24,7 +24,8 @@
     "q" : "1.2.0",
     "date-util" : "1.2.1",
     "humps" : "0.5.1",
-    "walk" : "2.3.9"
+    "walk" : "2.3.9",
+    "i18n" : "0.6.*"
   },
   "devDependencies": {
     "blanket": "1.1.6",

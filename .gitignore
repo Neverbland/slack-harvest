@@ -5,7 +5,7 @@ nbproject
 config.json
 !test/config.json
 .idea
-docs/
+locales/*
 
 # sessions
 .sessions

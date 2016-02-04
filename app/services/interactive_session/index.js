@@ -2,16 +2,17 @@
 'use strict';
 
 var
-        walk                = require('walk'),
+        walk                =   require('walk'),
         walker,
-        interactiveSession  = require('./lib/user_session.js'),
-        resolverConstructor = require('./lib/resolver.js'),
-        resolver            = null,
-        tools               = require('./../tools.js'),
-        _                   = require('lodash'),
-        timerTools          = require('./../timer'),
-        StepTools           = require('./lib/step_tools.js'),
-        errOutput           = 'Wrong input provided, try following the instructions...'
+        interactiveSession  =   require('./lib/user_session.js'),
+        resolverConstructor =   require('./lib/resolver.js'),
+        resolver            =   null,
+        tools               =   require('./../tools.js'),
+        _                   =   require('lodash'),
+        timerTools          =   require('./../timer'),
+        StepTools           =   require('./lib/step_tools.js'),
+        i18n                =   require('i18n'),
+        errOutput           =   i18n.__('Wrong input provided, try following the instructions...')
 ;
 
 
