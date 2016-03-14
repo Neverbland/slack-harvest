@@ -144,10 +144,9 @@ module.exports = {
      * Formats the string view
      * 
      * @param   {Object}    data
-     * @param   {String}    projectId
      * @returns {String}
      */
-    prepareString : function (data, projectId)
+    prepareString : function (data)
     {
         var view = this.prepareView(data),
             results = [],
@@ -155,7 +154,6 @@ module.exports = {
         ;
 
         _.each(view, function (viewObject) {
-            var timeSpent = viewObject.summary[projectId].time;
 
             results.push([
                 that.prepareTitle(viewObject),
@@ -172,11 +170,12 @@ module.exports = {
     /**
      * Returns the title of the report
      * 
-     * @param       {Object}        data
+     * @param       {Object|String}        data
      * @returns     {String}
      */
     prepareTitle : function (data)
     {
-        return '*' + data.title + '*\n';
+        var title = _.isObject(data) ? data.title : data;
+        return '*' + title + '*\n';
     }
 };
