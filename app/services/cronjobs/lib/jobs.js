@@ -3,6 +3,7 @@
 
 var notifier    =       require('./../../notifier/index.js'),
     harvest     =       require('./../../harvest')('default'),
+    forecast    =       require('./../../forecast')('default'),
     _           =       require('lodash'),
     tools       =       require('./../../tools.js'),
     logger      =       require('./../../logger.js')('default'),
@@ -167,6 +168,8 @@ var defaultJobs = {
                 harvest.doGetProjects();
                 logger.info(i18n.__('Loading clients from Harvest API...'), {});
                 harvest.doGetClients();
+                logger.info(i18n.__('Loading forecast clients/projects/people from Forecast API...'));
+                forecast.preload(true);
             };
         },
         
@@ -331,8 +334,9 @@ var defaultJobs = {
 
 module.exports = function (config, additionalJobs)
 {
-    var jobsHolder = new JobsHolder();
-    var jobs = _.assign(defaultJobs, additionalJobs);
+    var jobsHolder = new JobsHolder(),
+        jobs = _.assign(defaultJobs, additionalJobs)
+    ;
     _.each(config, function (configValues, jobName) {
         var job = jobs[jobName];
         if (!!job) {

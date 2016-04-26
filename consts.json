@@ -13,5 +13,8 @@
     },
     "userSession" : {
         "sessionTime" : 120000
+    },
+    "forecast" : {
+        "CRON_TIME" : "00 00 10 * * 1-5"
     }
 }

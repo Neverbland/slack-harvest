@@ -20,10 +20,13 @@ var
     notifier = require('./app/services/notifier'),
     reportNotifier = require('./app/services/report')(slack, harvest),
     slackNotifier = require('./app/services/slack/notifier')(slack, harvest),
+    slackForecastNotifier = require('./app/services/slack/notifier/forecast')(slack, harvest),
     slackReminder = require('./app/services/slack/notifier/remind')(slack, harvest),
     i18n = require('i18n'),
+    forecast = require('./app/services/forecast')('default', config.forecast),
     server
 ;
+
 
 i18n.configure({
     locales : ['en'],
@@ -41,8 +44,9 @@ i18n.configure({
 harvest.setUsers(config.users);
 slack.setUsers(config.users);
 
-// Defining two notification channels
+// Defining three notification channels
 notifier.addNotifier('users', slackNotifier);
+notifier.addNotifier('forecast', slackForecastNotifier);
 notifier.addNotifier('reminder', slackReminder);
 notifier.addNotifier('management', reportNotifier);
 
