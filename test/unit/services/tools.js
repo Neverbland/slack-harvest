@@ -160,7 +160,7 @@ describe('tools', function () {
                 { given : 1.5, expected : "01:30"},
                 { given : 2.29, expected : "02:17"},
                 { given : 2.31, expected : "02:18"},
-                { given : 34.20, expected : "34:12"},
+                { given : 34.20, expected : "34:12"}
             ];
 
 
@@ -168,6 +168,25 @@ describe('tools', function () {
                 var expected = value.expected,
                     given = value.given,
                     returned = tools.formatTime(given);
+
+                    expect(returned).to.equal(expected);
+            });
+        });
+    });
+    
+    
+    describe('tools.formatSeconds', function () {
+        it ('Should return time in HH:MM format for given number of seconds.', function () {
+            var input = [
+                { given : 3600, expected : "01:00"},
+                { given : 5400, expected : "01:30"}
+            ];
+
+
+            _.each(input, function (value) {
+                var expected = value.expected,
+                    given = value.given,
+                    returned = tools.formatSeconds(given);
 
                     expect(returned).to.equal(expected);
             });

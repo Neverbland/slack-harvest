@@ -41,17 +41,16 @@ function aggregateByUser (assignments)
     var results = {};
     _.each(assignments, function (assignment) {
         var person = assignment.person,
-            harvestUserId = person ? person.harvest_user_id : null,
-            project = assignment.project
+            harvestUserId = person ? person.harvest_user_id : null
         ;
         
         if (harvestUserId) {
             results[harvestUserId] = results[harvestUserId] || {
                 person : person,
-                projects : []
+                assignments : []
             };
             
-            results[harvestUserId].projects.push(project);            
+            results[harvestUserId].assignments.push(assignment);            
         }
     });
     
@@ -61,7 +60,7 @@ function aggregateByUser (assignments)
 
 function format (title, text)
 {
-    return [title, text].join("\n");
+    return "\n" + [title, text].join("\n") + "\n";
 }
 
 
@@ -133,9 +132,9 @@ var SlackNotifierPrototype = function ()
     {
         
         var name = userAssignments.person.first_name + ' ' + userAssignments.person.last_name;
-        return i18n.__('Projects assignments schedule for {{name}}:', {
+        return '*' + i18n.__('Projects assignments schedule for {{name}}:', {
             name : name
-        });
+        }) + '*';
 
     }
     
@@ -143,21 +142,22 @@ var SlackNotifierPrototype = function ()
     /**
      * prepares the text and triggers propper event when ready
      * 
-     * @param       {Array}        userAssignments
+     * @param       {Object}        userAssignments
      * @returns     {undefined}
      */
     this.prepareText = function (userAssignments)
     {
         var results = [];
-        _.each(userAssignments, function (assignment) {
+
+        _.each(userAssignments.assignments, function (assignment) {
             var text = [],
                 project = assignment.project,
                 client = project ? assignment.project.client : null,
-                timeSeconds = assignment.project.allocation,
-                timeText = tools.formatTime(timeSeconds)
+                timeSeconds = assignment.allocation,
+                timeText = tools.formatSeconds(Number(timeSeconds))
             ;
-
-            text.push(timeSeconds);
+            
+            text.push(timeText);
             if (client) {
                 text.push(client.name);
             }
@@ -168,8 +168,6 @@ var SlackNotifierPrototype = function ()
             if (!project && !client) {
                 text.push(i18n.__('N/A'));
             }
-            
-            text.push(timeText);
             
             results.push(text.join(' - '));
         });
