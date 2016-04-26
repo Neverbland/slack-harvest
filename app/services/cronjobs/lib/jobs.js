@@ -344,7 +344,9 @@ module.exports = function (config, additionalJobs)
                 configValues = [configValues];
             }
             _.each(configValues, function (configValue) {
-                jobsHolder.addJob(job, configValue);
+                if (job.getJob() !== null) {
+                    jobsHolder.addJob(job, configValue);
+                }
             });
         }
     });

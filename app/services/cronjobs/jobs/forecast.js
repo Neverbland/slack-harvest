@@ -3,7 +3,7 @@
 
 var 
     i18n        =       require('i18n'),
-    notifier    =       require('./../../notifier/index.js')
+    notifier    =       require('./../../notifier/index.js'),
     consts      =       require('./../../../../consts.json'),
     forecast    =       require('./../../forecast')('default'),
     logger      =       require('./../../logger.js')('default'),
@@ -20,6 +20,9 @@ var
         {
            return function ()
            {
+               if (forecast === null) {
+                   return null;
+               }
                var options = {
                    startDate : moment().startOf('day'),
                    endDate : moment().endOf('day')

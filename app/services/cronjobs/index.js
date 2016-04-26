@@ -24,8 +24,9 @@ module.exports = function (app, config) {
             conf = config[baseName] || {},
             job = require(file)
         ;
-        
-        cronJobs.addJob(job, conf);
+        if (job.getJob() !== null) {
+            cronJobs.addJob(job, conf);
+        }
         
         next();
     });

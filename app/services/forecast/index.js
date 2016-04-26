@@ -170,7 +170,7 @@ module.exports = function (key, config)
     if (!!instances[key]) {
         return instances[key];
     } else {
-        if (!!config && !!config.accountId && config.authorization) {
+        if (!!config && !!config.accountId && !!config.authorization) {
             instances[key] = new ForecastWrapper(config);
             return instances[key];
         }
