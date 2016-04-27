@@ -66,7 +66,7 @@ var
          */
         shouldRunNow : function (config)
         {
-           return false;
+           return true;
         },
 
 

@@ -4,7 +4,6 @@
 var _           =   require('lodash'),
     events      =   require("events"),
     logger      =   require('./../../logger.js')('default'),
-    tools       =   require('./../../tools.js'),
     i18n        =   require('i18n'),
     instance    =   null
 ;
@@ -31,58 +30,25 @@ function getUserName (users, harvestUserId)
 
 
 /**
- * Aggregates assignments by user
- * 
- * @param       {Object}        assignments
- * @returns     {Object}
- */
-function aggregateByUser (assignments)
-{
-    var results = {};
-    _.each(assignments, function (assignment) {
-        var person = assignment.person,
-            harvestUserId = person ? person.harvest_user_id : null
-        ;
-        
-        if (harvestUserId) {
-            results[harvestUserId] = results[harvestUserId] || {
-                person : person,
-                assignments : []
-            };
-            
-            results[harvestUserId].assignments.push(assignment);            
-        }
-    });
-    
-    return results;
-}
-
-
-function format (title, text)
-{
-    return "\n" + [title, text].join("\n") + "\n";
-}
-
-
-/**
  * Sends notifications via slack
  * 
  * @author      Maciej Garycki <maciej@neverbland.com>
  * 
  * @param       {Object}    slack       The slack object
  * @param       {Object}    harvest     The harvest object
+ * @param       {Object}    viewBuilder Forecast slack message view builder
  * @constructor
  */
-function SlackNotifier (slack, harvest)
+function SlackNotifier (slack, harvest, viewBuilder)
 {
     this.slack = slack;
     this.harvest = harvest;
+    this.viewBuilder = viewBuilder;
 }
 
 
 var SlackNotifierPrototype = function () 
 {
-   
     /**
      * Sends notification to slack
      * 
@@ -93,23 +59,23 @@ var SlackNotifierPrototype = function ()
     {
         var that = this,
             assignments = slackContext.assignments,
-            assignmentsByUser = aggregateByUser(assignments)
+            assignmentsByUser = that.viewBuilder.aggregateByUser(assignments)
         ;
         _.each(assignmentsByUser, function (userAssignments, harvestId) {
             if (!userAssignments.assignments.length) {
                 return;
             }
-            var text = that.prepareText(userAssignments),
-                title = that.prepareTitle(userAssignments),
-                slackId = getUserName(that.slack.users, harvestId),
-                fullText = format(title, text)
+            
+            
+            var slackId = getUserName(that.slack.users, harvestId),
+                view = that.viewBuilder.getView(userAssignments)
             ;
             
             if (!slackId) {
                 return;
             }
             
-            that.slack.sendMessage(fullText, {
+            that.slack.sendMessage(view, {
                 channel : '@' + slackId
             }, function (err, httpResponse, body) {
                 if (err === null) {
@@ -120,60 +86,6 @@ var SlackNotifierPrototype = function ()
             });
         });
     };
-    
-    
-    
-    /**
-     * 
-     * @param   {Object}     userAssignments
-     * @returns {undefined}
-     */
-    this.prepareTitle = function (userAssignments)
-    {
-        
-        var name = userAssignments.person.first_name + ' ' + userAssignments.person.last_name;
-        return '*' + i18n.__('Projects assignments schedule for {{name}}:', {
-            name : name
-        }) + '*';
-
-    }
-    
-    
-    /**
-     * prepares the text and triggers propper event when ready
-     * 
-     * @param       {Object}        userAssignments
-     * @returns     {undefined}
-     */
-    this.prepareText = function (userAssignments)
-    {
-        var results = [];
-
-        _.each(userAssignments.assignments, function (assignment) {
-            var text = [],
-                project = assignment.project,
-                client = project ? assignment.project.client : null,
-                timeSeconds = assignment.allocation,
-                timeText = tools.formatSeconds(Number(timeSeconds))
-            ;
-            
-            text.push(timeText);
-            if (client) {
-                text.push(client.name);
-            }
-            if (project) {
-                text.push(project.name);
-            }
-            
-            if (!project && !client) {
-                text.push(i18n.__('N/A'));
-            }
-            
-            results.push(text.join(' - '));
-        });
-        
-        return results.join("\n");
-    };
 };
 
 SlackNotifierPrototype.prototype = new events.EventEmitter();
@@ -182,8 +94,8 @@ SlackNotifierPrototype.prototype = new events.EventEmitter();
 SlackNotifier.prototype = new SlackNotifierPrototype();
 SlackNotifier.prototype.constructor = SlackNotifier;
 
-module.exports = function (slack, harvest) {
-    instance = new SlackNotifier(slack, harvest);
+module.exports = function (slack, harvest, viewBuilder) {
+    instance = new SlackNotifier(slack, harvest, viewBuilder);
     module.exports.instance = instance;
     
     return instance;
