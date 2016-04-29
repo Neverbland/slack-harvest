@@ -163,11 +163,12 @@ ForecastWrapper.prototype.constructor = ForecastWrapper;
  * 
  * @param   {String}    key
  * @param   {Object}    config
+ * @param   {Boolean}   update
  * @returns {Harvest}
  */
-module.exports = function (key, config)
+module.exports = function (key, config, update)
 {
-    if (!!instances[key]) {
+    if (!!instances[key] && !update) {
         return instances[key];
     } else {
         if (!!config && !!config.accountId && !!config.authorization) {
