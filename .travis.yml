@@ -4,6 +4,6 @@ node_js:
   - "0.11"
   - "0.10"
 
-branches:
-  except:
-    - feature/forecast
+#branches:
+#  except:
+#    - feature/forecast
