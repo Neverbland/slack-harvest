@@ -6,7 +6,7 @@ var
     interactiveSession  =   require('./../user_session.js'),
     tools               =   require('./../../../tools.js'),
     _                   =   require('lodash'),
-    Config              =   require('./../../../../../config/model/config'),
+    Config              =   require('./../../../../../config/model/config')('default'),
     i18n                =   require('i18n'),
     logger              =   require('./../../../logger.js')('default'),
     StepProvider        =   require('./../step_provider.js'),

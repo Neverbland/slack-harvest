@@ -6,7 +6,8 @@ var
     _           =       require('lodash'),
     logger      =       require('./../../app/services/logger')('default'),
     i18n        =       require('i18n'),
-    Config = require('./../model/config'),
+    sequelize   =       require('./../../app/services/db/index')('default'),
+    Config      =       require('./../model/config')('default', sequelize),
     formatResults = function (results) {
         var returnResults = {};
         _.each(results, function (result) {
