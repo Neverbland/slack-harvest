@@ -2,7 +2,7 @@
 'use strict';
 
 var 
-    forecastScheduleProvider,
+    assignPersonProvider,
     interactiveSession  =   require('./../user_session.js'),
     tools               =   require('./../../../tools.js'),
     _                   =   require('lodash'),
@@ -10,29 +10,34 @@ var
     i18n                =   require('i18n'),
     logger              =   require('./../../../logger.js')('default'),
     StepProvider        =   require('./../step_provider.js'),
-    forecast,
-    validNames          =   [
-        'accountId', 
-        'authorization'
-    ],
-    validateName        =   function (name) {
-        if (_.indexOf(validNames, name) !== -1) {
-            return name;
-        } else {
-            return false;
-        }
+    slack               =   require('./../../../slack/index')('default'),
+    harvest             =   require('./../../../harvest/index')('default'),
+    /**
+     * Validates the slack name
+     * 
+     * @param   {String}    slackName       The slack name to validate
+     */
+    validateSlackName = function (slackName) {
+        var regex = /[a-zA-Z_\.]+/,
+            isValid = regex.test(slackName)
+        ;
+        
+        return isValid;
+    },
+    validateHarvestId = function (harvestId) {
+        return !isNaN(parseInt(harvestId));
     }
 ;
 
-forecastScheduleProvider = new StepProvider('updateForecast');
-forecastScheduleProvider.addStep(1, {
+assignPersonProvider = new StepProvider('assignPerson');
+assignPersonProvider.addStep(1, {
     execute : function (params, callback)
     {
         
         var 
             action = tools.validateGet(params, 'action'),
             userId = params.userId,
-            name = (function (params) {
+            slackName = (function (params) {
                 var nameParts,
                     name
                 ;
@@ -43,27 +48,23 @@ forecastScheduleProvider.addStep(1, {
                     return null;
                 }
                 
-                if (!validateName(name)) {
-                    return null;
-                }
-                
-                return name;
+                return validateSlackName(name);
             })(params),
-            value = (function (params) {
+            harvestId = (function (params) {
                 var nameParts,
-                    value,
+                    id,
                     name
                 ;
                 
                 try {
                     nameParts = tools.validateGet(params, 'name').split(' ');
                     name = nameParts.shift();
-                    value = nameParts.join(' ');
+                    id = nameParts.join(' ');
                 } catch (err) {
                     return null;
                 }
                                 
-                return value;
+                return validateHarvestId(id);
             })(params),
             step,        
             handleCallback = function () {
@@ -72,15 +73,20 @@ forecastScheduleProvider.addStep(1, {
                             .createStep(userId, {}, action)
                 ;
                 
-                Config.getConfigMatching('forecast', function (result) {
-                    forecast = require('./../../../forecast/index')('default', result, true);
+                Config.getConfigMatching('users', function (results) {
+                    harvest.setUsers(results);
                     callback(null, step);
                 });
             }
         ;
         
-        if (!name || !value) {
-            callback(i18n.__('Invalid parameter name/value provided!'), null);
+        if (!slackName) {
+            callback(i18n.__('Invalid parameter slackName provided!'), null);
+            return;
+        }
+        
+        if (!harvestId) {
+            callback(i18n.__('Invalid parameter harvestId provided!'), null);
             return;
         }
         
@@ -91,27 +97,27 @@ forecastScheduleProvider.addStep(1, {
         
         Config.find({
             where : {
-                name : 'forecast.' + name
+                name : 'users.' + harvestId
             }
         }).then(function (record) {
             if (record) {
                 record.updateAttributes({
-                    value : value
+                    value : slackName
                 }).then(function () {
                     logger.log(i18n.__('Updated config record for {{name}} with value {{value}}', {
-                        name : 'forecast.' + name,
-                        value : value
+                        name : 'users.' + harvestId,
+                        value : slackName
                     }), {});
                     handleCallback();
                 });
             } else {
                 Config.create({
-                    name : name,
-                    value : value
+                    name : 'forecast.' + harvestId,
+                    value : slackName
                 }).then(function () {
                     logger.log(i18n.__('Created new config record for {{name}} with value {{value}}', {
-                        name : 'forecast.' + name,
-                        value : value
+                        name : 'users.' + harvestId,
+                        value : slackName
                     }), {});
                     handleCallback();
                 });
@@ -137,10 +143,10 @@ forecastScheduleProvider.addStep(1, {
     {
         return [
             "",
-            i18n.__('Successfully updated forecast setting.'),
+            i18n.__('Successfully updated user mapping setting.'),
             ""
         ].join("\n");
     }
 });
 
-module.exports = forecastScheduleProvider; 
+module.exports = assignPersonProvider; 
