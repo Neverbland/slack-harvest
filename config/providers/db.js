@@ -14,7 +14,7 @@ var
             
             var name = result.name,
                 value = result.value,
-                resultObject = Config.buildObject(value, name.split('.'), (name.split('.').length -1))
+                resultObject = Config.buildObject(value, name)
             ;
             
             logger.log(i18n.__('Merged config for {{name}} with value {{value}}', {

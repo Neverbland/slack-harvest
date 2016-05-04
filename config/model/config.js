@@ -12,11 +12,14 @@ var Sequelize   =       require('sequelize'),
         }
     },
     extendModel = function (Config) {
-        Config.buildObject = function (obj, namespaceArray, pos) {
-            var output = {};
-            output[namespaceArray[pos]] = obj;
-            if (pos > 0) {
-                output = Config.buildObject(output, namespaceArray, (pos - 1));
+        Config.buildObject = function (obj, namespaceString) {
+            var output = {},
+                namespaceArray = namespaceString.split('.'),
+                lastPart = namespaceArray.pop()
+            ;
+            output[lastPart] = obj;
+            if (namespaceArray.length) {
+                output = Config.buildObject(output, namespaceArray.join('.'));
             }
 
             return output;
@@ -46,9 +49,7 @@ var Sequelize   =       require('sequelize'),
                     }
                     var name = result.name,
                         value = result.value,
-                        splitName = name.split('.'),
-                        remainingLength = splitName.length - 1,
-                        resultObject = that.buildObject(value, splitName, remainingLength)
+                        resultObject = that.buildObject(value, name)
                     ;
 
                     _.defaultsDeep(returnResults, resultObject);

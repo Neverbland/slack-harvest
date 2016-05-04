@@ -11,6 +11,26 @@ var
 
 describe('Config model test', function () {
     
+    describe('Config.buildObject', function () {
+        it('Should create a namespaced object from given string with namespace parts separated by dots and given value.', function () {
+            var 
+                namespace = 'test',
+                testName = namespace + '.value.expected',
+                testValue = 'This is value',
+                expected = {
+                    test : {
+                        value : {
+                            expected : testValue
+                        }
+                    }
+                },
+                result = Config.buildObject(testValue, testName);
+                
+                expect(result).to.deep.equal(expected);
+            ;
+        });
+    });
+    
     describe('Config.getConfigMatching', function () {
         it('Should provide proper config object for given values.', function () {
             var 
@@ -32,7 +52,7 @@ describe('Config model test', function () {
                 value : testValue
             }).then(function () {
                 Config.getConfigMatching(namespace, function (result) {
-                    expect(result).to.deep.equal(expected.test);
+                    expect(result).to.deep.equal(expected[namespace]);
                 });
             });
         });
