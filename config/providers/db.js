@@ -47,6 +47,13 @@ var
 ;
 
 
+/**
+ * Provides a promise object that resolves once the database provides additional
+ * config.
+ * 
+ * @param       {Object}    config
+ * @returns     {Object}    Promise object
+ */
 module.exports = function (config)
 {
     var def = Q.defer();
