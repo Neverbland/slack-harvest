@@ -19,7 +19,7 @@ var
         if (_.indexOf(validNames, name) !== -1) {
             return name;
         } else {
-            return false;
+            throw new Error(i18n.__('Invalid parameter name!'));
         }
     }
 ;
@@ -30,8 +30,10 @@ forecastScheduleProvider.addStep(1, {
     {
         
         var 
+            step,
             action = tools.validateGet(params, 'action'),
             userId = params.userId,
+            error = null,
             name = (function (params) {
                 var nameParts,
                     name
@@ -40,15 +42,44 @@ forecastScheduleProvider.addStep(1, {
                     nameParts = tools.validateGet(params, 'name').split(' ');
                     name = nameParts[0];
                 } catch (err) {
+                    error = err;
                     return null;
                 }
-                
-                if (!validateName(name)) {
+                try {
+                    return validateName(name);
+                } catch (err) {
+                    error = err;
                     return null;
                 }
-                
-                return name;
             })(params),
+            validateAccountId = function (value) {
+                var regex = /^[0-9]{5,6}$/,
+                    isValid = regex.test(value)
+                ;
+                if (!isValid) {
+                    throw new Error(i18n.__('Invalid account ID!'));
+                }
+                
+                return value;
+            },
+            validateToken = function (value) {
+                var regex = /^(Bearer )([0-9]{5}.)([a-zA-Z0-9\-\_]{86})$/,
+                    isValid = regex.test(value)
+                ;
+                if (!isValid) {
+                    throw new Error(i18n.__('Invalid Token!'));
+                }
+                
+                return value;
+            },
+            validateValue = function (value, name) {
+                switch (name) {
+                    case validNames[0]:
+                        return validateAccountId(value);
+                    case validNames[1]:
+                        return validateToken(value);
+                }
+            },
             value = (function (params) {
                 var nameParts,
                     value,
@@ -60,12 +91,16 @@ forecastScheduleProvider.addStep(1, {
                     name = nameParts.shift();
                     value = nameParts.join(' ');
                 } catch (err) {
+                    error = err;
                     return null;
                 }
-                                
-                return value;
-            })(params),
-            step,        
+                try {                
+                    return validateValue(value, name);
+                } catch (err) {
+                    error = err;
+                    return null;
+                }
+            })(params),        
             handleCallback = function () {
                 step = interactiveSession
                             .getDefault()
@@ -80,7 +115,7 @@ forecastScheduleProvider.addStep(1, {
         ;
         
         if (!name || !value) {
-            callback(i18n.__('Invalid parameter name/value provided!'), null);
+            callback(error.message, null);
             return;
         }
         

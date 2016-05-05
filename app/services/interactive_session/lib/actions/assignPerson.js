@@ -18,7 +18,7 @@ var
      * @param   {String}    slackName       The slack name to validate
      */
     validateSlackName = function (slackName) {
-        var regex = /[a-zA-Z_\.]+/,
+        var regex = /^[a-zA-Z_\.]+$/,
             isValid = regex.test(slackName)
         ;
         
