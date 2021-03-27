@@ -12,7 +12,7 @@
     "mysql": "2.5.2",
     "cron": "1.0.9",
     "lodash": "2.4.1",
-    "request": "2.55.0",
+    "request": "2.88.2",
     "express-validator": "2.7.0",
     "express-session": "1.9.3",
     "express-session-json": "0.0.7",
