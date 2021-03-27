@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "express": "4.7.2",
-    "knex": "0.7.3",
+    "knex": "0.95.1",
     "q": "1.0.1",
     "body-parser": "1.9.2",
     "mysql": "2.5.2",
