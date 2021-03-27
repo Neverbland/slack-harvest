@@ -5,7 +5,7 @@
     "test": "env env=test mocha --recursive"
   },
   "dependencies": {
-    "express": "4.7.2",
+    "express": "4.17.1",
     "knex": "0.7.3",
     "q": "1.0.1",
     "body-parser": "1.9.2",
