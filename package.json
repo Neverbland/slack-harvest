@@ -8,7 +8,7 @@
     "express": "4.7.2",
     "knex": "0.7.3",
     "q": "1.0.1",
-    "body-parser": "1.9.2",
+    "body-parser": "1.19.0",
     "mysql": "2.5.2",
     "cron": "1.0.9",
     "lodash": "2.4.1",
