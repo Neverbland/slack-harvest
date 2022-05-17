@@ -5,7 +5,7 @@
     "test": "env env=test mocha --recursive"
   },
   "dependencies": {
-    "express": "4.7.2",
+    "express": "4.15.3",
     "knex": "0.7.3",
     "q": "1.0.1",
     "body-parser": "1.9.2",
@@ -14,7 +14,7 @@
     "lodash": "2.4.1",
     "request": "2.55.0",
     "express-validator": "2.7.0",
-    "express-session": "1.9.3",
+    "express-session": "1.15.3",
     "express-session-json": "0.0.7",
     "syslogh": "1.1.2",
     "harvest": "gacek85/node-harvest#master",
