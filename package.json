@@ -5,14 +5,14 @@
     "test": "env env=test mocha --recursive"
   },
   "dependencies": {
-    "express": "4.7.2",
+    "express": "4.17.3",
     "knex": "0.7.3",
     "q": "1.0.1",
-    "body-parser": "1.9.2",
+    "body-parser": "1.19.2",
     "mysql": "2.5.2",
     "cron": "1.0.9",
     "lodash": "2.4.1",
-    "request": "2.55.0",
+    "request": "2.73.0",
     "express-validator": "2.7.0",
     "express-session": "1.9.3",
     "express-session-json": "0.0.7",
